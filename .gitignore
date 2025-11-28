@@ -1,3 +1,10 @@
+# Generated data files
+*.csv
+*.png
+debug_orders.py
+test_weibull.py
+verify_data.py
+
 # Logs
 logs
 *.log
