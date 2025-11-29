@@ -16,7 +16,9 @@ export const mockUsers: User[] = [
 
 export function validateCredentials(email: string, password: string): User | null {
   // Simple mock validation - in production, this would hit an API
-  if (email === 'planner@borg.com' && password === 'demo123') {
+  // Accept both old and new demo credentials for backward compatibility
+  if ((email === 'planner@borg.com' && password === 'demo123') ||
+      (email === 'demo@borgai.platform' && password === 'demo1234')) {
     return mockUsers[0];
   }
   return null;

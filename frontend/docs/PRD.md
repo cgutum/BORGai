@@ -1,14 +1,14 @@
 Product Requirements Document (PRD)
-Core Supply Forecasting AI Dashboard MVP
+BORGai - Core Supply Forecasting AI Dashboard MVP
 
 BORG Automotive Remanufacturing Challenge 2025
 1. EXECUTIVE SUMMARY
 Vision Statement
 
-A real-time, AI-powered supply chain forecasting dashboard that enables BORG Automotive's supply chain planning teams to predict core supply volumes, optimize inventory levels, and make data-driven decisions about remanufacturing operations. The dashboard integrates multi-source data (internal historical records, external registrations, market trends, recall databases) with an ensemble machine learning model to forecast component availability 3-12 months ahead.
+BORGai is a real-time, AI-powered supply chain forecasting dashboard that enables BORG Automotive's supply chain planning teams to predict core supply volumes, optimize inventory levels, and make data-driven decisions about remanufacturing operations. The platform integrates multi-source data (internal historical records, external registrations, market trends, recall databases) with an ensemble machine learning model to forecast component availability 3-12 months ahead.
 Product Goal
 
-Build an MVP dashboard that visualizes AI core supply forecasts, model performance metrics, and actionable insights—transforming raw predictions into strategic supply chain intelligence for supply chain managers, warehouse operators, and logistics coordinators.
+Build an MVP dashboard (BORGai) that visualizes AI core supply forecasts, model performance metrics, and actionable insights—transforming raw predictions into strategic supply chain intelligence for supply chain managers, warehouse operators, and logistics coordinators.
 Key Success Metrics
 
     Forecast Accuracy: ≤ 20% MAPE (Mean Absolute Percentage Error) for 3-month horizon on test data
@@ -44,7 +44,7 @@ Industry leaders (e.g., C3.ai customers in remanufacturing) achieve:
 
     Real-time KPI dashboards for supply chain visibility
 
-BORG's MVP dashboard will establish foundational capability to compete.
+BORG's MVP dashboard (BORGai) will establish foundational capability to compete.
 Data Opportunity
 
 BORG has untapped data sources:
