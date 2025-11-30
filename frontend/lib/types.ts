@@ -23,7 +23,8 @@ export type StockStatus = 'in_stock' | 'low_stock' | 'out_of_stock';
 
 export type WarehouseLocation = 'Warehouse A' | 'Warehouse B' | 'Warehouse C';
 
-export interface Core {
+// Legacy Core interface (keep for backward compatibility)
+export interface LegacyCore {
   id: string;
   part_number: string;
   description: string;
@@ -38,6 +39,86 @@ export interface Core {
   yield_rate: number;
   lead_time_days: number;
   turn_rate: number;
+}
+
+// ===== REMAN Dashboard Types =====
+
+export interface CoreCategory {
+  id: string;                    // 'turbocharger'
+  name: string;                  // 'Turbocharger'
+  description?: string;
+  coreCount: number;             // Number of cores in this category
+}
+
+export interface Core {
+  core_id: string;               // 'TC_BMW_x3_2023'
+  category_id: string;           // 'turbocharger'
+  category: string;              // 'Turbocharger' (display name)
+  brand: string;                 // 'BMW'
+  model: string;                 // 'x3'
+  year: number;                  // 2023
+  status: 'Active' | 'Inactive';
+  isFavorite?: boolean;          // For "Planner's Favorites" preset
+  isPriority?: boolean;          // For "High Priority" preset
+  displayName: string;           // "BMW x3 2023"
+  fullDisplayName: string;       // "BMW x3 2023 (TC_BMW_x3_2023)"
+}
+
+export interface Component {
+  component_id: string;          // 'TC_BMW_x3_2023_Housing'
+  core_id: string;               // 'TC_BMW_x3_2023'
+  component_type: string;        // 'Housing'
+  condition_rate: number;        // 78 (percentage 0-100)
+  displayName: string;           // "Housing (78%)"
+}
+
+export interface WeeklyForecast {
+  week_start: string;            // 'YYYY-MM-DD' format (Thursdays)
+  core_id: string;               // 'TC_BMW_x3_2023'
+  category: string;              // 'Turbocharger'
+  weekly_supply: number;         // 30-150 units
+}
+
+export interface ComponentForecast {
+  week_start: string;            // 'YYYY-MM-DD' format
+  component_id: string;          // 'TC_BMW_x3_2023_Housing'
+  core_id: string;               // 'TC_BMW_x3_2023'
+  core_supply: number;           // Core weekly supply
+  condition_rate: number;        // 78
+  component_supply: number;      // Pre-calculated: core_supply × (condition_rate / 100)
+}
+
+export interface ChartDataPoint {
+  date: string;                  // 'YYYY-MM-DD'
+  week_label: string;            // 'May 1' or 'Week 18'
+  totalSupply: number;           // Aggregated supply for selected filters
+  isHistorical: boolean;         // true if date < today
+  isForecast: boolean;           // true if date >= today
+  breakdown: {                   // Core-level breakdown for tooltip
+    core_id: string;
+    core_display: string;
+    supply: number;
+    color: string;               // For stacked bars
+  }[];
+}
+
+export type PresetType = 'all' | 'favorites' | 'high-priority' | 'standard' | 'custom';
+export type TimeRangeType = '1month' | '3months' | '6months' | '1year';
+
+export interface FilterState {
+  preset: PresetType;
+  categories: string[];          // Array of category IDs
+  cores: string[];               // Array of core IDs
+  components: string[];          // Array of component IDs
+  timeRange: TimeRangeType;
+}
+
+export interface AggregatedKPIs {
+  totalSupply: number;              // Sum of weekly_supply across selected cores
+  averageConditionRate: number;     // Average of all components in selected cores
+  coreCount: number;                // Number of cores in selection
+  componentCount: number;           // Number of components available
+  forecastAccuracy: number;         // Placeholder for now (will specify later)
 }
 
 export type OrderStatus = 
