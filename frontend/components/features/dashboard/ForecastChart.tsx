@@ -60,9 +60,9 @@ export function ForecastChart() {
   };
   
   return (
-    <Card className="p-6 bg-white rounded-xl shadow-sm">
+    <Card className="p-4 bg-gray-50 rounded-lg border-0 shadow-none">
       {/* Header */}
-      <h2 className="text-lg font-semibold text-[#000000] mb-4">
+      <h2 className="text-base font-semibold text-[#000000] mb-2">
         Forecast Chart
       </h2>
       
@@ -77,28 +77,33 @@ export function ForecastChart() {
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={chartData}
-            margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+            margin={{ top: 20, right: 10, left: 20, bottom: 5 }}
           >
             {/* Grid */}
             <CartesianGrid 
-              stroke="#E5E5E5" 
-              strokeDasharray="0" 
-              vertical={false}
+              stroke="#D3D0CC" 
+              strokeDasharray="3 3" 
+              vertical={true}
+              horizontal={true}
             />
             
             {/* Axes */}
             <XAxis 
-              dataKey="week_label"
+              dataKey="date"
               tick={{ fontSize: 11, fill: '#6E685F' }}
               tickLine={false}
               axisLine={{ stroke: '#E5E5E5' }}
+              tickFormatter={(value) => {
+                const point = chartData.find(d => d.date === value);
+                return point?.week_label || value;
+              }}
             />
             <YAxis 
               label={{ 
                 value: 'Quantity', 
                 angle: -90, 
                 position: 'insideLeft',
-                style: { fontSize: 12, fill: '#6E685F', fontWeight: 500 }
+                style: { fontSize: 12, fill: '#6E685F', fontWeight: 600 }
               }}
               tick={{ fontSize: 11, fill: '#6E685F' }}
               tickLine={false}
@@ -107,11 +112,12 @@ export function ForecastChart() {
               ticks={Array.from({ length: Math.floor(yAxisMax / 25) + 1 }, (_, i) => i * 25)}
             />
             
+            
             {/* Confidence Band (rendered first, behind everything) */}
             <Area
               type="monotone"
               dataKey="confidenceUpper"
-              fill="rgba(0, 101, 189, 0.15)"
+              fill="rgba(0, 0, 0, 0.1)"
               stroke="none"
               fillOpacity={1}
               isAnimationActive={false}
@@ -129,14 +135,14 @@ export function ForecastChart() {
             <Bar 
               dataKey="actualSupply" 
               fill="#0065BD" 
-              radius={[4, 4, 0, 0]}
+              radius={[2, 2, 0, 0]}
               isAnimationActive={false}
             />
             <Bar 
               dataKey="confirmedSupply" 
               fill="#0065BD" 
               fillOpacity={0.7}
-              radius={[4, 4, 0, 0]}
+              radius={[2, 2, 0, 0]}
               isAnimationActive={false}
             />
             
@@ -153,24 +159,24 @@ export function ForecastChart() {
               connectNulls={false}
             />
             
-            {/* AI Forecast Line (blue, solid then dashed) */}
+            {/* AI Forecast Line (black, solid then dashed) */}
             {/* Split into two lines: historical (solid) and future (dashed) */}
             <Line
               type="monotone"
               dataKey={(dataPoint) => dataPoint.isHistorical ? dataPoint.aiForecast : null}
-              stroke="#0065BD"
+              stroke="#000000"
               strokeWidth={3}
-              dot={<CustomDot />}
+              dot={false}
               isAnimationActive={false}
               connectNulls={true}
             />
             <Line
               type="monotone"
               dataKey={(dataPoint) => dataPoint.isFuture ? dataPoint.aiForecast : null}
-              stroke="#0065BD"
+              stroke="#000000"
               strokeWidth={3}
               strokeDasharray="10 6"
-              dot={<CustomDot />}
+              dot={false}
               isAnimationActive={false}
               connectNulls={true}
             />
@@ -183,7 +189,7 @@ export function ForecastChart() {
                 strokeWidth={2}
                 strokeDasharray="8 4"
                 label={{
-                  value: 'TODAY',
+                  value: 'Today',
                   position: 'top',
                   style: { 
                     fontSize: 12, 
@@ -204,9 +210,9 @@ export function ForecastChart() {
       </div>
       
       {/* Year Label */}
-      <div className="text-center mt-2 mb-2">
-        <span className="text-xs font-medium text-[#000000]">
-          2025
+      <div className="text-center mt-0 mb-1">
+        <span className="text-xs font-semibold text-[#6E685F]">
+          {timeRange === '1month' || timeRange === '3months' ? '2025' : '2025 - 2026'}
         </span>
       </div>
       

@@ -102,7 +102,7 @@ export function ChartControls({ timeRange, onTimeRangeChange }: ChartControlsPro
         
         {/* Sync to ERP Button */}
         <Button
-          className="h-9 px-4 text-sm font-semibold bg-[#A2AD00] text-white hover:bg-[#8A9400] border-0"
+          className="h-9 px-4 text-sm font-semibold bg-[#000000] text-white hover:bg-[#333333] border-0"
           onClick={handleSyncERP}
         >
           <RefreshCw className="w-4 h-4 mr-2" />

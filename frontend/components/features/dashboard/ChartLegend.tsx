@@ -12,7 +12,7 @@ export function ChartLegend() {
           />
         </svg>
       ),
-      label: 'Today Line'
+      label: 'Today'
     },
     {
       id: 'historical',
@@ -34,7 +34,7 @@ export function ChartLegend() {
         <svg width="20" height="12" viewBox="0 0 20 12">
           <line 
             x1="0" y1="6" x2="20" y2="6" 
-            stroke="#0065BD" 
+            stroke="#000000" 
             strokeWidth="3"
           />
         </svg>
@@ -44,7 +44,7 @@ export function ChartLegend() {
     {
       id: 'confidence',
       visual: (
-        <div className="w-5 h-3 bg-[#0065BD] opacity-15 rounded-sm" />
+        <div className="w-5 h-3 bg-[#000000] opacity-10 rounded-sm" />
       ),
       label: 'AI 95% Confidence Band'
     },
