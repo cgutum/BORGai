@@ -41,7 +41,6 @@ Version: 2.0 - Ready for Implementation
 │                                                          │
 │  ┌─────────────────────────────────────────────────┐   │
 │  │              TOP BRANDING (centered)             │   │
-│  │    [BORGai Logo - logo_no_bg.svg] (96px height) │   │
 │  │    BORGai                (36px, TUM Blue, bold) │   │
 │  │    Intelligent Core Supply Forecasting Platform │   │
 │  │    (16px, Grey, weight 600)                     │   │
@@ -78,7 +77,7 @@ Version: 2.0 - Ready for Implementation
 │  │               FOOTER (centered)                  │   │
 │  │    powered by                                    │   │
 │  │    Team 66 | Christian Güttler and Robert Hoffmann│
-│  │    REMAN Challenge 2025 - The Power of AI...    │   │
+│  │    REMAN Challenge 2025 - Unlocking the Power...│   │
 │  │    [TUM Logo]  [BORGai Logo]                     │   │
 │  └─────────────────────────────────────────────────┘   │
 │                                                          │
@@ -309,24 +308,22 @@ Top Header Section (Updated with provided logos)
 
 text
 ┌────────────────────────────────────────────────┐
-│  [BORGai Logo - logo_no_bg.svg] (96px height)  │
 │  BORGai (36px, TUM Blue, bold)                 │
 │  Intelligent Core Supply Forecasting Platform  │
 └────────────────────────────────────────────────┘
 
-Logo Implementation:
-- BORGai Logo: Use logo_no_bg.svg (96px height, centered)
+Top Branding Implementation:
 - Platform title: "BORGai" - 36px, weight 700, #0065BD
 - Subtitle: 16px, weight 600, #6E685F
-- Spacing: 16px between logo and title
+- Centered alignment
 
 Footer Section (Updated structure):
 
 text
 ┌──────────────────────────────────────────────────────────────────────┐
-│  powered by (12px, #6E685F)                                      │
-│  Team 66 | Christian Güttler and Robert Hoffmann                 │
-│  REMAN Challenge 2025 - The Power of AI for Circular Industries │
+│  powered by (12px, #6E685F)                                            │
+│  Team 66 | Christian Güttler and Robert Hoffmann                       │
+│  REMAN Challenge 2025 - Unlocking the Power of AI for Circular Industries │
 │  [TUM Logo] [BORGai Logo]                                        │
 └──────────────────────────────────────────────────────────────────────┘
 
@@ -516,16 +513,15 @@ EXACT SPECIFICATIONS FOR IMPLEMENTATION:
 - Border-radius: 8px
 
 **Top Branding (Above card):**
-- Logo: logo_no_bg.svg - 96px height (centered, above text)
 - "BORGai" - 36px, weight 700, color #0065BD (TUM Blue)
 - "Intelligent Core Supply Forecasting Platform" - 16px, weight 600, color #6E685F (Grey)
 - Centered alignment
-- Spacing: 16px padding between logo and text, 24px margin-bottom
+- Spacing: 24px margin-bottom
 
 **Footer (Bottom of page, below card):**
 - Text line 1: "powered by" - 12px, #6E685F
 - Text line 2: "Team 66 | Christian Güttler and Robert Hoffmann" - 12px, #6E685F, weight 500
-- Text line 3: "REMAN Challenge 2025 - The Power of AI for Circular Industries" - 12px, #6E685F
+- Text line 3: "REMAN Challenge 2025 - Unlocking the Power of AI for Circular Industries" - 12px, #6E685F
 - Logos row: [TUM Logo] [BORGai Logo - logo_no_bg.svg]
 - Logos: 32px height each, horizontal layout with 16px gap
 - Centered alignment
@@ -602,7 +598,6 @@ EXACT SPECIFICATIONS FOR IMPLEMENTATION:
 ```
 LoginPage (page.tsx)
 ├── TopBranding (inline, centered)
-│   ├── BORGai Logo (logo_no_bg.svg)
 │   ├── Title "BORGai"
 │   └── Subtitle "Intelligent Core Supply..."
 └── LoginCard (white card, centered)

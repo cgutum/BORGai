@@ -67,15 +67,6 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Top Branding */}
         <div className="text-center mb-6">
-          <div className="flex justify-center mb-4">
-            <Image 
-              src="/logos/logo_no_bg.svg" 
-              alt="borgAI Logo" 
-              width={120} 
-              height={120}
-              className="h-24 w-auto"
-            />
-          </div>
           <h1 className="text-4xl font-bold text-[#0065BD] leading-tight">
             BORGai
           </h1>
@@ -241,7 +232,7 @@ export default function LoginPage() {
             Team 66 | Christian Güttler and Robert Hoffmann
           </p>
           <p className="text-xs text-[#6E685F] mb-4">
-            REMAN Challenge 2025 - The Power of AI for Circular Industries
+            REMAN Challenge 2025 - Unlocking the Power of AI for Circular Industries
           </p>
           <div className="flex items-center justify-center gap-4">
             <Image 
