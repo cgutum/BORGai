@@ -260,6 +260,7 @@ export function useChartData({ timeRange }: UseChartDataOptions): ChartDataPoint
         actualSupply: isHistorical ? generateActualSupply(value.supply) : null,
         confirmedSupply: isFuture ? generateConfirmedSupply(value.supply) : null,
         aiForecast: value.supply,
+        // Include isToday in future forecast elements so they show from Today marker onwards
         previousAiForecast: isFuture ? generatePreviousForecast(value.supply) : null,
         confidenceLower: isFuture ? Math.round(value.supply * 0.85) : null,
         confidenceUpper: isFuture ? Math.round(value.supply * 1.15) : null,
@@ -289,6 +290,18 @@ export function useChartData({ timeRange }: UseChartDataOptions): ChartDataPoint
       });
       
       dataPoints[closestIndex].isToday = true;
+      
+      // CRITICAL: Set forecast values for Today point so forecast elements start here
+      const todayPoint = dataPoints[closestIndex];
+      if (!todayPoint.previousAiForecast) {
+        todayPoint.previousAiForecast = generatePreviousForecast(todayPoint.aiForecast);
+      }
+      if (!todayPoint.confidenceLower) {
+        todayPoint.confidenceLower = Math.round(todayPoint.aiForecast * 0.85);
+      }
+      if (!todayPoint.confidenceUpper) {
+        todayPoint.confidenceUpper = Math.round(todayPoint.aiForecast * 1.15);
+      }
     }
     
     return dataPoints;

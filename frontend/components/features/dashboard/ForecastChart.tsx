@@ -27,8 +27,16 @@ export function ForecastChart() {
   // Find today's index for the reference line
   const todayIndex = chartData.findIndex(d => d.isToday);
   
-  // Get the date value for today's reference line
-  const todayDate = todayIndex >= 0 ? chartData[todayIndex].date : null;
+  // Calculate Today marker position - place it at the right edge of the today data point
+  // This ensures forecast lines extend TO the marker, not stop before it
+  let todayMarkerPosition = null;
+  if (todayIndex >= 0) {
+    // For Recharts with categorical scale, we position the marker slightly offset
+    // to ensure lines visually connect to it
+    const todayPoint = chartData[todayIndex];
+    todayMarkerPosition = todayPoint.date;
+  }
+  const todayDate = todayMarkerPosition;
   
   // Determine max value for Y-axis
   const maxValue = Math.max(
@@ -61,6 +69,8 @@ export function ForecastChart() {
   
   return (
     <Card className="p-4 bg-gray-50 rounded-lg border-0 shadow-none">
+      {/* White box wrapper around entire feature */}
+      <div className="bg-white rounded-lg p-4 shadow-sm">
       {/* Header */}
       <h2 className="text-base font-semibold text-[#000000] mb-2">
         Forecast Chart
@@ -72,8 +82,7 @@ export function ForecastChart() {
         onTimeRangeChange={setTimeRange}
       />
       
-      {/* Chart - wrapped in white box */}
-      <div className="bg-white rounded-lg p-3 mb-2">
+      {/* Chart */}
       <div className="w-full" style={{ height: '450px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
@@ -105,26 +114,7 @@ export function ForecastChart() {
               ticks={Array.from({ length: Math.floor(yAxisMax / 25) + 1 }, (_, i) => i * 25)}
             />
             
-            
-            {/* Confidence Band (rendered first, behind grid) */}
-            <Area
-              type="monotone"
-              dataKey="confidenceUpper"
-              fill="rgba(0, 0, 0, 0.1)"
-              stroke="none"
-              fillOpacity={1}
-              isAnimationActive={false}
-            />
-            <Area
-              type="monotone"
-              dataKey="confidenceLower"
-              fill="#FFFFFF"
-              stroke="none"
-              fillOpacity={1}
-              isAnimationActive={false}
-            />
-            
-            {/* Grid - placed after areas to be on top */}
+            {/* Layer 1 (Bottom): Grid - rendered FIRST (lowest z-index) */}
             <CartesianGrid 
               stroke="#D3D0CC" 
               strokeDasharray="3 3" 
@@ -132,7 +122,97 @@ export function ForecastChart() {
               horizontal={true}
             />
             
-            {/* Bars */}
+            {/* Layer 2: Confidence Band - light gray semi-transparent area from today onwards */}
+            {/* Use stacked areas to create band between upper and lower bounds */}
+            <Area
+              type="monotone"
+              dataKey={(entry) => (entry.isFuture || entry.isToday) ? entry.confidenceLower : null}
+              fill="transparent"
+              stroke="none"
+              isAnimationActive={false}
+              connectNulls={false}
+              stackId="confidence"
+            />
+            <Area
+              type="monotone"
+              dataKey={(entry) => {
+                if (entry.isFuture || entry.isToday) {
+                  return entry.confidenceUpper && entry.confidenceLower 
+                    ? entry.confidenceUpper - entry.confidenceLower 
+                    : null;
+                }
+                return null;
+              }}
+              fill="rgba(192, 192, 192, 0.30)"
+              stroke="none"
+              isAnimationActive={false}
+              connectNulls={false}
+              stackId="confidence"
+            />
+            
+            {/* Layer 3: Confidence Bound Lines (light grey dashed, show boundaries of confidence band) */}
+            {/* Upper confidence bound */}
+            <Line
+              type="monotone"
+              dataKey={(dataPoint) => (dataPoint.isFuture || dataPoint.isToday) ? dataPoint.confidenceUpper : null}
+              stroke="#999999"
+              strokeWidth={1}
+              strokeDasharray="4 3"
+              strokeOpacity={0.7}
+              dot={{ fill: '#999999', r: 1.5 }}
+              isAnimationActive={false}
+              connectNulls={false}
+            />
+            {/* Lower confidence bound */}
+            <Line
+              type="monotone"
+              dataKey={(dataPoint) => (dataPoint.isFuture || dataPoint.isToday) ? dataPoint.confidenceLower : null}
+              stroke="#999999"
+              strokeWidth={1}
+              strokeDasharray="4 3"
+              strokeOpacity={0.7}
+              dot={{ fill: '#999999', r: 1.5 }}
+              isAnimationActive={false}
+              connectNulls={false}
+            />
+            
+            {/* Layer 3: AI Forecast Line - MUST CONNECT AT TODAY */}
+            {/* Historical part (solid black) */}
+            <Line
+              type="monotone"
+              dataKey={(dataPoint) => dataPoint.isHistorical || dataPoint.isToday ? dataPoint.aiForecast : null}
+              stroke="#000000"
+              strokeWidth={2}
+              dot={{ fill: '#000000', r: 2 }}
+              isAnimationActive={false}
+              connectNulls={false}
+            />
+            {/* Future part (dashed black) - includes isToday to ensure connection */}
+            <Line
+              type="monotone"
+              dataKey={(dataPoint) => dataPoint.isFuture || dataPoint.isToday ? dataPoint.aiForecast : null}
+              stroke="#000000"
+              strokeWidth={2}
+              strokeDasharray="10 6"
+              dot={{ fill: '#000000', r: 2 }}
+              isAnimationActive={false}
+              connectNulls={false}
+            />
+            
+            {/* Layer 3: Previous AI Forecast Line (darker grey dashed, future only, starts at today) */}
+            <Line
+              type="monotone"
+              dataKey={(dataPoint) => (dataPoint.isFuture || dataPoint.isToday) ? dataPoint.previousAiForecast : null}
+              stroke="#555555"
+              strokeWidth={2}
+              strokeDasharray="5 5"
+              strokeOpacity={0.85}
+              dot={{ fill: '#555555', r: 2 }}
+              isAnimationActive={false}
+              connectNulls={false}
+            />
+            
+            {/* Layer 4: Bars */}
             <Bar 
               dataKey="actualSupply" 
               fill="#0065BD" 
@@ -147,46 +227,16 @@ export function ForecastChart() {
               isAnimationActive={false}
             />
             
-            {/* Previous AI Forecast Line (grey dashed, future only) */}
-            <Line
-              type="monotone"
-              dataKey="previousAiForecast"
-              stroke="#6E685F"
-              strokeWidth={2}
-              strokeDasharray="6 4"
-              strokeOpacity={0.8}
-              dot={{ fill: '#6E685F', r: 3 }}
-              isAnimationActive={false}
-              connectNulls={false}
+            {/* Tooltip */}
+            <Tooltip 
+              content={<ChartTooltip />}
+              cursor={{ fill: 'rgba(0, 101, 189, 0.1)' }}
             />
             
-            {/* AI Forecast Line - Historical (solid black with dots) */}
-            <Line
-              type="monotone"
-              dataKey={(dataPoint) => dataPoint.isHistorical || dataPoint.isToday ? dataPoint.aiForecast : null}
-              stroke="#000000"
-              strokeWidth={3}
-              dot={{ fill: '#000000', r: 3 }}
-              isAnimationActive={false}
-              connectNulls={false}
-            />
-            
-            {/* AI Forecast Line - Future (dashed black with dots, includes Today to connect) */}
-            <Line
-              type="monotone"
-              dataKey={(dataPoint) => dataPoint.isFuture || dataPoint.isToday ? dataPoint.aiForecast : null}
-              stroke="#000000"
-              strokeWidth={3}
-              strokeDasharray="10 6"
-              dot={{ fill: '#000000', r: 3 }}
-              isAnimationActive={false}
-              connectNulls={false}
-            />
-            
-            {/* Today Line - always show when today index exists */}
-            {todayIndex >= 0 && (
+            {/* Layer 5 (Highest): Today Line - positioned at today's data point */}
+            {todayDate && todayIndex >= 0 && (
               <ReferenceLine
-                x={chartData[todayIndex].date}
+                x={todayDate}
                 stroke="#000000"
                 strokeWidth={2}
                 strokeDasharray="8 4"
@@ -201,19 +251,12 @@ export function ForecastChart() {
                 }}
               />
             )}
-            
-            {/* Tooltip */}
-            <Tooltip 
-              content={<ChartTooltip />}
-              cursor={{ fill: 'rgba(0, 101, 189, 0.1)' }}
-            />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
-      </div>
       
       {/* Year Label */}
-      <div className="text-center mb-1">
+      <div className="text-center">
         <span className="text-xs font-semibold text-[#6E685F]">
           {timeRange === '1month' || timeRange === '3months' ? '2025' : '2025 - 2026'}
         </span>
@@ -221,6 +264,7 @@ export function ForecastChart() {
       
       {/* Legend */}
       <ChartLegend />
+      </div>
     </Card>
   );
 }
