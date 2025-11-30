@@ -1,7 +1,7 @@
-import { Core } from '../types';
+import { LegacyCore } from '../types';
 
 // TODO: Replace with API call to /api/inventory/cores
-export const mockInventory: Core[] = [
+export const mockInventory: LegacyCore[] = [
   {
     id: '1',
     part_number: 'CORE-TURBO-001',
