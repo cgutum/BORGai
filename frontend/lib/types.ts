@@ -48,6 +48,58 @@ export type OrderStatus =
   | 'delivered' 
   | 'cancelled';
 
+// Dashboard Types
+export interface KPIMetric {
+  label: string;
+  value: number;
+  unit: string;
+  trend: 'up' | 'down' | 'neutral';
+  trendValue: number; // % change
+  sparklineData: number[]; // Last 30 days
+  status: 'good' | 'warning' | 'critical';
+}
+
+export interface ForecastDataPoint {
+  date: string;
+  aiForecast: number;
+  consensusForecast: number;
+  confidenceLower: number;
+  confidenceUpper: number;
+}
+
+export interface FeatureContribution {
+  featureName: string;
+  category: 'ExternalData' | 'SalesOrders' | 'Events';
+  contributions: Record<string, number>; // { date: value }
+}
+
+export interface CriticalAction {
+  id: string;
+  type: 'STOCK_LOW_SINGLE' | 'STOCK_LOW_MULTI' | 'DELIVERY_COMING';
+  title: string;
+  description: string;
+  severity: 'warning' | 'critical';
+  affectedSKUs: string[];
+  actionDate: string;
+  icon: string;
+}
+
+export interface CalendarEvent {
+  date: string;
+  type: 'delivery' | 'alert' | 'threshold';
+  title: string;
+  description: string;
+  icon: string;
+}
+
+export interface ProductHierarchy {
+  id: string;
+  level: 'L1' | 'L2' | 'L3' | 'L4' | 'L5';
+  name: string;
+  parent?: string;
+  children?: ProductHierarchy[];
+}
+
 export interface OrderLine {
   order_id: string;
   core_id: string;
@@ -129,7 +181,8 @@ export interface ModelMetrics {
   data_points_used: number;
 }
 
-export interface KPIMetric {
+// Legacy KPI interface (keeping for backward compatibility)
+export interface LegacyKPIMetric {
   label: string;
   value: number | string;
   unit: string;

@@ -1,16 +1,12 @@
 'use client';
 
-import { KPIMetric } from '@/lib/types';
 import { KPICard } from './KPICard';
+import { hardcodedForecastMetrics } from '@/lib/data/forecast-metrics';
 
-interface MetricGridProps {
-  metrics: KPIMetric[];
-}
-
-export function MetricGrid({ metrics }: MetricGridProps) {
+export function MetricGrid() {
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {metrics.map((metric, index) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {hardcodedForecastMetrics.map((metric, index) => (
         <KPICard key={index} metric={metric} />
       ))}
     </div>

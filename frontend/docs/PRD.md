@@ -1,2156 +1,2115 @@
-Product Requirements Document (PRD)
-BORGai - Core Supply Forecasting AI Dashboard MVP
-
-BORG Automotive Remanufacturing Challenge 2025
-1. EXECUTIVE SUMMARY
+EXECUTIVE SUMMARY
 Vision Statement
 
-BORGai is a real-time, AI-powered supply chain forecasting dashboard that enables BORG Automotive's supply chain planning teams to predict core supply volumes, optimize inventory levels, and make data-driven decisions about remanufacturing operations. The platform integrates multi-source data (internal historical records, external registrations, market trends, recall databases) with an ensemble machine learning model to forecast component availability 3-12 months ahead.
+A modern, clean AI-powered supply chain forecasting dashboard designed for supply chain professionals like Morten Bie who need transparency, actionability, and visual clarity. The dashboard transforms complex forecasting data into intuitive visualizations, enabling supply chain managers to understand core supply predictions, validate AI model decisions through explainability analysis, and take immediate action on critical inventory alerts.
+Primary User
+
+Supply Chain Planner
+
+    Requirements: Clean, modern, appealing design that balances sophistication with usability
+
+    Goals: Quickly assess forecast accuracy, understand what drives predictions, respond to critical alerts, drill into specific core types
+
+    User Journey: Login → Dashboard Overview → Specific Core Type Drill-Down → Forecast Analysis Transparency
+
 Product Goal
 
-Build an MVP dashboard (BORGai) that visualizes AI core supply forecasts, model performance metrics, and actionable insights—transforming raw predictions into strategic supply chain intelligence for supply chain managers, warehouse operators, and logistics coordinators.
+Deliver an MVP dashboard that:
+
+    Provides immediate visibility into AI core supply forecasts and critical inventory actions
+
+    Enables drill-down into specific core types with detailed analysis
+
+    Reveals model transparency through feature contribution analysis (why the forecast is what it is)
+
+    Provides secure access for supply chain planners (multi-role support planned for Phase 2)
+
 Key Success Metrics
 
-    Forecast Accuracy: ≤ 20% MAPE (Mean Absolute Percentage Error) for 3-month horizon on test data
+    Usability: Dashboard load time < 2 seconds, critical actions visible within 3 seconds
 
-    Dashboard Performance: Load time < 2 seconds (P95)
+    Clarity: 100% of forecasts include explainability data (feature drivers visible)
 
-    User Adoption: 95%+ of supply chain team members actively use dashboard daily
+    Adoption: Supply chain team uses dashboard daily for forecast-informed decisions
 
-    Decision Impact: 15-20% reduction in stockouts, 10% improvement in inventory turnover
+    Trust: Transparency of AI model increases user confidence (measured via feature contribution clarity)
 
-    Model Explainability: 100% of forecasts include feature importance and driver explanation
+2. TARGET USERS & PRIMARY PERSONA
+Persona: Supply Chain Planner
 
-2. MARKET CONTEXT & PROBLEM STATEMENT
-Business Context
+Profile:
 
-BORG Automotive operates a critical remanufacturing supply chain serving European automotive markets. Core components (turbochargers, transmissions, engines, batteries, starters) arrive unpredictably—driven by vehicle age cohorts, failure patterns, seasonal repair peaks, and regulatory changes. Currently, BORG lacks visibility into future core supply, resulting in:
+    Experienced supply chain professional with strategic planning responsibilities
 
-    Stockouts: Missing cores block remanufacturing workflows
+    Tech-comfortable but values simplicity and clarity over feature complexity
 
-    Excess Inventory: Carrying costs and working capital strain
+    Works across strategic planning and operational decisions
 
-    Inefficient Planning: Supply chain decisions rely on intuition, not data
+    Needs quick decision-making support backed by transparent data
 
-    Missed Opportunities: Inability to identify supply spikes driven by recalls or seasonal patterns
+Goals:
 
-Competitive Context
+    Understand core supply forecasts at a glance
 
-Industry leaders (e.g., C3.ai customers in remanufacturing) achieve:
+    Validate AI predictions by seeing which data sources drive them
 
-    100%+ forecasting error reduction vs. baseline
+    Respond rapidly to stock-outs, delivery issues, and supply spikes
 
-    $100M-$300M in direct savings through improved inventory planning
+    Make confident reorder and safety stock decisions
 
-    Real-time KPI dashboards for supply chain visibility
+    Access transparent, explainable forecasting data
 
-BORG's MVP dashboard (BORGai) will establish foundational capability to compete.
-Data Opportunity
+Pain Points:
 
-BORG has untapped data sources:
+    Current systems hide model logic; difficult to trust "black box" forecasts
 
-    Internal: 5+ years of core return history by type, geography, customer segment
+    Alerts are scattered; hard to prioritize critical actions
 
-    External (Public): German KBA registration data, TÜV defect statistics, weather patterns, recall databases
+    Can't easily drill into what drives forecast changes
 
-    External (Partner): OEM warranty claims, customer segment data, service repair histories
+    Time-consuming to investigate anomalies
 
-The ensemble model architecture (TFT + XGBoost + SARIMAX) leverages these heterogeneous sources to achieve superior forecasts.
-3. TARGET USERS & PERSONAS
-Persona 1: Michael (Supply Chain Manager)
+Design Preferences:
 
-Profile: 40s, 15+ years in supply chain/logistics, Excel power user, strategic thinker
+    Clean, modern aesthetic (not cluttered or overly complex)
 
-    Tools Used: Excel, SAP, occasional BI dashboards
+    Appealing visual hierarchy (important data prominent)
 
-    Responsibility: Optimize inventory levels, forecast supply bottlenecks, make strategic sourcing decisions
+    Professional color palette reflecting corporate identity
 
-    Goals: Understand supply chain health, predict shortages, justify budget allocation
+    Intuitive navigation that feels natural, not overwhelming
 
-    Pain Points: Data scattered across systems, no single view of truth, slow ad-hoc reporting
+User Journey (MVP):
 
-    User Journey:
+    Login → Secure access with demo credentials
 
-        Login → Dashboard
+    Dashboard Overview → See KPIs, current forecast summary, critical alerts, CTA buttons
 
-        Review KPI cards: total inventory, critical alerts, lead time trends
+    Drill into Core Type → Select specific component (e.g., turbochargers) for focused view
 
-        Drill into specific core category (e.g., "Turbo supply trending down")
+    Review Forecast Analysis → Understand which data sources impact the prediction (macroeconomics, seasonality, weather, sales orders, etc.)
 
-        Check driver analysis: "Vehicle registrations down 12%, weather impacting returns"
+    Take Action → Accept forecast, request manual override, or schedule follow-up review
 
-        Decide: Accelerate supplier sourcing or adjust safety stock
+Future Users (Phase 2)
 
-    Success Criteria: Decision made in < 10 minutes with confidence in drivers
+    Warehouse Operator: Focus on inventory levels, incoming shipments, stock status
 
-Persona 2: Sarah (Warehouse Operator)
+    Logistics Coordinator: Focus on orders, lead times, delivery scheduling
 
-Profile: 30s, 8 years warehouse experience, operational focus, moderate tech comfort
+    Executive: Periodic access for high-level strategic reviews
 
-    Tools Used: Warehouse Management System (WMS), email, paper logs
+Note: MVP focuses on single planner role; multi-role support with differentiated views planned for Phase 2.
 
-    Responsibility: Receive cores, update inventory, maintain storage, process shipments
+3. CORE FEATURES & DETAILED SPECIFICATIONS
+Feature 1: User Authentication & Login Page
 
-    Goals: Know real-time inventory, process incoming efficiently, understand supply trends
+Status: ✅ Already implemented (no changes required)
 
-    Pain Points: Multiple system lookups, unclear reorder triggers, delayed notifications
+Overview: Secure login system with clean, modern design
 
-    User Journey:
+Current Implementation Details:
 
-        Login → Dashboard (Operator view, focus on inventory)
+    Brand: BORGai - Intelligent Core Supply Forecasting Platform
 
-        Check "Current Inventory" table for today's quantities
+    Role: Single 'planner' role (multi-role support planned for Phase 2)
 
-        See "Low Stock Alert" for turbochargers
+    Demo Credentials:
+        Email: demo@borgai.platform
+        Password: demo1234
+        (Legacy credentials planner@borg.com / demo123 also supported)
 
-        Review "Incoming Shipments" widget
+    Features:
+        Email + password validation
+        Show/hide password toggle
+        Remember me checkbox
+        Demo credentials display with auto-fill and copy buttons
+        Error messaging with orange accent (#E37222)
+        Loading state during authentication
 
-        Update received quantities in table
-
-    Success Criteria: Operational tasks completed 30% faster, less guesswork
-
-Persona 3: David (Logistics Coordinator)
-
-Profile: 25, tech-savvy, 4 years in logistics, works with multiple tools, data-oriented
-
-    Tools Used: Shipping software, CRM, messaging apps, SQL queries (self-taught)
-
-    Responsibility: Coordinate shipments, manage logistics network, track orders
-
-    Goals: Real-time visibility into orders/shipments, anticipate logistics bottlenecks, coordinate with warehouse
-
-    Pain Points: Limited warehouse visibility, manual tracking, reactive problem-solving
-
-    User Journey:
-
-        Login → Dashboard (Logistics view)
-
-        Check active shipments and order status
-
-        See forecast: "High demand expected Q2, plan for +40% shipment volume"
-
-        Review lead time trends to adjust planning
-
-        Coordinate with warehouse on anticipated volume surge
-
-    Success Criteria: Anticipate logistics needs 30+ days ahead, reduce expedited shipping
-
-Secondary User: Executive (CFO/COO)
-
-    Periodic Access: Weekly/monthly dashboards for strategic decisions
-
-    Focus: High-level KPIs, ROI justification, performance vs. targets
-
-    Success Criteria: Board-ready insights and trend analysis
-
-4. CORE REQUIREMENTS & FEATURES
-Feature 1: Forecast Dashboard & KPI Overview
+    Design:
+        Background: Light grey (#FAFAFA)
+        Primary button: Black with hover effect
+        Form validation and error states
+        Responsive layout for mobile/tablet/desktop
+        Footer with Team 66 branding, TUM and REMAN logos
+
+    Technical:
+        localStorage-based session management (will upgrade to JWT in Phase 2)
+        Session persists on page refresh
+        AuthContext for state management
+        Auto-logout: Planned for Phase 2
+
+    Attribution:
+        Team 66: Christian Güttler and Robert Hoffmann
+        REMAN Challenge 2025 - Unlocking the Power of AI for Circular Industries
+
+Feature 2: Main Dashboard - Forecast Overview & Critical Alerts
 
 User Stories:
 
-    As a supply chain manager, I want to see core supply forecasts at a glance so I can assess overall supply health
+    As a supply chain planner, I want to see my forecasts and critical alerts at a glance so I can assess supply chain health and prioritize actions
 
-    As an executive, I want to see key performance indicators and trends so I can track supply chain performance vs. targets
+    As a supply chain planner, I want to see incoming stock levels and low-stock warnings so I can manage inventory operations efficiently
 
-Functionality:
+2.1 Overall Dashboard Spatial Layout
 
-    KPI Cards: Display top-level metrics in a card grid
+Header Section (Full Width, Top)
 
-        Total Forecasted Core Supply (units, 3-month horizon)
+    Left: BORGai logo + "Core Forecast Dashboard" title
 
-        Current Inventory Value (€)
+    Center: Primary navigation (Dashboard, Forecast Analysis, [Coming Soon] Circular Transparency, [Coming Soon] Scenario Planning)
 
-        Average Lead Time (days)
+    Right: User profile, settings, logout controls
 
-        Model Accuracy (MAPE %)
+Left Sidebar (Fixed ~280px width)
 
-        Critical Low Stock Items (count)
+    Title: "Core Forecast"
 
-        Forecast vs. Historical Demand (trend indicator: ↑↓)
+    Filtering & Configuration:
 
-    Each KPI Card Includes:
+        Collapsible sections for forecast hierarchy levels (L1/L2/L3/L4/L5)
 
-        Primary metric value (large, readable)
+        "SOFA" category dropdown for system-wide filtering
 
-        Secondary information (trend arrow, % change, period)
+        Multi-select capability for comparing multiple product lines
 
-        Status indicator (green/yellow/red)
+        Expand/collapse all sections functionality
 
-        Optional: mini sparkline (7-30 day trend)
+    Purpose: Drive main dashboard content updates based on selection
 
-        Click to drill into detail page
+    Interactions: Clicking a level filters all dashboard data to show that product line
 
-    Critical Alerts Section:
+Main Content Area (Center, spans remaining width)
 
-        Ranked list of anomalies detected by model
+Section A: Upper Half - Forecast Chart
 
-        Examples: "Turbo supply forecast down 35% vs. 3-month average (reason: vehicle registrations -12%)"
+    Title: "Forecast Analysis"
 
-        Each alert includes: severity, reason, recommended action
+    Chart Type: Multi-line time series visualization
 
-        Dismiss or acknowledge alert
+        Blue Line (#0065BD): AI Forecast (model prediction, typically more volatile)
 
-    Quick Action Buttons:
+        Red Line (#C01530): Consensus Forecast or Historical Consumption (baseline)
 
-        View Detailed Forecast
+        Shaded Confidence Band: Light blue area showing 80% prediction interval
 
-        Export Report
+        Black Vertical Markers: Anomalies, data issues, or forecast recalibration points
 
-        Schedule Alert Notification
+        X-Axis: Time-based (dates at regular intervals, e.g., weekly)
 
-        Adjust Safety Stock Parameters
+        Y-Axis: Units/volume
 
-UI Design:
+        Interactive Tooltips: Show exact values, % change, contributor information on hover
 
-    Grid Layout: 4 columns on desktop (1920px), 2 on tablet (1024px), 1 on mobile (320px)
+        Grid Background: Subtle grey (#CCCCCC) for readability
 
-    Colors (TUM Design System):
+    Time Range Controls:
 
-        KPI Card background: White (#FFFFFF) with subtle border (Grey 20% #CCCCCC)
+        Quick select buttons: "2 Week", "1 Month", "3 Month", "6 Month", "Custom"
 
-        KPI Value text: TUM Blue (#0065BD) for primary metric, Grey 80% (#333333) for secondary
-
-        Positive trend (↑): Accent Green (#A2AD00)
-
-        Negative trend (↓): Accent Orange (#E37222)
-
-        Warning status: Accent Orange (#E37222)
-
-        Critical status: Accent Orange (#E37222) with red background overlay
-
-        Border/shadow: Subtle grey (Grey 20% #CCCCCC)
-
-        Card hover: Light grey background (Grey 20% #CCCCCC at 50% opacity)
-
-    Typography:
-
-        KPI Label: Montserrat/Inter, 12px, Grey 80% (#333333), weight 500
-
-        KPI Value: Montserrat/Inter, 32px, TUM Blue (#0065BD), weight 600
-
-        Trend Text: 14px, Grey 50% (#808080), weight 400
-
-        Card Title: 16px, TUM Blue (#0065BD), weight 600
-
-    Spacing & Layout:
-
-        Card padding: 20px
-
-        Gap between cards: 16px
-
-        Section margin-bottom: 32px
-
-Data Source:
-
-typescript
-// TODO: Replace with API call to /api/forecast/metrics
-// const response = await fetch('/api/forecast/metrics?horizon=3_month')
-const metrics = hardcodedForecastMetrics; // lib/data/forecast-metrics.ts
-
-Acceptance Criteria:
-
-    ✓ KPI cards display correctly on all screen sizes
-
-    ✓ Cards update without page reload (real-time simulation)
-
-    ✓ Clicking card drills to detail page
-
-    ✓ Alerts display with clear priority ranking
-
-    ✓ Color coding matches status (no accessibility issues)
-
-Feature 2: Forecast Detail Chart & Timeline
-
-User Stories:
-
-    As a supply chain manager, I want to see a detailed forecast timeline so I can understand supply patterns month by month
-
-    As a warehouse operator, I want to see upcoming supply weeks so I can plan receiving operations
-
-Functionality:
-
-    Main Forecast Chart: Combined bar + line chart showing
-
-        Historical core supplies (bars, blue, past 12 months)
-
-        AI forecast (bars, lighter blue, next 3-12 months)
-
-        Consensus forecast comparison (line, dashed, secondary source)
-
-        Lag-2 previous forecast overlay (line, dotted grey, model improvement tracking)
-
-        Quantile bands (light blue shaded area, confidence intervals)
-
-        Vertical "today" line marking current date
-
-        Interactive tooltips on hover
-
-    Component-Level Breakdown:
-
-        Dropdown to select core type (e.g., "Turbochargers", "Transmissions", "Engines")
-
-        Shows component-specific forecast below main chart
-
-        Color-coded by component type
-
-        Stacked area view option
-
-    Time Period Selector:
-
-        Quick buttons: "3 Month", "6 Month", "12 Month", "Custom"
+        Default view: 2-week rolling window
 
         Date range picker for custom periods
 
-        Zoom in/out on chart
+        Zoom controls for detailed inspection
 
-    Driver Explanation Panel (Key Feature for Explainability):
+    Legend & Controls:
 
-        Below chart: List of top 3-5 factors driving the forecast
+        Legend below chart identifying blue (AI), red (Consensus), and confidence bands
 
-        Each factor shows: name, contribution %, direction (↑↓), recent value
+        "Download Chart" button for exporting
 
-        Examples:
+        Comparison toggle (show/hide consensus line)
 
-            "Vehicle Registrations" +12%, ↑ (KBA data shows +12% new cars registered)
+        Component breakdown dropdown (select specific core type)
 
-            "Seasonal Peak" +8%, ↑ (March tire change season approaching)
+Section B: Lower Half - KPI Cards & Alert Summary
 
-            "Weather Events" +5%, ↑ (Winter damage predictions from insurance data)
+    KPI Card Grid (4 cards on desktop, responsive on mobile):
 
-            "Recall Campaigns" -3%, ↓ (No major active recalls this period)
+        Card 1: Recent Model Accuracy (MAPE %)
 
-        Feature importance bars (SHAP values from model)
+            Value: Large, bold, TUM Blue (#0065BD)
 
-    Scenario Analysis Widget (Advanced):
+            Trend: ↑↓ arrow + percentage change (green for improvement, orange for decline)
 
-        "What if" sliders for key drivers
+            Mini sparkline: Last 30 days trend
 
-        Example: "If registrations increase 10%, forecast becomes..."
+        Card 2: Last Forecast Offset (%)
 
-        Real-time forecast recalculation
+            Shows deviation of forecast from actual
 
-        Export scenario analysis
+            Indicates model recency/reliability
 
-UI Design:
+        Card 3: AI Forecast vs. Historical Demand (%)
 
-    Chart Container:
+            Highlights divergence from historical baseline
 
-        Width: 100% of page (max 1400px)
+            Helps assess if supply surge/drop is unusual
 
-        Height: 400px on desktop, 300px on mobile
+        Card 4: Model Data Freshness
 
-        Background: White (#FFFFFF)
+            Shows when last forecast was generated
 
-        Border: 1px Grey 20% (#CCCCCC)
+            Indicates data update frequency
 
-        Border-radius: 8px
+    Alert Summary Section (Left of KPI cards):
 
-        Padding: 16px
+        Title: "Alert Summary"
 
-    Color Scheme:
+        Total Alert Count: "ALL ALERTS: [N]"
 
-        Historical supply bars: TUM Blue (#0065BD) at full opacity
+        Alert Breakdown:
 
-        Forecast bars: Accent Light Blue (#98C6EA)
+            Forecast Alerts: [count]
 
-        Confidence interval shading: TUM Blue (#0065BD) at 10% opacity
+            Model Performance Alerts: [count]
 
-        Consensus forecast line: Accent Medium Blue (#64A0C8)
+        Last 30 Days Trend: Mini bar chart showing alert frequency over time
 
-        Previous forecast line: Grey 50% (#808080) dashed
+        Visual: Red background for urgency, badge styling
 
-        Today line: Accent Orange (#E37222)
+Critical Actions Panel (Right-side callout, fixed position)
 
-        Component colors: TUM Blue, Secondary Blue 1 (#005293), Secondary Blue 2 (#003359)
+    Title: "Critical Actions"
 
-    Axis Labels:
+    Red Alert Boxes (stacked vertically):
 
-        X-axis (dates): Format "Jan 2024", "Feb 2024", etc.
+        "STOCK LOW <Y": Stock below minimum threshold Y
 
-        Y-axis (quantity): Format "0", "100", "200", "300"
+            Color: Red (#C01530)
 
-        Font: Inter/Montserrat, 12px, Grey 80% (#333333)
+            Icon: ⚠️ warning symbol
 
-    Driver Explanation Panel:
+            Action: Trigger reorder review
 
-        Position: Below main chart
+            Clickable: Drill into affected SKUs
 
-        Background: Light beige (#DAD7CB) at 20% opacity
+        "DELIVERY COMING": Scheduled delivery approaching (48-72 hours)
 
-        List items with small icons and percentages
+            Color: Red (#C01530)
 
-        Font: 13px, Grey 80% (#333333)
+            Icon: 🚚 delivery truck
 
-        Icon: Lucide TrendingUp / TrendingDown
+            Action: Prepare receiving, validate forecast
 
-Data Source:
+            Clickable: Show delivery details and expected contents
 
-typescript
-// TODO: Replace with API call to /api/forecast/detail?core_type=turbocharger&horizon=12_month
-const forecastData = hardcodedForecastDetail; // lib/data/forecast-detail.ts
-const driverExplanation = hardcodedDrivers; // Calculated from model SHAP values
+        "STOCK LOW ×Y": Multiple products critically low (multiplicative factor)
 
-Libraries:
+            Color: Red (#C01530)
 
-    Chart library: Recharts (lightweight, React-native)
+            Icon: 🔴 critical indicator
 
-    Tooltip: Recharts built-in + custom formatting
+            Action: Immediate escalation needed
 
-    Date handling: date-fns or Day.js
+            Clickable: Show affected products and locations
 
-Acceptance Criteria:
+    Calendar Widget:
 
-    ✓ Chart displays historical + forecast data
+        Shows upcoming critical action dates
 
-    ✓ Interactive tooltip shows exact values on hover
+        Blue circle: Today's date
 
-    ✓ Component dropdown changes chart data correctly
+        Red circles: Dates with critical events (deliveries, threshold alerts)
 
-    ✓ Time period selector zooms/pans chart
+        Emoji/icons: Visual indication of event type
 
-    ✓ Driver explanation renders with correct percentages
+        Purpose: Timeline visualization of when actions occur
 
-    ✓ Scenario sliders update forecast in real-time
+2.2 UI Design Specifications for Dashboard
 
-    ✓ Mobile: Chart responsive, labels readable
+Color Palette (Adapted from Morten's Requirements):
 
-Feature 3: Inventory Management & Stock Levels
+    Primary Blue: #0065BD — Headers, primary metric values, main CTAs, chart lines (AI forecast)
+
+    Secondary Grey: #6E685F — Secondary headers, labels, muted text
+
+    Black: #000000 — Primary text, dark elements, structure
+
+    White: #FFFFFF — Backgrounds, card surfaces, clean spaces
+
+    Accent Green: #A2AD00 — Positive trends, in-stock status, success states
+
+    Accent Orange: #E37222 — Warnings, caution states, declining trends
+
+    Accent Red: #C01530 — Critical alerts, stock-out, urgent actions
+
+    Border/Shadow Grey: #D3D0CC — Subtle borders, shadow effects
+
+    Chart Consensus Red: #C01530 — Historical/consensus forecast line
+
+Typography:
+
+    Font Stack: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Montserrat, sans-serif
+
+    Dashboard Title (H1): 32px, weight 600, TUM Blue (#0065BD)
+
+    Section Headers (H2): 20px, weight 600, TUM Blue (#0065BD)
+
+    Card Titles (H3): 14px, weight 600, Secondary Grey (#6E685F)
+
+    KPI Values: 28px, weight 600, TUM Blue (#0065BD)
+
+    Body Text: 14px, weight 400, Black (#000000)
+
+    Labels/Captions: 12px, weight 500, Secondary Grey (#6E685F)
+
+    Chart Axis Labels: 11px, weight 400, Secondary Grey (#6E685F)
+
+Spacing:
+
+    Sidebar Width: 280px (fixed)
+
+    Card Padding: 20px
+
+    Gap Between Cards: 16px
+
+    Section Margins: 24px top/bottom
+
+    Border Radius: 8px (standard cards), 4px (buttons/inputs)
+
+    Box Shadow: 0 1px 3px rgba(0, 0, 0, 0.08) (subtle), 0 4px 8px rgba(0, 0, 0, 0.12) (on hover)
+
+Responsive Breakpoints:
+
+    Desktop (1024px+): Full layout (sidebar + main + right panel)
+
+    Tablet (768px-1023px): Sidebar collapses to icon mode, main content expands
+
+    Mobile (320px-767px): Stack vertically, drawer for sidebar, actions panel slides up
+
+2.3 Component Interaction Flow
+
+Left Sidebar Selection → Dashboard Update:
+
+    User clicks product line in left sidebar (e.g., "L2 Turbochargers")
+
+    Selected item highlights (blue background)
+
+    Main forecast chart updates to show that product's data
+
+    KPI metrics refresh with selected product's performance
+
+    Critical actions filter to show relevant alerts for that product
+
+    Time range resets to default (2 weeks) or maintains previous selection
+
+Chart Interactions:
+
+    User hovers over chart line → Tooltip appears with exact values
+
+    User clicks on date range → Dashboard can optionally zoom to that period
+
+    User drags to select date range → Fine-grain analysis of specific period
+
+    User clicks legend item → Toggle that data series visibility
+
+Critical Action Interaction:
+
+    User clicks red alert box (e.g., "STOCK LOW <Y")
+
+    Dashboard filters/highlights affected SKUs in sidebar
+
+    Chart updates to show that product's forecast
+
+    Right panel expands to show detailed inventory breakdown by location
+
+    Calendar highlights affected dates
+
+Time Range Selection:
+
+    User clicks quick select (e.g., "1 Month")
+
+    Chart X-axis adjusts to show 1-month window
+
+    KPI metrics recalculate for that period
+
+    Forecast bands update to show 1-month ahead predictions
+
+Feature 3: Forecast Analysis Page - Model Transparency & Feature Contribution
 
 User Stories:
 
-    As a warehouse operator, I want to see current inventory levels so I can know what's in stock
+    As a supply chain planner, I want to see exactly which data sources drive each week's forecast so I can understand and validate the model's logic
 
-    As a supply chain manager, I want to identify low-stock cores so I can trigger replenishment
+    As a supply chain planner, I want to review feature contributions over time so I can detect model drift or unusual patterns
 
-Functionality:
+3.1 Page Layout Structure
 
-    Inventory Table:
+Header Section (Full Width, Top)
 
-        Columns: Core ID, Part Number, Description, Current Qty, Reorder Point, Status, Location, Last Updated, Unit Price, Supplier
+    SKU/Product Information:
 
-        50+ rows (paginated, 10 per page)
+        SKU name: e.g., "Turbocharger, 3.0L Diesel"
 
-        Sortable by any column (click header)
+        SKU ID: e.g., "CORE-TURBO-001"
 
-        Status badges: ✓ In Stock (green), ⚠ Low Stock (orange), ✗ Out of Stock (red)
+    Status Indicators (Right-aligned):
 
-        Status logic:
+        Forecast Status: "Need Review" / "Accepted" / "Overridden" (badge with color)
 
-            In Stock: Qty ≥ Reorder Point
+        Edit Status: "Open" / "Locked" (badge)
 
-            Low Stock: Qty < Reorder Point AND Qty > 0
+        Last Action: "Accepted by M. Bie on Nov 28, 2025 at 14:32"
 
-            Out of Stock: Qty = 0
+        Total Alerts: "[N] alerts"
 
-        Row highlighting for low stock / out of stock
+        Last Updated: "Generated 2 hours ago"
 
-    Filters & Search:
+        Lock Date: "Locked until Dec 5, 2025"
 
-        Search box: Real-time filter by Part Number, Description, Supplier
+    Action Buttons (Right side):
 
-        Status filter: All / In Stock / Low Stock / Out of Stock
+        "Accept AI Forecast" (Primary button, TUM Blue #0065BD): Confirm model prediction
 
-        Location filter: Dropdown of warehouse locations
+        "Overwrite" (Secondary button, grey border): Manual override (opens override panel)
 
-        Date range filter: Last Updated within X days
+3.2 Navigation Tabs
 
-        Price range slider: $0-$10,000
+Three Main Tabs:
 
-        "Advanced Filters" collapsed section
+    Forecast Overview (Default View)
 
-        "Clear All Filters" button
+        High-level forecast summary
 
-    Bulk Actions:
+        Chart showing AI vs. consensus
 
-        Select multiple rows (checkbox column)
+        KPI metrics for this SKU
 
-        Bulk update status
+    Analysis (Primary for Feature Contribution)
 
-        Bulk export to CSV
+        Detailed feature contribution table
 
-        Bulk update reorder points
+        Three sub-views (described below)
 
-    Alerts & Warnings:
+        Deep dive into model drivers
 
-        Banner above table: "⚠️ 12 cores below reorder point" with link to filter
+    History
 
-        Recommendation: "Cores expected to run out in X days based on forecast"
+        Previous forecast versions
 
-    Stock Level Visual Indicator:
+        Comparison with actual outcomes (once realized)
 
-        Each row includes progress bar: [==== ] showing Qty / Reorder Point
+        Audit trail of changes
 
-        Color: Green if above reorder point, orange if below
+Currently on "Analysis" Tab
+3.3 Analysis Tab - Sub-Views
 
-UI Design:
+Sub-View Toggle (Below tabs):
 
-    Table Container:
+    Forecast Data Analysis (Default, selected)
 
-        Width: 100% (scrollable on mobile)
+        Shows feature contribution table with full detail
 
-        Background: White (#FFFFFF)
+        Useful for understanding individual drivers
 
-        Border: 1px Grey 20% (#CCCCCC)
+    Aggregated View
 
-        Border-radius: 8px
+        Rolls up features into categories
 
-    Table Header:
+        Shows category-level contributions
 
-        Background: Grey 20% (#CCCCCC)
+        Cleaner overview, less granular
 
-        Font: Inter/Montserrat, 12px, weight 600, Grey 80% (#333333)
+    Feature Contribution Analysis
 
-        Sortable columns show ↑ or ↓ indicator
+        Alternative visualization of top drivers
 
-    Table Rows:
+        Ranked list format
 
-        Alternating background: White, Grey 20% at 30% opacity
+        Good for identifying dominant factors
 
-        Hover: Grey 20% at 50% opacity
+3.4 Feature Contribution Table (Main Component in Analysis Tab)
 
-        Height: 44px per row
+Table Structure:
 
-        Padding: 12px left/right
+Columns (Time periods):
 
-    Status Badges:
+    Each column represents a forecast period (weekly intervals typical)
 
-        Background: Color-coded (green/orange/red) at 20% opacity
+    Column header shows date: "03/01", "03/08", "03/15", ..., "05/17"
 
-        Text: Color-coded (green/orange/red) at full
+    Cell at top of column shows forecasted quantity for that week (e.g., "586", "573", "615")
 
-        Font: 11px, weight 600, border-radius 12px
+    Column width: Consistent, auto-resizes on screen resize
 
-        Padding: 4px 8px
+Rows (Forecast Components & Features):
 
-    Filters:
+    Current Forecast (Top row, bold)
 
-        Position: Above table, sticky (stays visible when scrolling)
+        Shows the final AI-predicted demand for each week
 
-        Background: Light beige (#DAD7CB) at 10% opacity
+        Values: 586, 573, 615, 623, 557, 612, ... (example values)
 
-        Display: Flex row, gap 12px
+        Styling: Bold background (light blue #98C6EA at 20% opacity)
 
-        Search box: Border 1px Grey 50%, padding 8px
+        This is the bottom-line forecast that appears on main dashboard
 
-        Dropdowns: Bordered, light background
+    External Data Group (Collapsible section):
 
-Data Source:
+        Macroeconomic Trends (e.g., PMI, interest rates, inflation)
 
-typescript
-// TODO: Replace with API call to /api/inventory/cores
-const inventory = hardcodedInventoryData; // lib/data/inventory.ts
+            Contribution values: -64, -30, -76, +9, -34, ...
 
-Acceptance Criteria:
+            Positive = increases forecast, Negative = decreases forecast
 
-    ✓ Table displays 10+ rows with correct data
+        Customer Trends (e.g., customer sentiment, order patterns)
 
-    ✓ Sort works on all columns
+            Values: -80, +3, -87, -21, -79, ...
 
-    ✓ Filters update table in real-time
+        Google Trends (e.g., search interest in replacement parts)
 
-    ✓ Search finds cores by part number or description
+            Values: +17, -89, -47, -67, -82, ...
 
-    ✓ Status badges display with correct colors
+        Market Insights (e.g., competitor activity, market conditions)
 
-    ✓ Mobile: Horizontal scroll or column selection
+            Values: +48, -67, +5, +64, -8, ...
 
-    ✓ Bulk select/export functions work
+        Point of Sale Transactions (e.g., actual sales data)
 
-Feature 4: Orders, Shipments & Lead Time Tracking
+            Values: -2, -66, -132, -80, -69, ...
 
-User Stories:
+        Seasonality (e.g., seasonal patterns, holiday effects)
 
-    As a logistics coordinator, I want to see all active orders so I can track shipment status
+            Values: +50, +179, +164, +4, +73, ...
 
-    As a supply chain manager, I want to monitor lead times so I can identify bottlenecks
+        Weather (e.g., seasonal vehicle damage, maintenance peaks)
 
-Functionality:
+            Values: +67, +127, +13, -71, -46, ...
 
-    Order Status Pipeline View:
+    Sales Orders Group (Collapsible section):
 
-        Horizontal timeline showing order states: Placed → Processing → Shipped → In Transit → Delivered
+        Open Sales Orders (current backlog)
 
-        Cards for each order showing:
+            Values: -60, +183, +27, -20, -15, ...
 
-            Order ID / Order Number
+        Historical Sales Orders (past order patterns)
 
-            Status (visual state on timeline)
+            Values: +43, -64, -29, +36, -72, ...
 
-            Creation Date
+    Events Group (Collapsible section):
 
-            Estimated Delivery Date
+        Holidays (e.g., winter break, Easter, summer holidays)
 
-            Actual Delivery Date (if delivered)
+            Values: +2, +197, +158, [blank], [blank], ...
 
-            Lead Time (days)
+        Marketing Campaigns (e.g., promotional periods)
 
-            Supplier Name
+            Values: -53, -67, -83, +37, +28, ...
 
-            Core Type(s)
+Cell Styling & Color Coding:
 
-            Quantity
+    Green Cells: Positive contributions (increase forecast)
 
-            Comments / Notes field
+        Light green background: #A2AD00 at 15% opacity
 
-    Filters & Search:
+        Text: #A2AD00 (darker green)
 
-        Status filter: All / Placed / Processing / Shipped / In Transit / Delivered
+        Intensity (saturation): Higher for larger contributions
 
-        Date range: Created within X days
+    Red Cells: Negative contributions (decrease forecast)
 
-        Supplier filter: Dropdown
+        Light red background: #E37222 at 15% opacity
 
-        Search: Order ID or core type
+        Text: #E37222 (darker orange/red)
 
-        Lead time filter: Orders > X days
+        Intensity: Higher for larger (more negative) contributions
 
-    Lead Time Analytics:
+    Neutral Cells: Zero or near-zero contributions
 
-        Average lead time (days)
+        Light grey background
 
-        Trend: Compare to previous month
+        Text: Black or grey
 
-        Distribution chart: How many orders take 0-7, 8-14, 15-21, 22+ days
+    Empty Cells: Feature not available for that period
 
-        Supplier comparison: Which suppliers fastest/slowest
+        Light grey diagonal hatching or "N/A" text
 
-    Alerts:
+        Subtle styling to indicate no data
 
-        Banner: "⚠️ 3 orders delayed" (estimated delivery passed)
+Cell Interaction:
 
-        Recommendations: Contact supplier, escalate
+    Hover over cell: Tooltip appears with exact value, feature name, interpretation
 
-        Auto-escalation workflows (for future)
+        Example: "Seasonality (Winter peak): +127 units | Contributes 20% to weekly forecast"
 
-    Action Buttons (Per Order):
+    Click on cell: Opens detailed explanation panel
 
-        View Details
+        Shows: Why this feature contributes (e.g., "Winter typically shows +25% increase due to vehicle maintenance peaks")
 
-        Update Status
+        Shows: Historical context (e.g., "Compared to last week: +15% increase")
 
-        Send Reminder (to supplier/customer)
+3.5 Feature Contribution Display Options
 
-        Generate Invoice
+Top Controls (Above table):
 
-        Export Shipment Label
+    Display Mode Selector:
 
-UI Design:
+        Toggle: Absolute Value vs. Signed Value
 
-    Timeline View:
+            Absolute: Shows magnitude (|value|), harder to distinguish impact direction
 
-        Horizontal flow: [Placed] → [Processing] → [Shipped] → [In Transit] → [Delivered]
+            Signed: Shows direction (positive/negative), easier to see push/pull
 
-        Current state highlighted (TUM Blue #0065BD)
+        Default: Signed Value
 
-        Completed states (✓ checkmark, green #A2AD00)
+    Color Scheme Selector:
 
-        Pending states (circle outline, grey #808080)
+        Option 1: Red/Green (default, intuitive for contribution direction)
 
-        Each order is a row with timeline + metadata
+        Option 2: Blue/Orange (alternative, better for color-blind users)
 
-    Card Layout (Alternative to Timeline):
+        Option 3: Monochrome (grayscale, printer-friendly)
 
-        Card per order
+    Feature Filter:
 
-        Grid: 2 columns on desktop, 1 on mobile
+        Multi-select dropdown: Choose which feature groups to display
 
-        Card background: White (#FFFFFF)
+        Options: Show/hide "External Data", "Sales Orders", "Events", etc.
 
-        Border: 1px Grey 20% (#CCCCCC)
+        Purpose: Focus on relevant drivers, reduce cognitive load
 
-        Border-left: 4px TUM Blue (#0065BD)
+        Default: All features shown
 
-        Padding: 16px
+    Update / Apply Button:
 
-        Shadow: Subtle (Grey 50% at 10% opacity)
+        Click to refresh table based on selections above
 
-    Status Badge:
+        Shows loading indicator while recalculating
 
-        Colors: Placed (grey), Processing (yellow), Shipped (blue), In Transit (light blue), Delivered (green)
+        Maintains current scroll position
 
-        Font: 12px, weight 600, border-radius 4px
+    Export Controls:
 
-        Padding: 4px 8px
+        "Download as CSV": Export table data for analysis in Excel
 
-    Lead Time Color:
+        "Download as PNG": Export chart visualization
 
-        < 10 days: Green (#A2AD00)
+        "Share Report": Generate shareable link with these settings
 
-        10-20 days: Orange (#E37222)
-
-            20 days: Red warning
-
-Data Source:
-
-typescript
-// TODO: Replace with API call to /api/orders
-const orders = hardcodedOrderData; // lib/data/orders.ts
-
-Acceptance Criteria:
-
-    ✓ Orders display in correct status on timeline
-
-    ✓ Filters work correctly
-
-    ✓ Lead time calculations accurate
-
-    ✓ Delayed orders flagged with alert
-
-    ✓ Supplier comparison chart renders
-
-    ✓ Mobile: Cards stack vertically
-
-Feature 5: Model Performance & Accuracy Monitoring
-
-User Stories:
-
-    As a supply chain manager, I want to see model accuracy metrics so I can trust the forecasts
-
-    As a data team, I want to monitor model performance so I can retrain when needed
-
-Functionality:
-
-    Overall Model Metrics Card:
-
-        Model Accuracy: MAPE % (Mean Absolute Percentage Error)
-
-        Prediction Intervals: 80% CI coverage
-
-        Last Training: Date/time of last model retrain
-
-        Data Points Used: Number of historical records
-
-        Feature Count: Number of features in model
-
-    Accuracy by Component Type:
-
-        Table: Component, MAPE, MAE, RMSE, # Forecasts, Status (✓ Good / ⚠ Drift Detected)
-
-        Each component row links to detailed performance page
-
-        Sparkline per component showing accuracy over last 10 retrains
-
-    Model Drift Detection:
-
-        If MAPE increases > 10% threshold, flag "Drift Detected"
-
-        Recommendations: Check data quality, retrain model
-
-        Recent data anomaly examples
-
-    Forecast Performance Tracking:
-
-        Chart: Actual vs. Forecast over time (last 90 days)
-
-        Residuals plot: Shows prediction errors
-
-        Histogram: Distribution of errors (should be normal)
-
-    Feature Importance Ranking:
-
-        Table: Top 20 features by SHAP importance value
-
-        Shows contribution % to forecast
-
-        Changes highlighted if top features shift
-
-UI Design:
-
-    Metrics Cards:
-
-        2x3 grid layout
-
-        Each card shows metric + small trend indicator
-
-        Background: White (#FFFFFF)
-
-        Border: 1px Grey 20% (#CCCCCC)
-
-        Metric value: Large, TUM Blue (#0065BD)
-
-    Alert Styling (If Drift Detected):
-
-        Background: Light orange (#DAD7CB tinted orange)
-
-        Border-left: 4px Accent Orange (#E37222)
-
-        Text: Grey 80% (#333333)
-
-        Icon: Alert triangle (Lucide)
-
-Data Source:
-
-typescript
-// TODO: Replace with API call to /api/model/performance
-const modelMetrics = hardcodedModelMetrics; // lib/data/model-metrics.ts
-
-Acceptance Criteria:
-
-    ✓ MAPE metric displays correctly
-
-    ✓ Component accuracy table shows all components
-
-    ✓ Drift detection triggers alert when MAPE > 10%
-
-    ✓ Charts render accurately
-
-    ✓ Feature importance ranked by SHAP values
-
-Feature 6: User Authentication & Role-Based Access
-
-User Stories:
-
-    As a supply chain team member, I want to log in securely so only authorized people access data
-
-    As a manager, I want different views for different roles so team members see relevant information
-
-Functionality:
-
-    Login Page:
-
-        Email input field with validation
-
-        Password input field
-
-        "Remember me" checkbox (localStorage)
-
-        "Forgot Password" link (placeholder for future)
-
-        Login button (disabled while loading)
-
-        Error message display (invalid credentials, account locked, etc.)
-
-        Test credentials hint (for development)
-
-        Logo/branding at top
-
-    Role-Based Views:
-
-        Manager: Full dashboard access (forecasts, inventory, orders, analytics, performance)
-
-        Operator: Focused on inventory and incoming shipments (limited orders view)
-
-        Coordinator: Focused on orders and shipments (limited inventory view)
-
-        Executive: High-level KPI dashboard only (monthly views)
-
-        Admin: System settings, user management (future)
-
-    Session Management:
-
-        JWT token (or localStorage session for MVP)
-
-        Auto-logout after 30 minutes inactivity (with warning at 25 min)
-
-        Logout button in header
-
-        Session persists on refresh (until token expires)
-
-    User Profile:
-
-        Dropdown in top-right corner showing user name, email, role
-
-        Settings link (preferences, password change—future)
-
-        Logout link
-
-UI Design:
-
-    Login Page:
-
-        Full-screen centered layout
-
-        Logo at top: 100px
-
-        Form width: 360px
-
-        Background: White (#FFFFFF)
-
-        Form card: White with 1px border (Grey 20% #CCCCCC)
-
-        Input fields: Border 1px Grey 50% (#808080), padding 12px, border-radius 4px
-
-        Login button: Background TUM Blue (#0065BD), text white, padding 12px 24px, border-radius 4px
-
-        Button hover: Background Secondary Blue 1 (#005293)
-
-        Error message: Accent Orange (#E37222) text, padding 12px, background tinted orange at 10%
-
-        Link color: Accent Medium Blue (#64A0C8)
-
-    Header User Section:
-
-        Position: Top-right
-
-        User avatar (initials in circle, TUM Blue background)
-
-        Name and role displayed
-
-        Dropdown menu with logout
-
-Data Source:
-
-typescript
-// TODO: Replace with actual OAuth2/JWT authentication
-const users = hardcodedUsers; // lib/data/users.ts
-// validateCredentials function checks against hardcoded users
-
-Acceptance Criteria:
-
-    ✓ Login form validates input (email format, password > 6 chars)
-
-    ✓ Valid credentials redirect to /dashboard
-
-    ✓ Invalid credentials show error
-
-    ✓ Role-based views restrict features correctly
-
-    ✓ Logout clears session
-
-    ✓ Auto-logout warning displays at 25 min
-
-Feature 7: Analytics & Insights (Advanced)
-
-User Stories:
-
-    As a supply chain manager, I want to see trends and insights so I can plan strategically
-
-    As an executive, I want to see performance dashboards so I can track supply chain effectiveness
-
-Functionality:
-
-    Trend Charts:
-
-        Inventory levels trend (90 days): Line chart showing total inventory over time
-
-        Order fulfillment rate trend (90 days): % of orders delivered on time
-
-        Average lead time trend: Days trending up/down
-
-        Forecast accuracy improvement: MAPE trending down (model improving)
-
-    Performance Benchmarks:
-
-        Best-performing core types (lowest variability, highest forecast accuracy)
-
-        Worst-performing core types (highest variability, attention needed)
-
-        Supplier performance scorecard: On-time %, quantity accuracy, lead time consistency
-
-    Geographic Analysis (If applicable):
-
-        Map or regional breakdown showing inventory distribution
-
-        Top returning locations / highest shortage risk regions
-
-    Seasonal Patterns:
-
-        Heatmap: Month × Day of Week showing average cores returned
-
-        Identify peak seasons (tire change, winter damage, etc.)
-
-        Plan staffing and inventory around peaks
-
-    Forecasting Performance Improvement:
-
-        Chart: Previous forecast vs. actual vs. current forecast (showing model learning)
-
-        Quarterly accuracy improvements (e.g., "Model improved 8% in Q1 vs Q4")
-
-UI Design:
-
-    Chart Grid: 2 columns on desktop, 1 on mobile
-
-    Each Chart:
-
-        Title at top (bold, TUM Blue #0065BD)
-
-        Interactive tooltip on hover
-
-        Legend below chart
-
-        "Download as PNG" button (future)
-
-        Background: White (#FFFFFF)
-
-        Border: 1px Grey 20% (#CCCCCC)
-
-        Padding: 16px
-
-    Colors:
-
-        Trend UP: Green (#A2AD00)
-
-        Trend DOWN: Orange/Red (#E37222)
-
-        Neutral: Grey (#808080)
-
-        Secondary data lines: Light blue, dashed
-
-Data Source:
-
-typescript
-// TODO: Replace with API call to /api/analytics/trends
-const analyticsData = hardcodedAnalytics; // lib/data/analytics.ts
-
-Acceptance Criteria:
-
-    ✓ Trend charts display correct historical data
-
-    ✓ Benchmarks ranked by performance
-
-    ✓ Seasonal heatmap shows patterns clearly
-
-    ✓ Forecast improvement chart demonstrates model learning
-
-5. TECHNICAL ARCHITECTURE
-System Architecture Overview
+3.6 Visual Layout of Analysis Tab
 
 text
-┌─────────────────────────────────────────────────────────────┐
-│                    User Interface (React/Next.js)            │
-│  ┌─────────────────────────────────────────────────────────┐ │
-│  │  Pages: login, dashboard, inventory, orders, analytics  │ │
-│  │  Components: Dashboard, Charts, Tables, Filters         │ │
-│  │  State: React Context (Auth, UI State)                  │ │
-│  └─────────────────────────────────────────────────────────┘ │
-├─────────────────────────────────────────────────────────────┤
-│                    Data Layer (MVP: Hardcoded)              │
-│  lib/data/                                                   │
-│  ├── forecast-metrics.ts       (KPI card data)              │
-│  ├── forecast-detail.ts        (Chart data)                 │
-│  ├── inventory.ts              (Table data)                 │
-│  ├── orders.ts                 (Order data)                 │
-│  ├── users.ts                  (User credentials)           │
-│  ├── model-metrics.ts          (Model performance)          │
-│  └── analytics.ts              (Trend data)                 │
-├─────────────────────────────────────────────────────────────┤
-│                    API Layer (TODO for Phase 2)             │
-│  Endpoints (to be built):                                   │
-│  ├── /api/forecast/metrics                                  │
-│  ├── /api/forecast/detail                                   │
-│  ├── /api/inventory/cores                                   │
-│  ├── /api/orders                                            │
-│  ├── /api/model/performance                                 │
-│  └── /api/analytics/trends                                  │
-├─────────────────────────────────────────────────────────────┤
-│              Backend (Future: Python + FastAPI)             │
-│  ├── Data Pipeline: Extract, Transform, Load               │
-│  ├── Model Training: XGBoost, TFT, SARIMAX ensemble        │
-│  ├── Forecast Generation: 3-12 month horizons              │
-│  └── SHAP Explainability: Feature importance & drivers     │
-├─────────────────────────────────────────────────────────────┤
-│           Data Sources (Historical & Real-time)             │
-│  ├── BORG Internal: Core return history (5+ years)         │
-│  ├── KBA: German vehicle registrations, recalls            │
-│  ├── TÜV: Defect statistics by age cohort                  │
-│  ├── Weather: Historical and forecast data                 │
-│  └── Economic: PMI, interest rates, inflation indices      │
+┌─ Header Section ────────────────────────────────────────────┐
+│ SKU: Turbocharger, 3.0L Diesel (CORE-TURBO-001)            │
+│ Status: Need Review | Edit: Open | Alerts: 3                │
+│ [Accept AI Forecast] [Overwrite] [↓ More Actions]           │
 └─────────────────────────────────────────────────────────────┘
 
+┌─ Tabs ──────────────────────────────────────────────────────┐
+│ Forecast Overview | Analysis [ACTIVE] | History             │
+└─────────────────────────────────────────────────────────────┘
+
+┌─ Sub-View Selector ─────────────────────────────────────────┐
+│ ● Forecast Data Analysis | Aggregated View | Feature Contrib│
+└─────────────────────────────────────────────────────────────┘
+
+┌─ Display Controls ──────────────────────────────────────────┐
+│ [● Signed Value | Absolute Value] [Red/Green ▼] [Filters ▼]│
+│                                              [Update] [↓]    │
+└─────────────────────────────────────────────────────────────┘
+
+┌─ Feature Contribution Table ────────────────────────────────┐
+│      │ 03/01 │ 03/08 │ 03/15 │ 03/22 │ 03/29 │ ... │ 05/17 │
+├──────┼───────┼───────┼───────┼───────┼───────┼─────┼───────┤
+│ AI   │  586  │  573  │  615  │  623  │  557  │ ... │  712  │
+├──────┼───────┼───────┼───────┼───────┼───────┼─────┼───────┤
+│[▼] EXTERNAL DATA                                             │
+│ Macro │ -64   │ -30   │ -76   │  +9   │ -34   │ ... │  -7   │
+│ Custr │ -80   │  +3   │ -87   │ -21   │ -79   │ ... │ +116  │
+│ GTrnd │ +17   │ -89   │ -47   │ -67   │ -82   │ ... │ +76   │
+│ Mkt   │ +48   │ -67   │  +5   │ +64   │  -8   │ ... │ -13   │
+│ PoS   │  -2   │ -66   │ -132  │ -80   │ -69   │ ... │ -125  │
+│ Seas  │ +50   │ +179  │ +164  │  +4   │ +73   │ ... │ +63   │
+│ Weatr │ +67   │ +127  │ +13   │ -71   │ -46   │ ... │  +1   │
+├──────┼───────┼───────┼───────┼───────┼───────┼─────┼───────┤
+│[▼] SALES ORDERS                                              │
+│ Open  │ -60   │ +183  │ +27   │ -20   │ -15   │ ... │ +158  │
+│ Hist  │ +43   │ -64   │ -29   │ +36   │ -72   │ ... │ +13   │
+├──────┼───────┼───────┼───────┼───────┼───────┼─────┼───────┤
+│[▼] EVENTS                                                    │
+│ Hol   │  +2   │ +197  │ +158  │ blank │ blank │ ... │ +30   │
+│ Mktg  │ -53   │ -67   │ -83   │ +37   │ +28   │ ... │ -13   │
+└──────┴───────┴───────┴───────┴───────┴───────┴─────┴───────┘
+
+[Legend: ✓ = supported data | ◯ = N/A | Green = positive contributor | Red = negative contributor]
+
+3.7 User Interactions on Analysis Tab
+
+Collapse/Expand Feature Groups:
+
+    User clicks [▼] or [►] icon next to "EXTERNAL DATA" group
+
+    Section expands/collapses to show/hide individual features
+
+    State persists during session
+
+Drill into Feature Explanation:
+
+    User clicks on a cell (e.g., "Seasonality +179" for 03/08)
+
+    Explanation panel slides in from right side
+
+    Shows:
+
+        Feature name and value
+
+        Why this feature contributed (e.g., "Spring break holidays increase travel demand")
+
+        Historical context (e.g., "Seasonality was -15 last week, now +179 — trend change detected")
+
+        Confidence indicator (e.g., "Based on 3 years of historical data")
+
+    User clicks [X] to close panel or clicks another cell to update it
+
+Change Display Settings:
+
+    User toggles "Signed Value" → "Absolute Value"
+
+    Cell values change (e.g., "-64" becomes "64")
+
+    Interpretation: Focus shifts from "impact direction" to "magnitude"
+
+Filter Features:
+
+    User clicks "Filters ▼"
+
+    Dropdown shows checklist: External Data ☑️, Sales Orders ☑️, Events ☑️
+
+    User uncheck "Events"
+
+    Clicks [Update]
+
+    Table refreshes, Events rows hidden
+
+    Column totals recalculate
+
+Feature 4: Coming Soon Placeholder Features
+
+These features are NOT implemented in MVP but are visible in navigation with "Coming Soon" indicator and transparency effect.
+Feature 4a: Circular Transparency (Coming Soon)
+
+Navigation Button:
+
+    Location: Top navigation bar, right side after "Forecast Analysis"
+
+    Label: "Circular Transparency"
+
+    Status Badge: "Coming Soon" (small red badge, top-right corner of button)
+
+    Styling: 50% opacity (transparency effect, "matter" look - appears greyed out)
+
+    Hover Tooltip: "Quellen-Senken Analyse of Supply Chain" (German for Source-Sink Analysis)
+
+    Interaction: Click disabled, shows toast notification "This feature is under development"
+
+Feature 4b: Scenario Planning (Coming Soon)
+
+Navigation Button:
+
+    Location: Top navigation bar, right side after "Circular Transparency"
+
+    Label: "Scenario Planning"
+
+    Status Badge: "Coming Soon" (small red badge, top-right corner of button)
+
+    Styling: 50% opacity (transparency effect, "matter" look)
+
+    Hover Tooltip: "Scenario based planning with what-if scenarios and more"
+
+    Interaction: Click disabled, shows toast notification "This feature is under development"
+
+Planned Functionality (for reference, not implemented):
+
+    What-if scenario builder
+
+    Adjust key drivers (registrations, seasonality, weather) and see forecast impact
+
+    Compare multiple scenarios side-by-side
+
+    Export scenario analysis reports
+
+4. TECHNICAL ARCHITECTURE
 Frontend Stack
 
-    Framework: Next.js 15 (App Router, TypeScript)
+    Framework: Next.js 15 with App Router
 
-    Styling: Tailwind CSS v4 + custom components
+    Language: TypeScript (strict mode)
 
-    UI Component Library: shadcn/ui (pre-built, customizable)
+    Styling: Tailwind CSS v4
 
-    Charts: Recharts (lightweight React charts)
+    UI Components: shadcn/ui (customized with TUM color palette)
+
+    Charts: Recharts (multi-line time series with tooltips)
 
     Forms: React Hook Form + Zod validation
 
     Icons: Lucide React
 
-    State Management: React Context API + Hooks (no Redux needed for MVP)
+    State Management: React Context API + Hooks
 
-    Authentication: localStorage sessions (MVP), JWT in Phase 2
+    Authentication: localStorage sessions (MVP)
 
-    Deployment: Vercel (automatic CI/CD on git push)
+    Deployment: Vercel (automatic CI/CD)
 
-Data Layer (MVP)
+Data Layer (MVP - All Hardcoded)
 
-All data hardcoded in TypeScript files to enable rapid development without backend:
+All data is hardcoded in TypeScript files to enable rapid MVP development:
 
-lib/types.ts — Type definitions:
+lib/data/:
 
-typescript
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'manager' | 'operator' | 'coordinator' | 'executive' | 'admin';
-}
+    forecast-metrics.ts - KPI values, alert counts, model accuracy
 
-interface Core {
-  id: string;
-  part_number: string;
-  description: string;
-  quantity: number;
-  reorder_point: number;
-  status: 'in_stock' | 'low_stock' | 'out_of_stock';
-}
+    forecast-chart.ts - Time series data (AI forecast, consensus, confidence bands)
 
-interface Order {
-  id: string;
-  order_number: string;
-  status: 'placed' | 'processing' | 'shipped' | 'in_transit' | 'delivered';
-  created_at: string;
-  estimated_delivery: string;
-  actual_delivery?: string;
-}
+    feature-contributions.ts - Feature impact table data (organized by category)
 
-interface Forecast {
-  date: string;
-  historical_quantity: number;
-  forecast_quantity: number;
-  confidence_lower: number;
-  confidence_upper: number;
-}
+    inventory.ts - Stock levels, reorder points, locations
 
-interface ModelMetric {
-  name: string;
-  value: number;
-  unit: string;
-  trend: 'up' | 'down' | 'neutral';
-  threshold?: number;
-}
+    orders.ts - Order status, lead times, deliveries
 
-lib/data/*.ts — Hardcoded data:
+    users.ts - Test user accounts with roles
 
-    forecast-metrics.ts: KPI values (totals, averages, counts)
+    critical-actions.ts - Alerts, delivery schedules, stock warnings
 
-    forecast-detail.ts: 36-month forecast time series per core type
+    calendar-events.ts - Upcoming delivery dates, action dates
 
-    inventory.ts: 50+ core items with quantities and status
+lib/types.ts - TypeScript interfaces for all data models
 
-    orders.ts: 20+ orders with status and dates
+lib/contexts/:
 
-    users.ts: Test user accounts with credentials
-
-    model-metrics.ts: MAPE, accuracy by component, drift alerts
-
-    analytics.ts: Historical trends for charts
+    AuthContext.tsx - Authentication state, session handling (role management planned for Phase 2)
 
 Component Architecture
 
 text
 components/
-├── ui/                          # shadcn/ui base components
+├── ui/                          # shadcn/ui components
 │   ├── button.tsx
 │   ├── card.tsx
 │   ├── table.tsx
-│   ├── input.tsx
-│   ├── select.tsx
-│   ├── badge.tsx
-│   └── ...
+│   ├── tabs.tsx
+│   └── badge.tsx
 │
-├── layout/                      # Shared layout
-│   ├── Header.tsx               # Top navigation + user menu
-│   ├── Sidebar.tsx              # Left navigation with collapse
-│   └── Footer.tsx               # Footer (optional)
+├── layout/
+│   ├── Header.tsx               # Top navigation
+│   ├── Sidebar.tsx              # Left sidebar with core forecast filter
+│   └── CriticalActionsPanel.tsx # Right-side alerts panel
 │
-├── features/
-│   ├── dashboard/
-│   │   ├── KPICard.tsx           # Single metric card
-│   │   ├── MetricGrid.tsx        # Grid of KPI cards
-│   │   ├── CriticalAlerts.tsx    # Alert list component
-│   │   └── QuickActions.tsx      # Action buttons
-│   │
-│   ├── forecast/
-│   │   ├── ForecastChart.tsx     # Main chart (bar + line)
-│   │   ├── ComponentSelector.tsx # Dropdown to select core type
-│   │   ├── DriverExplanation.tsx # Feature importance list
-│   │   ├── ScenarioAnalysis.tsx  # What-if sliders
-│   │   └── TimeSelector.tsx      # Period buttons + picker
-│   │
-│   ├── inventory/
-│   │   ├── InventoryTable.tsx    # Main table
-│   │   ├── InventoryFilters.tsx  # Filter controls
-│   │   ├── StockBadge.tsx        # Status badge component
-│   │   └── BulkActions.tsx       # Select/export buttons
-│   │
-│   ├── orders/
-│   │   ├── OrderTimeline.tsx     # Order status timeline
-│   │   ├── OrderCard.tsx         # Individual order card
-│   │   ├── OrderFilters.tsx      # Filter controls
-│   │   ├── LeadTimeChart.tsx     # Lead time distribution
-│   │   └── SupplierScore.tsx     # Supplier performance
-│   │
-│   ├── analytics/
-│   │   ├── TrendChart.tsx        # Multi-line trend
-│   │   ├── BenchmarkTable.tsx    # Top/bottom performers
-│   │   ├── HeatmapChart.tsx      # Seasonal patterns
-│   │   └── PerformanceGauge.tsx  # Visual progress indicator
-│   │
-│   └── auth/
-│       ├── LoginForm.tsx         # Login form
-│       └── UserMenu.tsx          # User profile dropdown
+└── features/
+    ├── dashboard/
+    │   ├── KPIGrid.tsx          # KPI card grid
+    │   ├── ForecastChart.tsx    # Main multi-line chart
+    │   ├── AlertSummary.tsx     # Alert count and trend
+    │   └── CalendarWidget.tsx   # Delivery date calendar
+    │
+    ├── forecast-analysis/
+    │   ├── AnalysisHeader.tsx   # SKU info, status, buttons
+    │   ├── AnalysisTabs.tsx     # Tab navigation
+    │   ├── FeatureTable.tsx     # Feature contribution table
+    │   ├── TableControls.tsx    # Display options
+    │   └── FeatureExplainer.tsx # Detail panel for cell drill-down
+    │
+    └── auth/
+        └── LoginForm.tsx        # Already implemented
 
 Page Routes
 
 text
 app/
-├── page.tsx                     # Landing page (redirects to /login or /dashboard)
+├── page.tsx                     # Landing → redirects to /login or /dashboard
 ├── login/
-│   └── page.tsx                 # Login page
-├── dashboard/
-│   ├── layout.tsx               # Dashboard main layout
-│   ├── page.tsx                 # KPI overview page
-│   ├── forecast/
-│   │   └── page.tsx             # Detailed forecast page
-│   ├── inventory/
-│   │   └── page.tsx             # Inventory table page
-│   ├── orders/
-│   │   └── page.tsx             # Orders timeline page
-│   ├── analytics/
-│   │   └── page.tsx             # Analytics & insights page
-│   └── performance/
-│       └── page.tsx             # Model performance page
-├── api/
-│   ├── auth/
-│   │   └── route.ts             # Login endpoint (MVP: local validation)
-│   └── [feature]/
-│       └── route.ts             # Future API endpoints
-└── globals.css                  # Tailwind + custom styles
+│   └── page.tsx                 # Login page (existing)
+└── dashboard/
+    ├── layout.tsx               # Main dashboard layout
+    ├── page.tsx                 # Main dashboard (KPIs, chart, alerts)
+    └── forecast-analysis/
+        └── page.tsx             # Forecast analysis page (feature contributions)
 
-Development Workflow (Vibe Coding)
+Component Interaction Flow
 
-    Define PRD (this document) with clear user stories and feature specs
-
-    Feature Planning: Use Claude to break down each feature into components
-
-    Component Implementation:
-
-        Create type definitions (TypeScript interfaces)
-
-        Create hardcoded data file (lib/data/*.ts)
-
-        Build React component (components/features/*/Component.tsx)
-
-        Wire up to page (app/dashboard/*/page.tsx)
-
-    Testing: Manual testing + accessibility checks
-
-    Commit & Deploy: Push to GitHub → auto-deploy to Vercel
-
-    Iterate: Gather feedback → refine component → commit → redeploy
-
-Deployment Pipeline
+Sidebar Selection → Dashboard Update:
 
 text
-Local Development
-    ↓ (git push origin main)
-GitHub Repository
-    ↓ (webhook trigger)
-Vercel Build
-    ↓ (npm run build + next build)
-Production Deployment
-    ↓
-Live URL: https://scmwebapp.vercel.app
+User clicks sidebar item (L2 Turbochargers)
+  ↓ (setSelectedProduct)
+Dashboard Context updates
+  ↓
+ForecastChart filters data by selected product
+KPIGrid recalculates metrics for that product
+AlertSummary refreshes alert counts
+CriticalActionsPanel filters relevant alerts
 
-6. DESIGN SYSTEM & BRANDING
-Color Palette (TUM Corporate Design)
+Chart Hover → Tooltip:
+
+text
+User hovers over chart line
+  ↓
+Recharts tooltip displays
+  ↓
+Shows: [Date, AI Forecast Value, Consensus Value, % Diff]
+
+Critical Action Click → Drill-Down:
+
+text
+User clicks "STOCK LOW <Y" alert
+  ↓
+Modal/drawer opens showing:
+  - Affected SKUs and locations
+  - Current vs. reorder point quantities
+  - Recommended action
+  - Option to view forecast for affected product
+
+Time Range Selection → Chart Zoom:
+
+text
+User clicks "1 Month" button
+  ↓
+Chart X-axis adjusts to 1-month window
+KPI metrics recalculate for that period
+Forecast bands update accordingly
+
+5. DESIGN SYSTEM & VISUAL SPECIFICATIONS
+Color Palette (Morten's Requirements - Final)
 
 Primary Colors:
 
-    TUM Blue (Primary): #0065BD — Main brand color, CTAs, active states
+    Primary Blue (#0065BD): Page headers (H1/H2), KPI values, primary buttons, AI forecast line (chart)
 
-    White: #FFFFFF — Background, card surfaces
+    White (#FFFFFF): Page background, card surfaces, clean spacing
 
-    Black: #000000 — Text, dark elements (minimal use)
+    Black (#000000): Primary text body, critical elements
 
-Secondary Blues:
+Secondary Colors:
 
-    Secondary Blue 1 (Pantone 301): #005293 — Hover states, secondary highlights
+    Secondary Grey (#6E685F): Section headers (H3), labels, secondary text, descriptions
 
-    Secondary Blue 2 (Pantone 540): #003359 — Dark accents, borders
-
-Neutral Greys:
-
-    Grey 80%: #333333 — Primary text color
-
-    Grey 50%: #808080 — Secondary text, disabled states
-
-    Grey 20%: #CCCCCC — Borders, dividers, subtle backgrounds
+    Border/Shadow Grey (#D3D0CC): Subtle borders, card shadows, dividers
 
 Accent Colors:
 
-    Accent Light Beige (Pantone 7527): #DAD7CB — Light backgrounds, info sections
+    Accent Green (#A2AD00): Positive trends, in-stock status, success badges
 
-    Accent Orange (Pantone 158): #E37222 — Warnings, alerts, trending down
+    Accent Orange (#E37222): Warnings, caution states, declining trends, some alert types
 
-    Accent Green (Pantone 383): #A2AD00 — Success, positive trends, in stock
-
-    Accent Light Blue (Pantone 283): #98C6EA — Information, secondary highlights
-
-    Accent Medium Blue (Pantone 542): #64A0C8 — Charts, secondary lines
-
-Status Color Mapping
-
-    Good / In Stock / Active: Green #A2AD00
-
-    Warning / Low Stock / Caution: Orange #E37222
-
-    Critical / Out of Stock / Error: Red (use Orange with increased opacity as fallback) #E37222
-
-    Neutral / Processing: Grey #808080
-
-    Success / Positive Trend: Green #A2AD00
-
-    Negative Trend / Decline: Orange #E37222
+    Accent Red (#C01530): Critical alerts, stock-outs, urgent actions, consensus line (chart)
 
 Typography
 
-Font Families:
+Font Stack:
 
-    Primary: Inter, Montserrat, or system sans-serif (-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif)
-
-    Monospace (for data/code): Courier New, Menlo, or Monaco
+text
+-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Montserrat, sans-serif
 
 Font Sizes & Weights:
+Element	Size	Weight	Color
+Page Title (H1)	32px	600	#0065BD
+Section Header (H2)	20px	600	#0065BD
+Card Title (H3)	14px	600	#6E685F
+Body Text	14px	400	#000000
+Labels/Captions	12px	500	#6E685F
+Small Text	11px	400	#6E685F
+KPI Value	28px	600	#0065BD
+Chart Axis Labels	11px	400	#6E685F
+Spacing & Layout
 
-    Page Title (H1): 32px, weight 600, TUM Blue #0065BD
+Base Unit: 4px (multiples: 4, 8, 12, 16, 20, 24, 32)
+Element	Value
+Sidebar Width	280px (fixed)
+Card Padding	20px
+Gap Between Cards	16px
+Section Margin	24px (top/bottom)
+Chart Height	400px (desktop), 300px (mobile)
+Chart Padding	16px
+KPI Card Height	Auto (min 140px)
 
-    Section Title (H2): 24px, weight 600, TUM Blue #0065BD
+Border Radius:
 
-    Card Title (H3): 16px, weight 600, TUM Blue #0065BD
+    Cards: 8px
 
-    Label / Overline: 12px, weight 500, Grey 80% #333333
+    Buttons: 4px
 
-    Body Text: 14px, weight 400, Grey 80% #333333
+    Badges: 12px (pill-shaped)
 
-    Small Text / Caption: 12px, weight 400, Grey 50% #808080
+    Inputs: 4px
 
-    Button Text: 14px, weight 600, white on TUM Blue
+Shadows & Effects
+Situation	Shadow
+Card Default	0 1px 3px rgba(0, 0, 0, 0.08)
+Card Hover	0 4px 8px rgba(0, 0, 0, 0.12)
+Chart Container	0 1px 3px rgba(0, 0, 0, 0.08)
+Alert Box	0 2px 4px rgba(0, 0, 0, 0.1)
 
-    KPI Value: 32px, weight 600, TUM Blue #0065BD
+Effects:
 
-Spacing System
+    Card Hover: Slight shadow elevation + 1px scale-up (matter design)
 
-    Base unit: 4px
+    Button Hover: Subtle background shade shift (Secondary Blue #005293 for blue buttons)
 
-    Padding: 8px, 12px, 16px, 20px, 24px, 32px
+    Disabled State: 50% opacity + cursor: not-allowed
 
-    Margin: 8px, 12px, 16px, 20px, 32px, 40px
+Component Styling
 
-    Gap (between grid items): 12px, 16px, 20px
+Buttons:
 
-    Border Radius: 4px (small), 8px (standard), 12px (pill), 9999px (full circle)
+    Primary (Blue):
 
-    Box Shadow: Subtle (0 2px 4px rgba(0,0,0,0.1)) to prominent (0 10px 20px rgba(0,0,0,0.15))
-
-Border & Shadow
-
-    Borders: 1px solid Grey 20% #CCCCCC (standard), 1px solid Grey 50% #808080 (input focus)
-
-    Shadows:
-
-        Subtle: 0 1px 3px rgba(0, 0, 0, 0.08)
-
-        Standard: 0 4px 6px rgba(0, 0, 0, 0.1)
-
-        Prominent: 0 10px 25px rgba(0, 0, 0, 0.15)
-
-Component Styles
-Buttons
-
-    Primary Button:
-
-        Background: TUM Blue #0065BD
+        Background: #0065BD
 
         Text: White
 
         Padding: 10px 20px
 
-        Border: None
+        Hover: Background #005293
 
-        Border-radius: 4px
+        Disabled: Opacity 50%
 
-        Font: 14px, weight 600
-
-        Hover: Background Secondary Blue 1 #005293
-
-        Active: Background Secondary Blue 2 #003359
-
-        Disabled: Opacity 50%, cursor not-allowed
-
-    Secondary Button:
-
-        Background: Grey 20% #CCCCCC at 50% opacity
-
-        Text: Grey 80% #333333
-
-        Border: 1px solid Grey 50% #808080
-
-        Hover: Background Grey 20% #CCCCCC
-
-    Outline Button:
+    Secondary (Grey outline):
 
         Background: Transparent
 
-        Border: 1px solid Grey 50% #808080
+        Border: 1px solid #D3D0CC
 
-        Text: TUM Blue #0065BD
+        Text: #6E685F
 
-        Hover: Background Grey 20% #CCCCCC at 20% opacity
+        Padding: 10px 20px
 
-Cards
+        Hover: Background #F5F5F5
 
-    Background: White #FFFFFF
+    Alert Button (Red):
 
-    Border: 1px solid Grey 20% #CCCCCC
+        Background: #C01530
+
+        Text: White
+
+        Padding: 10px 20px
+
+        Hover: Background #A01228
+
+        Cursor: Pointer
+
+Cards:
+
+    Background: #FFFFFF
+
+    Border: 1px solid #D3D0CC
 
     Border-radius: 8px
 
-    Padding: 16px or 20px
+    Padding: 20px
 
-    Shadow: Subtle (0 2px 4px)
+    Shadow: 0 1px 3px rgba(0, 0, 0, 0.08)
 
-    Hover Shadow: Standard (0 4px 8px)
+    Hover: Shadow increases to 0 4px 8px rgba(0, 0, 0, 0.12)
 
-Input Fields
+Input Fields:
 
-    Background: White #FFFFFF
+    Background: #FFFFFF
 
-    Border: 1px solid Grey 50% #808080
-
-    Border-radius: 4px
+    Border: 1px solid #D3D0CC
 
     Padding: 10px 12px
 
-    Focus: Border TUM Blue #0065BD, outline 2px solid #0065BD at 30% opacity
+    Border-radius: 4px
 
-    Placeholder: Grey 50% #808080
+    Focus: Border #0065BD, outline 2px solid #0065BD (20% opacity)
 
-    Font: 14px, weight 400, Grey 80% #333333
+    Font: 14px, #000000
 
-Badges & Status Indicators
+Badges:
 
-    Background: Color-coded (green/orange/red) at 20% opacity
+    Status Badges (Success): Background #A2AD00 (15% opacity), Text #A2AD00
 
-    Text: Color-coded (green/orange/red) at full opacity
+    Status Badges (Warning): Background #E37222 (15% opacity), Text #E37222
+
+    Status Badges (Critical): Background #C01530 (15% opacity), Text #C01530
+
+    Font: 11px, weight 600
 
     Padding: 4px 8px
 
     Border-radius: 12px
 
-    Font: 11px, weight 600
+Tables:
 
-Tables
+    Header Background: #F5F5F5
 
-    Header Background: Grey 20% #CCCCCC
+    Header Text: #6E685F, weight 600
 
-    Header Text: Grey 80% #333333, weight 600
+    Row Background: Alternating #FFFFFF and #FAFAFA
 
-    Row Background: White (alternating white / Grey 20% at 30% opacity)
+    Row Hover: #F5F5F5
 
-    Row Hover: Grey 20% #CCCCCC at 50% opacity
-
-    Border: 1px solid Grey 20% #CCCCCC
+    Border: 1px solid #D3D0CC
 
     Cell Padding: 12px
 
-Charts
+Charts:
 
-    Background: White #FFFFFF
+    Background: #FFFFFF
 
-    Border: 1px solid Grey 20% #CCCCCC
+    Border: 1px solid #D3D0CC
 
-    Text (axis labels): Grey 80% #333333, 12px
+    Grid Lines: #D3D0CC (20% opacity)
 
-    Grid lines: Grey 20% #CCCCCC at 50% opacity
+    AI Forecast Line: #0065BD (2px)
 
-    Line colors: TUM Blue #0065BD, Secondary Blues, Accent colors
+    Consensus Line: #C01530 (2px, dashed)
 
-    Tooltip: Black background, white text, subtle shadow
+    Confidence Band: #0065BD (10% opacity fill)
 
-Responsive Breakpoints
+    Tooltip Background: #000000
 
-    Mobile: 320px - 639px (1 column, stacked layout)
+    Tooltip Text: #FFFFFF
 
-    Tablet: 640px - 1023px (2 columns, collapsed sidebar)
+Responsive Design
 
-    Desktop: 1024px - 1919px (3-4 columns, expanded sidebar)
+Breakpoints:
+Device	Width	Layout
+Mobile	320px-767px	Stack vertically; sidebar becomes drawer; actions panel slides up
+Tablet	768px-1023px	Sidebar collapses to icons; main content expands; actions panel stays
+Desktop	1024px+	Full layout: sidebar + main + actions panel all visible
 
-    Large Desktop: 1920px+ (max-width 1400px for content)
+Key Responsive Changes:
+
+    KPI Grid: 1 column (mobile), 2 columns (tablet), 4 columns (desktop)
+
+    Chart Height: 250px (mobile), 300px (tablet), 400px (desktop)
+
+    Font Sizes: 12px body (mobile), 13px (tablet), 14px (desktop)
+
+    Padding: 12px (mobile), 16px (tablet), 20px (desktop)
 
 Accessibility
 
-    Color Contrast: Minimum 4.5:1 for normal text, 3:1 for large text
+Color Contrast:
 
-    Font Size: Minimum 12px (readable without zoom)
+    Primary text vs. white background: ≥ 4.5:1 (AAA)
 
-    Touch Targets: Minimum 44px × 44px for interactive elements
+    Secondary text vs. white background: ≥ 3:1 (AA)
 
-    Keyboard Navigation: Tab order logical, focus visible on all interactive elements
+    Chart lines vs. white background: ≥ 3:1 (AA)
 
-    ARIA Labels: Semantic HTML + ARIA attributes where needed
+    Alert boxes: ≥ 4.5:1 (AAA)
 
-    Focus Indicators: 2px outline, TUM Blue #0065BD
+Interactive Elements:
 
-7. DATA STRUCTURES & MODELS
-Core Data Models (TypeScript)
+    Minimum touch target: 44px × 44px
 
-User Model:
+    Focus visible: 2px outline, #0065BD
 
-typescript
-interface User {
-  id: string;                  // UUID
-  email: string;              // Unique
-  password_hash?: string;     // Never send to frontend
-  name: string;
-  role: UserRole;
-  department: string;
-  created_at: Date;
-  last_login?: Date;
-  is_active: boolean;
-}
+    All buttons keyboard accessible (Tab key)
 
-type UserRole = 'manager' | 'operator' | 'coordinator' | 'executive' | 'admin';
+    All form inputs have <label> or aria-label
 
-Core / Component Model:
+Semantic HTML:
 
-typescript
-interface Core {
-  id: string;                      // Unique ID
-  part_number: string;            // e.g., "CORE-TURBO-001"
-  description: string;            // e.g., "Turbocharger, 3.0L Diesel"
-  component_type: ComponentType;  // Turbo, Engine, Transmission, etc.
-  quantity: number;               // Current inventory
-  reorder_point: number;          // Trigger for low stock alert
-  unit_price: number;             // €
-  location: WarehouseLocation;
-  supplier_id: string;
-  status: StockStatus;
-  last_updated: Date;
-  yield_rate: number;            // % of returned cores usable
-  lead_time_days: number;        // Average from supplier
-  turn_rate: number;             // Turnover rate (times per year)
-}
+    Page structure: <header>, <nav>, <main>, <aside>, <footer>
 
-type ComponentType = 'turbo' | 'engine' | 'transmission' | 'battery' | 'starter' | 'alternator';
-type StockStatus = 'in_stock' | 'low_stock' | 'out_of_stock';
-type WarehouseLocation = 'Warehouse A' | 'Warehouse B' | 'Warehouse C';
+    Headings: <h1> (page title), <h2> (sections), <h3> (cards)
 
-Order Model:
+    Lists: <ul> (alerts), <ol> (ranked items)
+
+    Tables: <table> with <thead>, <tbody>
+
+    Forms: <form>, <input>, <label>, <button>
+
+ARIA Attributes:
+
+    aria-label on icon buttons
+
+    aria-describedby on complex components
+
+    role="status" on alert summaries
+
+    aria-expanded on collapsible sections
+
+    aria-selected on tabs
+
+    aria-hidden="true" on decorative elements
+
+6. DATA FLOW & HARDCODED DATA STRATEGY
+Data Structure Overview
+
+KPI Metrics:
 
 typescript
-interface Order {
-  id: string;
-  order_number: string;           // Human-readable, e.g., "ORD-2024-001234"
-  supplier_id: string;
-  core_items: OrderLine[];        // Array of cores in this order
-  total_quantity: number;
-  total_value: number;            // €
-  status: OrderStatus;
-  priority: 'low' | 'normal' | 'high' | 'urgent';
-  created_at: Date;
-  placed_at?: Date;
-  processing_at?: Date;
-  shipped_at?: Date;
-  in_transit_at?: Date;
-  delivered_at?: Date;
-  estimated_delivery: Date;
-  lead_time_days: number;         // Actual or estimated
-  notes: string;
-}
-
-interface OrderLine {
-  order_id: string;
-  core_id: string;
-  quantity: number;
-  unit_price: number;
-}
-
-type OrderStatus = 'placed' | 'processing' | 'shipped' | 'in_transit' | 'delivered' | 'cancelled';
-
-Forecast Model:
-
-typescript
-interface Forecast {
-  id: string;
-  core_id: string;
-  forecast_date: Date;           // Date forecast was generated
-  horizon_days: number;          // 90 (3 months), 180 (6 months), 365 (12 months)
-  
-  forecasts: ForecastPoint[];    // Time series
-  model_version: string;         // e.g., "ensemble_v2.1"
-  accuracy_mape: number;         // % error on validation set
-  
-  drivers: FeatureDriver[];      // Top factors driving forecast
-  scenarios?: Scenario[];        // Optional what-if scenarios
-}
-
-interface ForecastPoint {
-  date: Date;
-  quantity_mean: number;         // Point estimate
-  quantity_std: number;          // Standard deviation for uncertainty
-  confidence_lower: number;      // 10th percentile (for 80% CI)
-  confidence_upper: number;      // 90th percentile
-  component_state?: ComponentState[];  // Breakdown by condition
-}
-
-interface ComponentState {
-  state: 'working' | 'minor_repair' | 'major_repair' | 'scrap';
-  percentage: number;            // % of returned cores in this state
-}
-
-interface FeatureDriver {
-  feature_name: string;          // e.g., "Vehicle Registrations"
-  shap_value: number;            // Contribution to forecast
-  current_value?: string;        // e.g., "+12% registrations"
-  direction: 'up' | 'down' | 'neutral';
-}
-
-interface Scenario {
-  name: string;                  // e.g., "Economic Downturn"
-  adjusted_quantity: number;     // What forecast becomes
-  adjustments: Record<string, number>;  // Feature value changes
-}
-
-Model Performance Model:
-
-typescript
-interface ModelMetrics {
-  model_version: string;
-  trained_at: Date;
-  mape: number;                  // Mean Absolute Percentage Error (%)
-  mae: number;                   // Mean Absolute Error (units)
-  rmse: number;                  // Root Mean Squared Error
-  
-  component_metrics: ComponentMetric[];  // Accuracy per component type
-  drift_detected: boolean;       // MAPE increased > threshold
-  
-  feature_importance: FeatureImportance[];
-  data_points_used: number;
-}
-
-interface ComponentMetric {
-  component_type: ComponentType;
-  mape: number;
-  mae: number;
-  forecast_count: number;
-  status: 'good' | 'drift_detected' | 'insufficient_data';
-}
-
-interface FeatureImportance {
-  rank: number;                  // 1-20
-  feature_name: string;
-  importance_score: number;      // SHAP or similar
-  trend: 'increasing' | 'stable' | 'decreasing';
-}
-
-Analytics Model:
-
-typescript
-interface AnalyticsTrend {
-  metric_name: string;          // e.g., "Average Inventory Level"
-  data_points: TrendPoint[];
-}
-
-interface TrendPoint {
-  date: Date;
+interface KPIMetric {
+  label: string;
   value: number;
-  change_percent: number;        // % change from previous period
+  unit: string;
+  trend: 'up' | 'down' | 'neutral';
+  trendValue: number;          // % change
+  sparklineData: number[];      // Last 30 days
+  status: 'good' | 'warning' | 'critical';
 }
 
-interface PerformanceBenchmark {
-  rank: number;
-  entity_name: string;           // Component type or Supplier name
-  metric_value: number;
-  performance_score: number;     // 0-100
-  change_vs_previous: number;    // % change
+Forecast Data:
+
+typescript
+interface ForecastDataPoint {
+  date: string;
+  aiForecas: number;
+  consensusForecas: number;
+  confidenceLower: number;
+  confidenceUpper: number;
 }
+
+const forecastData: ForecastDataPoint[] = [
+  { date: '04/01', aiForecas: 586, consensusForecas: 550, confidenceLower: 480, confidenceUpper: 650 },
+  { date: '04/08', aiForecas: 573, consensusForecas: 560, confidenceLower: 470, confidenceUpper: 640 },
+  // ... more data points
+]
+
+Feature Contributions:
+
+typescript
+interface FeatureContribution {
+  featureName: string;
+  category: 'ExternalData' | 'SalesOrders' | 'Events';
+  contributions: Record<string, number>; // { date: value, ...}
+}
+
+const featureContributions: FeatureContribution[] = [
+  { 
+    featureName: 'Macroeconomic Trends',
+    category: 'ExternalData',
+    contributions: { '03/01': -64, '03/08': -30, '03/15': -76, ... }
+  },
+  // ... more features
+]
+
+Critical Actions:
+
+typescript
+interface CriticalAction {
+  id: string;
+  type: 'STOCK_LOW_SINGLE' | 'STOCK_LOW_MULTI' | 'DELIVERY_COMING';
+  title: string;
+  description: string;
+  severity: 'warning' | 'critical';
+  affectedSKUs: string[];
+  actionDate: string;
+  icon: string;
+}
+
+const criticalActions: CriticalAction[] = [
+  {
+    id: 'alert_001',
+    type: 'STOCK_LOW_SINGLE',
+    title: 'STOCK LOW <Y',
+    description: 'Turbocharger stock below reorder point',
+    severity: 'critical',
+    affectedSKUs: ['CORE-TURBO-001'],
+    actionDate: '2025-11-30',
+    icon: '⚠️'
+  },
+  // ... more actions
+]
+
+Data Files to Create
+
+lib/data/:
+
+    forecast-metrics.ts - All KPI values, alert summaries
+
+    forecast-chart.ts - Time series data for main chart
+
+    feature-contributions.ts - Feature impact values organized by category
+
+    critical-actions.ts - Alert boxes, delivery alerts, stock warnings
+
+    inventory.ts - SKU list, stock levels (reference for sidebar filter)
+
+    orders.ts - Order data (for future reference)
+
+    users.ts - Test user accounts with roles (already exists)
+
+    calendar-events.ts - Delivery dates, action dates for calendar widget
+
+lib/types.ts - All TypeScript interfaces
+Hardcoded Data Pattern
+
+Every component has a comment marking where API calls would go:
+
+typescript
+// TODO: Replace with API call to /api/forecast/metrics
+const metrics = hardcodedForecastMetrics;
+
+This enables easy replacement in Phase 2 when backend is available.
+7. USER JOURNEY & INTERACTION SCENARIOS
+Scenario 1: Planner Reviews Supply Chain Health (Main Dashboard)
+
+Step 1: Login
+
+    Navigate to app
+
+    Enter credentials (demo@borgai.platform / demo1234)
+
+    Redirected to /dashboard
+
+Step 2: Dashboard Overview
+
+    See KPI cards showing model accuracy (85%), forecast offset (24%)
+
+    View main chart: Blue line (AI forecast) trends upward, red line (consensus) flatter
+
+    Notice critical actions on right: "STOCK LOW ×Y" (red alert)
+
+    Scan alert summary: 16 total alerts, 12 forecast-related, 4 model performance
+
+Step 3: Investigate Specific Product
+
+    Click "Turbochargers" in left sidebar
+
+    Chart updates to show turbocharger-specific forecast
+
+    Alert panel filters to show turbocharger-specific alerts
+
+    KPI cards refresh with turbocharger metrics
+
+Step 4: Check Critical Alert
+
+    Click "STOCK LOW ×Y" alert on right panel
+
+    Modal/drawer opens showing:
+
+        Affected locations: Warehouse A (142 units), Warehouse B (18 units)
+
+        Reorder point: 200 units
+
+        Recommendation: Expedite delivery or reduce forecast-based demand
+
+    Option: Click "View Forecast for This SKU" → Navigate to /dashboard/forecast-analysis
+
+Step 5: Review Forecast Analysis
+
+    On /dashboard/forecast-analysis page
+
+    See turbocharger SKU selected
+
+    Review feature contribution table
+
+    Notice "Seasonality +179" for March (high) and "Macroeconomic -64" (low)
+
+    Hover over cells to understand drivers
+
+    Decision: Accept forecast or override
+
+Step 6: Accept Forecast
+
+    Click [Accept AI Forecast] button
+
+    Status updates to "Accepted"
+
+    Timestamp shows: "Accepted by [User Name] on Nov 30, 2025 at 09:22"
+
+    Return to dashboard (either via navigation or back button)
+
+Scenario 2: Planner Checks Upcoming Deliveries
+
+Step 1: Login
+
+    Credentials: sarah@borg.com / password123
+
+    Role: Operator
+
+Step 2: Operator Dashboard View
+
+    Dashboard shows operator-specific view
+
+    Inventory cards prominent (limited forecast detail)
+
+    Critical actions: stock levels, incoming deliveries
+
+    Chart: Simplified view (no detailed feature analysis)
+
+Step 3: Check Incoming Delivery
+
+    Calendar widget shows "🚚 Dec 2" (delivery date highlighted in red)
+
+    Click calendar date
+
+    Details: "2 pallets turbochargers arriving Dec 2, 3 PM"
+
+    Quantity: 500 units
+
+    Expected impact: Resolve "STOCK LOW ×Y" alert
+
+Step 4: Prepare for Delivery
+
+    Click "DELIVERY COMING" alert
+
+    See delivery details and expected impact on inventory
+
+    Review affected SKUs and forecast adjustments
+
+    Plan warehouse capacity and receiving logistics
+
+Scenario 3: Future Multi-Role Implementation (Phase 2)
+
+Step 1: Login
+
+    Credentials: executive@borg.com / password123
+
+    Role: Executive
+
+Step 2: Executive Dashboard View
+
+    High-level KPI dashboard only
+
+    4 main metrics: forecast accuracy, inventory health, lead time, cost impact
+
+    No detailed tables, no drill-down into individual SKUs
+
+    Monthly trend view (not weekly)
+
+Step 3: View Performance Trend
+
+    Chart shows last 90 days aggregate performance
+
+    Green line trending up (positive)
+
+    Alert summary: 3 critical alerts (vs. 16 in manager view)
+
+    PDF export option available
 
 8. ACCEPTANCE CRITERIA & TESTING STRATEGY
-MVP Definition (What Constitutes "Done")
+MVP Definition - What Constitutes "Done"
+Feature Completeness
 
-✅ All 7 Core Features Implemented:
+✅ Login Page: Functional with test credentials
+✅ Main Dashboard: All components render correctly
 
-    Dashboard KPI overview with 5+ metrics
+    Header with navigation
 
-    Forecast detail chart with driver explanation
+    Left sidebar with product filter (L1-L5)
 
-    Inventory table with filters and search
+    KPI card grid (4 cards minimum)
 
-    Orders timeline view with lead time analytics
+    Forecast chart (multi-line with tooltips)
 
-    Model performance monitoring page
+    Alert summary box
 
-    User authentication with role-based views
+    Critical actions panel (red alert boxes)
 
-    Analytics & insights page with 4+ trend charts
+    Calendar widget (with delivery dates)
 
-✅ Functional Requirements:
+✅ Forecast Analysis Page: Feature contribution table
 
-    All pages load in < 2 seconds (P95)
+    Header with SKU info and action buttons
 
-    Responsive design: Mobile (320px) to Desktop (1920px)
+    Tabs: Forecast Overview, Analysis, History
 
-    Filters and search work correctly (real-time)
+    Feature contribution table with color-coded cells
 
-    Charts render without errors
+    Display options (absolute/signed, color scheme, filters)
 
-    No console errors or warnings
+    Collapsible feature categories
 
-    All data displays correctly (no formatting issues)
+    Cell hover tooltips
 
-    Role-based access control enforced
+✅ Coming Soon Placeholders: Disabled navigation buttons
 
-    Logout and session management working
+    "Circular Transparency" button (50% opacity, tooltip)
 
-✅ Non-Functional Requirements:
+    "Scenario Planning" button (50% opacity, tooltip)
 
-    Code is TypeScript (strict mode, no any types except justified cases)
+Functional Requirements
+
+✅ Page Load Performance: < 2 seconds (P95)
+✅ Responsive Design:
+
+    Desktop (1024px+): Full layout renders correctly
+
+    Tablet (768px-1023px): Sidebar collapses to icons, layout adjusts
+
+    Mobile (320px-767px): Stack vertically, no horizontal scroll
+
+✅ Chart Interactions:
+
+    Hover tooltip displays correct values
+
+    Time range buttons update chart window
+
+    Legend toggle works
+
+    Component dropdown filters data
+
+✅ Sidebar Filter:
+
+    Click product line → dashboard updates
+
+    Selected item highlights
+
+    All data (chart, KPI, alerts) filters to product
+
+    Can expand/collapse L1-L5 hierarchy
+
+✅ Table Interactions:
+
+    Hover cell → tooltip appears
+
+    Click cell → explanation panel opens (if implemented)
+
+    Collapse/expand feature groups
+
+    Display options update table
+
+✅ Data Accuracy:
+
+    KPI values match hardcoded data
+
+    Chart values align with forecast data
+
+    Feature contributions sum to final forecast
+
+    No data formatting errors
+
+✅ Authentication:
+
+    Planner role: All features accessible
+
+    Valid credentials redirect to dashboard
+
+    Invalid credentials show error message
+
+    Session persists on page refresh
+
+    (Multi-role access control planned for Phase 2)
+
+✅ No Errors:
+
+    Zero console errors
+
+    Zero console warnings
+
+    All links functional
+
+    All buttons respond to clicks
+
+Non-Functional Requirements
+
+✅ Code Quality:
+
+    TypeScript strict mode (no any types)
 
     Components reusable and well-documented
 
-    Accessibility: WCAG AA compliance
+    Comments mark hardcoded data locations (// TODO: Replace with API call)
 
-    Color contrast: 4.5:1 for normal text
+    Consistent naming conventions
 
-    All interactive elements keyboard navigable
+✅ Accessibility (WCAG AA):
 
-    Focus indicators visible
+    Color contrast ≥ 4.5:1 for normal text
 
-    Semantic HTML used throughout
+    Color contrast ≥ 3:1 for large text
 
-    Comments mark data placeholders (// TODO: Replace with API call)
+    Interactive elements ≥ 44px × 44px
 
-✅ Deployment:
+    Keyboard navigation: Tab, Enter, Escape all work
 
-    Code pushed to GitHub
+    Focus indicators visible on all interactive elements
 
-    Auto-deployed to Vercel
+    Semantic HTML used
 
-    Live URL shareable
+    ARIA labels present where needed
 
-    No deployment errors
+✅ Design System Adherence:
 
-    All pages accessible from live URL
+    Colors match palette (TUM Blue #0065BD, Grey #6E685F, etc.)
 
+    Typography matches spec (font sizes, weights, colors)
+
+    Spacing consistent (16px gaps, 20px padding, etc.)
+
+    Component styling matches design spec
+
+    No off-brand colors or fonts
+
+✅ Browser Compatibility:
+
+    Chrome (latest): Fully functional
+
+    Firefox (latest): Fully functional
+
+    Safari (latest): Fully functional
+
+    Edge (latest): Fully functional
+
+Deployment
+
+✅ GitHub Repository: Code pushed, committed with clear messages
+✅ Vercel Deployment: Auto-deployed, live URL accessible
+✅ No Deployment Errors: Build successful, no runtime errors
+✅ All Pages Accessible: Each route navigable from UI
 Testing Checklist
 Functional Testing
 
-    Login page: Valid/invalid credentials
+Dashboard Page:
 
-    Role-based views: Manager sees all features, Operator sees limited views
+    Header renders with logo, navigation, user menu
 
-    Dashboard: All KPI cards display with correct values
+    Left sidebar displays product hierarchy (L1-L5)
 
-    Forecast chart: Data displays, interactive tooltips work
+    Clicking sidebar item updates all dashboard data
 
-    Inventory table: Sorts, filters, search works
+    KPI cards display with correct values
 
-    Orders timeline: Status displays correctly, lead time calculated
+    KPI cards show trend arrows and sparklines
 
-    Model metrics: MAPE and component accuracy displayed
+    Forecast chart renders with blue (AI) and red (Consensus) lines
 
-    Analytics: Trends chart renders with historical data
+    Chart shows confidence band (shaded area)
 
-    Logout: Session cleared, redirects to login
+    Tooltip appears on chart hover with exact values
+
+    Time range buttons change chart window
+
+    Alert summary box shows total and breakdown counts
+
+    Critical actions panel shows red alert boxes
+
+    Calendar widget displays with highlighted dates
+
+    Right panel alerts are clickable (open details)
+
+Forecast Analysis Page:
+
+    Header shows SKU name, ID, status, alerts
+
+    [Accept AI Forecast] button works
+
+    [Overwrite] button works (or opens override modal)
+
+    Tabs navigate between Forecast Overview, Analysis, History
+
+    Feature contribution table displays all rows
+
+    Cells color-coded correctly (green for positive, red for negative)
+
+    Feature groups collapse/expand
+
+    Display options (Absolute/Signed) toggle correctly
+
+    Color scheme selector changes cell colors
+
+    Feature filter shows/hides rows
+
+    [Update] button refreshes table with selections
+
+    Cell hover tooltip displays explanation
+
+    Table scrolls horizontally on small screens
+
+Login Page:
+
+    Email input validates (requires @ symbol)
+
+    Password input validates (not empty)
+
+    Valid credentials (demo@borgai.platform / demo1234) redirect to dashboard
+
+    Invalid credentials show error message
+
+    Remember Me checkbox works
+
+    Show/hide password toggle works
+
+    Demo credentials auto-fill works
+
+    Copy credentials buttons work
+
+    Logout clears session and redirects to login
+
+Navigation:
+
+    Dashboard link navigates to /dashboard
+
+    Forecast Analysis link navigates to /dashboard/forecast-analysis
+
+    Coming Soon buttons disabled with tooltip
+
+    User menu shows profile + logout
+
+    Logout clears session
 
 Responsive Design Testing
 
-    Mobile (320px): All pages stack vertically, readable without horizontal scroll
+Mobile (320px):
 
-    Tablet (768px): 2-column layout works, sidebar collapses
+    All text readable without zoom
 
-    Desktop (1024px+): 3-4 column layout, sidebar expands
+    No horizontal scroll (except tables with built-in scroll)
 
-    Touch interactions: Buttons, filters work on touch devices
+    Buttons at least 44x44px (tap-friendly)
 
-    Font sizing: Readable at all breakpoints
+    Sidebar becomes drawer/modal
 
-    Images/charts: Scale appropriately
+    KPI cards stack vertically
+
+    Chart readable on small screen
+
+    Alerts panel slides up from bottom or shows in modal
+
+Tablet (768px):
+
+    Sidebar collapses to icons
+
+    Main content expands to fill width
+
+    KPI grid: 2 columns
+
+    Chart readable at tablet size
+
+    Dropdowns and selects work with touch
+
+Desktop (1024px+):
+
+    Full layout visible (sidebar + main + actions panel)
+
+    No scaling or zoom needed
+
+    All components properly spaced
+
+    Chart shows full detail
 
 Accessibility Testing
 
-    Keyboard navigation: Tab through all interactive elements
+Keyboard Navigation:
 
-    Focus indicators: Visible on all focusable elements
+    Tab moves through all interactive elements in logical order
 
-    Screen reader: Page structure semantic, ARIA labels present
+    Enter activates buttons
 
-    Color contrast: Text ≥ 4.5:1, large text ≥ 3:1
+    Escape closes modals
 
-    Form labels: All inputs labeled (for attribute or aria-label)
+    Focus visible on all focusable elements (2px outline)
 
-    Alt text: Images/icons have descriptions
+    Dropdown menus accessible via keyboard
 
-    Zoom: Page works at 200% zoom
+Color Contrast:
+
+    Primary text vs. white background ≥ 4.5:1
+
+    Secondary text vs. white background ≥ 3:1
+
+    Chart lines vs. white background ≥ 3:1
+
+    Alert boxes have sufficient contrast
+
+Screen Reader (if testing with NVDA/JAWS):
+
+    Page structure announced correctly (headings, sections)
+
+    Form labels associated with inputs
+
+    Button purpose clear ("Accept AI Forecast", not just "Button")
+
+    Chart description available (table alternative or aria-label)
+
+    Alerts announced as alerts (role="status" or aria-live)
+
+Form Labels:
+
+    All inputs have <label> or aria-label
+
+    Placeholder text not substitute for labels
+
+    Error messages associated with inputs
 
 Performance Testing
 
-    Page load time: < 2 seconds (Chrome DevTools, throttled to "Fast 3G")
+Page Load:
 
-    Time to Interactive: < 3 seconds
+    Dashboard loads in < 2 seconds
 
-    Lighthouse score: ≥ 85 performance
+    No jank or stuttering
 
-    No layout shifts: CLS (Cumulative Layout Shift) < 0.1
+    Images load progressively
 
-    Chart rendering: Charts appear within 1 second
+    Lighthouse score ≥ 85
 
-Browser Compatibility
+Interactivity:
 
-    Chrome (latest): All features work
+    Chart interactions instant (no lag)
 
-    Firefox (latest): All features work
+    Sidebar filter updates immediately
 
-    Safari (latest): All features work
+    Table sort/filter fast
 
-    Edge (latest): All features work
+    No loading spinners unless data actually loading
 
+Chart Rendering:
+
+    Recharts renders smoothly
+
+    Tooltip appears instantly on hover
+
+    No flickering or layout shifts
+
+Data Accuracy Testing
+
+KPI Cards:
+
+    Values match hardcoded data
+
+    Trends calculated correctly (↑ for improvement, ↓ for decline)
+
+    Sparklines render with last 30 days data
+
+Chart Data:
+
+    Blue line matches AI forecast values
+
+    Red line matches consensus values
+
+    Confidence band calculated correctly
+
+    X-axis labels correct (dates)
+
+    Y-axis scale appropriate for data range
+
+Feature Contributions:
+
+    Each cell value matches hardcoded contributions
+
+    Feature groups sum correctly
+
+    Color coding matches contribution direction
+
+    Column totals match final AI forecast value
+
+Critical Alerts:
+
+    Alert count matches data
+
+    Alert text matches data
+
+    Affected SKUs correct
+
+    Calendar dates match alert dates
+
+Browser Compatibility Testing
+Browser	Version	Status
+Chrome	Latest	[ ] Pass
+Firefox	Latest	[ ] Pass
+Safari	Latest	[ ] Pass
+Edge	Latest	[ ] Pass
 Manual Testing Scenarios
+Test Case 1: Planner's Daily Forecast Review
 
-Scenario 1: Manager Reviews Supply Chain Health
+Steps:
 
-    Navigate to login page
+    Open app, log in as demo@borgai.platform / demo1234
 
-    Enter manager credentials
+    Dashboard loads (< 2 sec)
 
-    Should see full dashboard
+    KPI cards visible: Model Accuracy 85%, Offset 24%
 
-    Click forecast chart → should drill to detail page
+    Click "Turbochargers" in sidebar
 
-    Change time period to 6 months → chart updates
+    Chart updates to turbocharger forecast
 
-    Adjust scenario slider → forecast recalculates
+    Click "STOCK LOW ×Y" alert on right
 
-    Return to dashboard
+    Details modal shows affected locations
 
-    Click inventory tab → should see full table
+    Click "View Forecast" in modal
 
-    Filter for low stock items → table updates
+    Navigate to /dashboard/forecast-analysis
 
-    All actions should complete < 2 seconds
+    See feature contribution table
 
-Scenario 2: Warehouse Operator Checks Stock
+    Hover over "Seasonality +179" cell
 
-    Log in as operator
+    Tooltip explains March spring break peak
 
-    Dashboard should show operator-focused view (limited orders)
+    Review all features, identify top 3 drivers
 
-    Navigate to inventory
+    Click [Accept AI Forecast]
 
-    Search for "turbo" → results display
+    Status updates to "Accepted"
 
-    Filter for "In Stock" → shows only in-stock items
+    Timestamp shows: "Accepted by [User Name] on Nov 30, 2025 at 09:22"
 
-    Should NOT see model performance or analytics pages
+    Navigate back to dashboard
 
-Scenario 3: Executive Views Monthly Report
+Expected Result: All steps complete < 3 minutes, no errors
+Test Case 2: Responsive Mobile View
 
-    Log in as executive
+Steps:
 
-    Dashboard shows high-level KPIs only (no detailed tables)
+    Open dashboard on mobile (320px width or zoom to 50%)
 
-    Can view trends and benchmarks
+    Header and navigation visible
 
-    Cannot access detail pages
+    Sidebar becomes hamburger menu (or drawer)
 
-    Can logout and return to login
+    KPI cards stack vertically
 
-Automated Testing (Future Phase 2)
+    Chart visible (may scroll horizontally for interaction)
 
-    Unit tests: Components, utilities, type validation
+    Tap chart to see tooltip
 
-    Integration tests: Data loading, filtering, sorting
+    Tap alert box
 
-    E2E tests: User flows (login → dashboard → drill-down)
+    Modal or sheet slides up with details
 
-    Performance tests: Lighthouse automation
+    Navigate to forecast analysis
 
-9. DEVELOPMENT PHASES & TIMELINE
-Phase 1: Foundation & Core Features (Weeks 1-2)
+    Table scrolls horizontally
 
-Deliverables:
+    Feature groups visible, can collapse/expand
 
-    ✅ Project setup (Next.js, TypeScript, Tailwind, shadcn/ui)
+    All text readable without zoom
 
-    ✅ GitHub repository + local development environment
+Expected Result: Full functionality on mobile, no horizontal scroll except for tables
+Test Case 3: Coming Soon Feature Interaction
 
-    ✅ Authentication flow (login page, session management)
+Steps:
 
-    ✅ Dashboard layout (header, sidebar, main content area)
+    Dashboard loads
 
-    ✅ KPI cards (dashboard overview)
+    Hover over "Circular Transparency" button
 
-    ✅ Hardcoded data structures (all .ts files)
+    Tooltip shows: "Quellen-Senken Analyse of Supply Chain"
 
-Sprints:
+    Button appears 50% opacity (disabled look)
 
-    Sprint 1: Setup, auth, layout, KPI cards
+    Click button
 
-    Sprint 2: Forecast chart, inventory table, orders timeline (basic)
+    Toast message: "This feature is under development"
 
-Phase 2: Advanced Features & Polish (Week 3)
+    Same for "Scenario Planning" button
 
-Deliverables:
+Expected Result: Disabled buttons show tooltip and toast, no navigation
+9. FEATURE COMPLETENESS MATRIX
+MVP Features (To Be Built)
+Feature	Dashboard	Forecast Analysis	Comments
+Login Page	✅	✅	Already complete
+Header & Navigation	✅	✅	Standard header across all pages
+Left Sidebar Filter	✅	—	Dashboard only
+KPI Cards	✅	—	Dashboard KPIs only
+Forecast Chart	✅	—	Multi-line with confidence band
+Alert Summary	✅	—	Dashboard alert count
+Critical Actions Panel	✅	—	Red alert boxes, calendar
+Feature Contribution Table	—	✅	Analysis page core component
+Display Controls	—	✅	Absolute/Signed, color, filter
+Cell Tooltips	—	✅	Hover explanations
+Authentication	✅	✅	Secure login (multi-role Phase 2)
+Responsive Design	✅	✅	Mobile, tablet, desktop
+Accessibility	✅	✅	WCAG AA compliance
+Coming Soon Features (Not Implemented)
+Feature	Status	Notes
+Circular Transparency	🔜 Coming Soon	Disabled button with tooltip
+Scenario Planning	🔜 Coming Soon	Disabled button with tooltip
+10. GLOSSARY & DEFINITIONS
 
-    ✅ Forecast detail page with driver explanation
+AI Forecast: Machine learning model prediction of core supply volume
 
-    ✅ Model performance monitoring page
+Consensus Forecast: Baseline or historical average, used for comparison
 
-    ✅ Analytics & insights page (trends, benchmarks)
+Confidence Band: 80% prediction interval showing forecast uncertainty range
 
-    ✅ Inventory filters and search
+Feature Contribution: Impact of individual data source (feature) on final forecast value
 
-    ✅ Orders lead time analysis
+Supply Chain Planner: Primary user persona requiring clean, modern design and full forecast transparency
 
-    ✅ Mobile responsiveness
+BORGai: Intelligent Core Supply Forecasting Platform (Team 66 - REMAN Challenge 2025)
 
-    ✅ Accessibility compliance
+L1-L5: Hierarchical levels of forecast (product family → SKU level)
 
-Phase 3: Deployment & Optimization (Week 4, if applicable)
+SOFA: System Of Forecast Analysis or category filter (exact definition TBD)
 
-Deliverables:
+Stock LOW <Y: Alert when inventory below threshold Y
 
-    ✅ Vercel deployment
+Stock LOW ×Y: Alert when multiple products critically low (multiplicative factor)
 
-    ✅ Performance optimization (< 2s load time)
+Delivery COMING: Alert when scheduled delivery arriving within 48-72 hours
 
-    ✅ Documentation & README
+Quellen-Senken Analyse: German for Source-Sink Analysis (supply chain flow mapping)
+11. DEVELOPMENT APPROACH - VIBE CODING WITH GITHUB COPILOT
+Workflow
 
-    ✅ Final testing & bug fixes
+Step 1: Copy Feature Section
 
-10. FUTURE ROADMAP (Beyond MVP)
-Phase 2: Backend Integration (Months 2-3)
+    Copy relevant section from this PRD (e.g., "Feature 2: Main Dashboard")
 
-    Build Python backend with FastAPI
+Step 2: Paste to GitHub Copilot Chat
 
-    Implement actual ML model (TFT + XGBoost + SARIMAX ensemble)
+    Paste section with prompt:
 
-    Connect to real BORG data sources (ERP, WMS)
+    text
+    Implement this feature according to the PRD section.
+    Generate React components using Next.js, TypeScript, Tailwind CSS.
+    Use colors from Design System section (Primary Blue #0065BD, Grey #6E685F, etc.).
+    Create hardcoded data in lib/data/ files marked with TODO comments.
+    Ensure accessibility (WCAG AA).
+    Include comments marking where API calls would go.
 
-    Implement real authentication (OAuth2, JWT)
+Step 3: Generate Components
 
-    Add real-time WebSocket updates
+    Copilot generates component code
 
-    Build model retraining pipeline
+    You copy into project structure
 
-Phase 3: Advanced Features (Months 4-6)
+    Run npm run dev to test locally
 
-    Real-time alerts & notifications
+Step 4: Iterate & Refine
 
-    Email notification system
+    Test on mobile/tablet/desktop
 
-    Advanced scenario analysis & optimization
+    Adjust colors, spacing, typography as needed
 
-    Mobile app (React Native)
+    Ask Copilot for refinements
 
-    Integration with external APIs (KBA, TÜV, weather)
+    Commit to GitHub
 
-    User management & admin panel
+Step 5: Deploy
 
-Phase 4: Scale & Optimization (Months 7+)
+    Push to GitHub main branch
 
-    Multi-region deployment
+    Vercel auto-deploys
 
-    Distributed model training
+    Share live URL with stakeholders
 
-    Advanced analytics (root cause analysis)
+12. DOCUMENT CONTROL
 
-    Supply chain optimization algorithms
-
-    Integration with supplier systems
-
-    Audit logging & compliance
-
-11. ASSUMPTIONS & CONSTRAINTS
-Assumptions
-
-    MVP uses hardcoded data: No backend API yet (enables rapid prototyping)
-
-    Simple authentication: localStorage sessions (will upgrade to JWT in Phase 2)
-
-    No real ML model: Dashboard displays mock forecasts (actual model in Phase 2)
-
-    German market focus: Data sources focus on DACH region initially
-
-    Internal users only: Not customer-facing in MVP
-
-    Browser-based: No mobile app (considered for Phase 3)
-
-    Single deployment: Vercel free tier (single region)
-
-Constraints
-
-    Development time: 3-4 weeks to MVP
-
-    Team size: 1-2 developers (with AI assistance via GitHub Copilot)
-
-    Budget: Free/low-cost tools (Vercel, GitHub, shadcn/ui, Recharts)
-
-    Data: Only internal BORG data (no new procurement required)
-
-    Real-time: MVP uses static snapshots (not true real-time)
-
-    Scale: MVP tested with 50-100 users (will scale in Phase 2)
-
-12. SUCCESS CRITERIA & KPIs
-Business KPIs
-KPI	Target	Measurement
-Forecast Accuracy (MAPE)	< 20%	Quarterly model evaluation
-Dashboard Adoption	95% of supply team	Usage analytics
-Inventory Turnover	+10% improvement	Monthly KPI tracking
-Stockout Reduction	15-20% fewer stockouts	Operational metrics
-Lead Time Reduction	5-10% faster turnaround	Order fulfillment analytics
-Technical KPIs
-KPI	Target	Measurement
-Page Load Time (P95)	< 2 seconds	Lighthouse, Chrome DevTools
-Uptime	99%+	Vercel analytics
-Error Rate	< 0.1%	Sentry/monitoring
-Accessibility Score	WCAG AA	Axe, WAVE tools
-Performance Score	≥ 85/100	Lighthouse
-User Experience KPIs
-KPI	Target	Measurement
-Time to Insight	< 10 minutes	User testing
-Feature Discoverability	80% of users find all features	Analytics tracking
-User Satisfaction	≥ 4/5 NPS	Post-launch survey
-Forecast Explainability	100% of forecasts have drivers	Dashboard validation
-13. DEPENDENCIES & RISKS
-Key Dependencies
-
-    GitHub: Repository hosting and Copilot integration
-
-    Vercel: Deployment and hosting
-
-    Node.js / npm: Build toolchain
-
-    Recharts: Chart rendering
-
-    shadcn/ui: Pre-built components
-
-    BORG data sources: Historical core return data
-
-Identified Risks & Mitigation
-Risk	Probability	Impact	Mitigation
-Data quality issues	High	High	Validate data early, use mock data for MVP
-Model accuracy too low	Medium	High	Use ensemble approach, test on historical data
-Deployment issues	Low	Medium	Use Vercel templates, test locally first
-Performance degradation	Low	Medium	Profile with Lighthouse, optimize early
-Scope creep	Medium	High	Strict MVP definition, defer features
-Team availability	Low	Medium	Clear documentation, use AI assistance
-14. GLOSSARY & DEFINITIONS
-
-Core: Returned automotive component (turbocharger, transmission, engine, etc.) sent to BORG for remanufacturing
-
-Remanufacturing: Process of disassembling, inspecting, cleaning, and reassembling cores to like-new condition
-
-Lead Time: Time from placing an order to receiving delivered cores (days)
-
-Forecast Horizon: Time period ahead being forecasted (3 months, 6 months, 12 months)
-
-MAPE (Mean Absolute Percentage Error): Average percentage error between predicted and actual values; lower is better
-
-SHAP (SHapley Additive exPlanations): Model-agnostic method for explaining feature importance
-
-Ensemble Model: Combination of multiple ML models (TFT, XGBoost, SARIMAX) for improved accuracy
-
-TFT (Temporal Fusion Transformer): Deep learning model for multivariate time series forecasting
-
-XGBoost: Gradient boosting algorithm for tabular data with built-in feature importance
-
-SARIMAX: Statistical model for univariate time series with seasonality and exogenous variables
-
-Quantile Regression: Regression that outputs prediction intervals instead of point estimates
-
-Feature Importance: Measure of how much a feature (variable) influences model predictions
-
-Drift Detection: Identifying when model performance degrades (MAPE increases) signaling need for retraining
-15. DOCUMENT CONTROL & APPROVAL
-
-Document Version: 1.0 MVP PRD
-Last Updated: November 29, 2025
-Author: AI Assistant + Team
+Document Version: 2.1 (MVP - Updated for Current Implementation)
+Date: November 30, 2025
 Status: Ready for Development
+Primary User: Supply Chain Planner
+Design Target: Clean, modern, appealing interface
+Branding: BORGai - Intelligent Core Supply Forecasting Platform
+Authentication: Single planner role (multi-role in Phase 2)
+Team: Team 66 (Christian Güttler and Robert Hoffmann)
+Challenge: REMAN Challenge 2025 - Unlocking the Power of AI for Circular Industries
 
-Stakeholders:
+Key Sections for Copilot:
 
-    Supply Chain Team (end users)
+    Feature 2 (Main Dashboard) → Full layout specifications
 
-    BORG Management (sponsors)
+    Feature 3 (Forecast Analysis) → Feature contribution table specs
 
-    Development Team (implementers)
+    Section 5 (Design System) → Colors, typography, spacing
 
-APPENDIX: Code Setup Commands
-Environment Setup
+    Section 7 (Testing) → Acceptance criteria to validate
 
-bash
-# Clone repository
-git clone https://github.com/YOUR-USERNAME/scmwebapp.git
-cd scmwebapp
+END OF PRD VERSION 2.1
+How to Use This PRD with GitHub Copilot
 
-# Install dependencies
-npm install
+    For Main Dashboard → Copy "Feature 2: Main Dashboard - Forecast Overview & Critical Alerts" section + "Design System" section
 
-# Install additional packages
-npm install tailwindcss-animate class-variance-authority clsx tailwind-merge lucide-react
-npm install recharts
+    For Forecast Analysis → Copy "Feature 3: Forecast Analysis Page" section + design specs
 
-# Initialize shadcn/ui
-npx shadcn@latest init
-npx shadcn@latest add button card table input select tabs badge
+    For Testing → Reference "Acceptance Criteria & Testing Strategy" while building
 
-# Start development server
-npm run dev  # Visit http://localhost:3000
+    For Data → Review "Data Flow & Hardcoded Data Strategy" to structure files
 
-Data File Templates
+    For Layout Details → Check spatial diagrams in sections 2.1 and 3.6
 
-lib/types.ts:
-
-typescript
-// Define all TypeScript interfaces here
-export interface User { /* ... */ }
-export interface Core { /* ... */ }
-// ... other types
-
-lib/data/forecast-metrics.ts:
-
-typescript
-// Export hardcoded KPI metrics
-export const forecastMetrics = [
-  { label: 'Total Forecast Supply', value: 102046, unit: 'units', trend: 'up' },
-  // ... more metrics
-]
-
-lib/contexts/AuthContext.tsx:
-
-typescript
-// React Context for authentication state
-export const AuthProvider = ({ children }) => { /* ... */ }
-export const useAuth = () => { /* ... */ }
-
-Git Workflow
-
-bash
-# Create feature branch
-git checkout -b feature/forecast-chart
-
-# Make changes, then commit
-git add .
-git commit -m "feat: add forecast detail chart with driver explanation"
-
-# Push to GitHub
-git push origin feature/forecast-chart
-
-# Create Pull Request on GitHub, merge to main
-# Vercel auto-deploys when main branch updates
-
-END OF DOCUMENT
-How to Use This PRD
-
-    For Development: Reference specific feature sections while coding components
-
-    For Design: Use Design System section (#6) for all styling decisions
-
-    For Testing: Check Acceptance Criteria (#8) to verify feature completion
-
-    For Deployment: Follow phases (#9) and success criteria (#12)
-
-    For AI Code Generation: Paste relevant feature section into GitHub Copilot as context
-
-Pro Tip: Each feature section is self-contained. You can copy a feature (e.g., "Feature 2: Forecast Detail Chart") and paste into Copilot Chat with prompt: "Implement this feature according to this PRD section. Generate React components with TypeScript and Tailwind CSS styling using colors specified in section 6."
+Each major feature is self-contained and can be implemented independently. Start with Login (already done) → Main Dashboard → Forecast Analysis.

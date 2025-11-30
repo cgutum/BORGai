@@ -4,6 +4,9 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { Header } from '@/components/layout/Header';
+import { Sidebar } from '@/components/layout/Sidebar';
+import { CriticalActionsPanel } from '@/components/features/dashboard/CriticalActionsPanel';
+import { CalendarWidget } from '@/components/features/dashboard/CalendarWidget';
 
 export default function DashboardLayout({
   children,
@@ -35,11 +38,25 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
       <Header />
-      <main className="container mx-auto px-4 py-8">
-        {children}
-      </main>
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Sidebar */}
+        <Sidebar />
+        
+        {/* Main Content */}
+        <main className="flex-1 overflow-auto">
+          {children}
+        </main>
+        
+        {/* Right Panel: Critical Actions */}
+        <aside className="w-[320px] bg-white border-l border-[#D3D0CC] p-6 overflow-y-auto hidden xl:block">
+          <CriticalActionsPanel />
+          <div className="mt-6">
+            <CalendarWidget />
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }

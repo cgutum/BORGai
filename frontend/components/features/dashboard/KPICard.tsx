@@ -1,74 +1,72 @@
 'use client';
 
+import { Card } from '@/components/ui/card';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { KPIMetric } from '@/lib/types';
-import { formatNumber, formatCurrency, formatPercent } from '@/lib/utils';
 
 interface KPICardProps {
   metric: KPIMetric;
 }
 
 export function KPICard({ metric }: KPICardProps) {
-  const TrendIcon = 
-    metric.trend === 'up' ? TrendingUp : 
-    metric.trend === 'down' ? TrendingDown : 
-    Minus;
-
-  const trendColor = 
-    metric.trend === 'up' ? 'text-green-600' : 
-    metric.trend === 'down' ? 'text-orange-600' : 
-    'text-gray-600';
-
-  const formatValue = (value: number | string, unit: string) => {
-    if (typeof value === 'string') return value;
-    if (unit === '€') return formatCurrency(value);
-    if (unit === '%') return `${value}%`;
-    return formatNumber(value);
+  const getTrendIcon = () => {
+    switch (metric.trend) {
+      case 'up':
+        return <TrendingUp className="h-4 w-4" />;
+      case 'down':
+        return <TrendingDown className="h-4 w-4" />;
+      default:
+        return <Minus className="h-4 w-4" />;
+    }
   };
 
-  const statusColors = {
-    good: 'bg-green-50 text-green-700 border-green-200',
-    warning: 'bg-orange-50 text-orange-700 border-orange-200',
-    critical: 'bg-red-50 text-red-700 border-red-200',
+  const getTrendColor = () => {
+    if (metric.status === 'good') {
+      return metric.trend === 'up' ? 'text-[#A2AD00]' : 'text-[#E37222]';
+    }
+    return metric.trend === 'up' ? 'text-[#E37222]' : 'text-[#A2AD00]';
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
-          {metric.label}
-        </CardTitle>
-        {metric.status && (
-          <Badge 
-            variant="outline" 
-            className={statusColors[metric.status]}
-          >
-            {metric.status}
-          </Badge>
-        )}
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-baseline justify-between">
-          <div>
-            <div className="text-3xl font-bold text-primary">
-              {formatValue(metric.value, metric.unit)}
-            </div>
-            {metric.unit && typeof metric.value === 'number' && (
-              <p className="text-xs text-muted-foreground mt-1">
-                {metric.unit}
-              </p>
-            )}
-          </div>
-          {metric.change_percent !== undefined && (
-            <div className={`flex items-center gap-1 text-sm font-medium ${trendColor}`}>
-              <TrendIcon className="h-4 w-4" />
-              <span>{formatPercent(metric.change_percent)}</span>
-            </div>
-          )}
+    <Card className="p-5 border-[#D3D0CC] shadow-sm hover:shadow-md transition-shadow">
+      {/* Card Title */}
+      <h3 className="text-sm font-semibold text-[#6E685F] mb-3">
+        {metric.label}
+      </h3>
+
+      {/* Main Value */}
+      <div className="flex items-baseline gap-2 mb-2">
+        <span className="text-[28px] font-semibold text-[#0065BD]">
+          {metric.value}
+        </span>
+        <span className="text-sm text-[#6E685F]">{metric.unit}</span>
+      </div>
+
+      {/* Trend Indicator */}
+      <div className={`flex items-center gap-1 text-sm ${getTrendColor()}`}>
+        {getTrendIcon()}
+        <span className="font-medium">
+          {metric.trendValue > 0 ? '+' : ''}
+          {metric.trendValue}%
+        </span>
+      </div>
+
+      {/* Mini Sparkline */}
+      {metric.sparklineData && metric.sparklineData.length > 0 && (
+        <div className="mt-3 h-8 flex items-end gap-[2px]">
+          {metric.sparklineData.slice(-20).map((value, index) => {
+            const maxValue = Math.max(...metric.sparklineData);
+            const height = (value / maxValue) * 100;
+            return (
+              <div
+                key={index}
+                className="flex-1 bg-[#0065BD] opacity-30 rounded-sm"
+                style={{ height: `${height}%` }}
+              />
+            );
+          })}
         </div>
-      </CardContent>
+      )}
     </Card>
   );
 }
