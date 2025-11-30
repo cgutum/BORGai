@@ -149,6 +149,95 @@ export function searchComponents(query: string, componentsToSearch: Component[])
   );
 }
 
+// ===== FORECAST DATA GENERATION =====
+
+// Helper: Generate week start dates from May 2025 to December 2026 (80 weeks)
+function generateWeekStarts(): string[] {
+  const weeks: string[] = [];
+  const startDate = new Date('2025-05-01'); // Start date
+  
+  for (let i = 0; i < 80; i++) {
+    const weekDate = new Date(startDate);
+    weekDate.setDate(startDate.getDate() + (i * 7));
+    weeks.push(weekDate.toISOString().split('T')[0]); // YYYY-MM-DD
+  }
+  
+  return weeks;
+}
+
+const weekStarts = generateWeekStarts();
+
+// ===== CORE FORECASTS (1,920 records: 24 cores × 80 weeks) =====
+export const coreForecasts: WeeklyForecast[] = cores.flatMap(core => {
+  // Each core has a base supply range (30-150)
+  const baseSupply = 50 + Math.floor(Math.random() * 60); // 50-110 base
+  
+  return weekStarts.map(week => {
+    // Add weekly variation (±20%)
+    const variation = (Math.random() - 0.5) * 0.4; // -20% to +20%
+    const weeklySupply = Math.round(baseSupply * (1 + variation));
+    
+    return {
+      week_start: week,
+      core_id: core.core_id,
+      category: core.category,
+      weekly_supply: Math.min(150, Math.max(30, weeklySupply)) // Clamp to 30-150
+    };
+  });
+});
+
+// ===== COMPONENT FORECASTS (9,600 records: 120 components × 80 weeks) =====
+export const componentForecasts: ComponentForecast[] = components.flatMap(component => {
+  return weekStarts.map(week => {
+    // Get corresponding core forecast for this week
+    const coreForecast = coreForecasts.find(
+      cf => cf.core_id === component.core_id && cf.week_start === week
+    );
+    
+    const coreSupply = coreForecast?.weekly_supply || 0;
+    const componentSupply = Math.round(coreSupply * (component.condition_rate / 100));
+    
+    return {
+      week_start: week,
+      component_id: component.component_id,
+      core_id: component.core_id,
+      core_supply: coreSupply,
+      condition_rate: component.condition_rate,
+      component_supply: componentSupply
+    };
+  });
+});
+
+// ===== FORECAST HELPER FUNCTIONS =====
+
+// Get core forecasts for specific cores within date range
+export function getCoreForecastData(
+  coreIds: string[],
+  startDate: string,
+  endDate: string
+): WeeklyForecast[] {
+  return coreForecasts.filter(
+    forecast =>
+      coreIds.includes(forecast.core_id) &&
+      forecast.week_start >= startDate &&
+      forecast.week_start <= endDate
+  );
+}
+
+// Get component forecasts for specific components within date range
+export function getComponentForecastData(
+  componentIds: string[],
+  startDate: string,
+  endDate: string
+): ComponentForecast[] {
+  return componentForecasts.filter(
+    forecast =>
+      componentIds.includes(forecast.component_id) &&
+      forecast.week_start >= startDate &&
+      forecast.week_start <= endDate
+  );
+}
+
 // TODO: Replace with API calls in Phase 2
 // - GET /api/categories
 // - GET /api/cores?category={id}

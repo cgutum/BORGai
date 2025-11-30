@@ -1,143 +1,217 @@
 'use client';
 
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import {
-  LineChart,
-  Line,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
+import { useState } from 'react';
+import { 
+  ComposedChart, 
+  Bar, 
+  Line, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
   ResponsiveContainer,
-  ComposedChart,
+  ReferenceLine,
+  Legend as RechartsLegend
 } from 'recharts';
-import { hardcodedForecastData } from '@/lib/data/forecast-chart';
-import { Download } from 'lucide-react';
+import { useChartData, TimeRangeType } from '@/lib/hooks/useChartData';
+import { ChartControls } from './ChartControls';
+import { ChartLegend } from './ChartLegend';
+import { ChartTooltip } from './ChartTooltip';
+import { Card } from '@/components/ui/card';
 
 export function ForecastChart() {
-  const timeRanges = ['2 Week', '1 Month', '3 Month', '6 Month', 'Custom'];
-
+  const [timeRange, setTimeRange] = useState<TimeRangeType>('3months');
+  const chartData = useChartData({ timeRange });
+  
+  // Find today's index for the reference line
+  const todayIndex = chartData.findIndex(d => d.isToday);
+  
+  // Get the date value for today's reference line
+  const todayDate = todayIndex >= 0 ? chartData[todayIndex].date : null;
+  
+  // Determine max value for Y-axis
+  const maxValue = Math.max(
+    ...chartData.map(d => 
+      Math.max(
+        d.actualSupply || 0,
+        d.confirmedSupply || 0,
+        d.aiForecast,
+        d.confidenceUpper || 0
+      )
+    )
+  );
+  const yAxisMax = Math.ceil(maxValue * 1.1 / 25) * 25; // Round up to nearest 25 with 10% padding
+  
+  // Custom dot renderer to handle solid/dashed transition
+  const CustomDot = (props: any) => {
+    const { cx, cy, payload } = props;
+    if (!payload) return null;
+    
+    return (
+      <circle 
+        cx={cx} 
+        cy={cy} 
+        r={3} 
+        fill="#0065BD" 
+        stroke="none"
+      />
+    );
+  };
+  
   return (
-    <Card className="p-5 border-[#D3D0CC]">
+    <Card className="p-6 bg-white rounded-xl shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-[#0065BD]">Forecast Analysis</h2>
-        <div className="flex items-center gap-2">
-          {/* Time Range Controls */}
-          {timeRanges.map((range) => (
-            <Button
-              key={range}
-              variant={range === '2 Week' ? 'default' : 'outline'}
-              size="sm"
-              className={
-                range === '2 Week'
-                  ? 'bg-[#0065BD] text-white hover:bg-[#005293]'
-                  : 'border-[#D3D0CC] text-[#6E685F] hover:bg-[#F5F5F5]'
-              }
-            >
-              {range}
-            </Button>
-          ))}
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-[#D3D0CC] text-[#6E685F] hover:bg-[#F5F5F5]"
-          >
-            <Download className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
+      <h2 className="text-lg font-semibold text-[#000000] mb-4">
+        Forecast Chart
+      </h2>
+      
+      {/* Controls */}
+      <ChartControls 
+        timeRange={timeRange}
+        onTimeRangeChange={setTimeRange}
+      />
+      
       {/* Chart */}
-      <div className="h-[400px] w-full">
+      <div className="w-full" style={{ height: '450px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
-            data={hardcodedForecastData}
-            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            data={chartData}
+            margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#D3D0CC" opacity={0.3} />
-            <XAxis
-              dataKey="date"
-              stroke="#6E685F"
-              style={{ fontSize: '11px' }}
-            />
-            <YAxis
-              stroke="#6E685F"
-              style={{ fontSize: '11px' }}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#000000',
-                border: 'none',
-                borderRadius: '4px',
-                color: '#FFFFFF',
-              }}
-              labelStyle={{ color: '#FFFFFF' }}
-            />
-            <Legend
-              wrapperStyle={{ fontSize: '12px' }}
-              iconType="line"
+            {/* Grid */}
+            <CartesianGrid 
+              stroke="#E5E5E5" 
+              strokeDasharray="0" 
+              vertical={false}
             />
             
-            {/* Confidence Band */}
+            {/* Axes */}
+            <XAxis 
+              dataKey="week_label"
+              tick={{ fontSize: 11, fill: '#6E685F' }}
+              tickLine={false}
+              axisLine={{ stroke: '#E5E5E5' }}
+            />
+            <YAxis 
+              label={{ 
+                value: 'Quantity', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { fontSize: 12, fill: '#6E685F', fontWeight: 500 }
+              }}
+              tick={{ fontSize: 11, fill: '#6E685F' }}
+              tickLine={false}
+              axisLine={{ stroke: '#E5E5E5' }}
+              domain={[0, yAxisMax]}
+              ticks={Array.from({ length: Math.floor(yAxisMax / 25) + 1 }, (_, i) => i * 25)}
+            />
+            
+            {/* Confidence Band (rendered first, behind everything) */}
             <Area
               type="monotone"
               dataKey="confidenceUpper"
+              fill="rgba(0, 101, 189, 0.15)"
               stroke="none"
-              fill="#0065BD"
-              fillOpacity={0.1}
-              name="Confidence Band"
+              fillOpacity={1}
+              isAnimationActive={false}
             />
             <Area
               type="monotone"
               dataKey="confidenceLower"
-              stroke="none"
               fill="#FFFFFF"
+              stroke="none"
               fillOpacity={1}
+              isAnimationActive={false}
             />
             
-            {/* Consensus Forecast Line */}
+            {/* Bars */}
+            <Bar 
+              dataKey="actualSupply" 
+              fill="#0065BD" 
+              radius={[4, 4, 0, 0]}
+              isAnimationActive={false}
+            />
+            <Bar 
+              dataKey="confirmedSupply" 
+              fill="#0065BD" 
+              fillOpacity={0.7}
+              radius={[4, 4, 0, 0]}
+              isAnimationActive={false}
+            />
+            
+            {/* Previous AI Forecast Line (grey dashed, future only) */}
             <Line
               type="monotone"
-              dataKey="consensusForecast"
-              stroke="#C01530"
+              dataKey="previousAiForecast"
+              stroke="#6E685F"
               strokeWidth={2}
-              strokeDasharray="5 5"
+              strokeDasharray="6 4"
+              strokeOpacity={0.8}
               dot={false}
-              name="Consensus Forecast"
+              isAnimationActive={false}
+              connectNulls={false}
             />
             
-            {/* AI Forecast Line */}
+            {/* AI Forecast Line (blue, solid then dashed) */}
+            {/* Split into two lines: historical (solid) and future (dashed) */}
             <Line
               type="monotone"
-              dataKey="aiForecast"
+              dataKey={(dataPoint) => dataPoint.isHistorical ? dataPoint.aiForecast : null}
               stroke="#0065BD"
-              strokeWidth={2}
-              dot={{ fill: '#0065BD', r: 4 }}
-              name="AI Forecast"
+              strokeWidth={3}
+              dot={<CustomDot />}
+              isAnimationActive={false}
+              connectNulls={true}
+            />
+            <Line
+              type="monotone"
+              dataKey={(dataPoint) => dataPoint.isFuture ? dataPoint.aiForecast : null}
+              stroke="#0065BD"
+              strokeWidth={3}
+              strokeDasharray="10 6"
+              dot={<CustomDot />}
+              isAnimationActive={false}
+              connectNulls={true}
+            />
+            
+            {/* Today Line */}
+            {todayDate && (
+              <ReferenceLine
+                x={todayDate}
+                stroke="#000000"
+                strokeWidth={2}
+                strokeDasharray="8 4"
+                label={{
+                  value: 'TODAY',
+                  position: 'top',
+                  style: { 
+                    fontSize: 12, 
+                    fontWeight: 600, 
+                    fill: '#6E685F'
+                  }
+                }}
+              />
+            )}
+            
+            {/* Tooltip */}
+            <Tooltip 
+              content={<ChartTooltip />}
+              cursor={{ fill: 'rgba(0, 101, 189, 0.1)' }}
             />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
-
-      {/* Legend Description */}
-      <div className="mt-4 text-xs text-[#6E685F] flex gap-6">
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-0.5 bg-[#0065BD]" />
-          <span>AI Forecast (Model Prediction)</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-0.5 bg-[#C01530] border-dashed" />
-          <span>Consensus/Historical</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-3 bg-[#0065BD] opacity-10" />
-          <span>80% Confidence Band</span>
-        </div>
+      
+      {/* Year Label */}
+      <div className="text-center mt-2 mb-2">
+        <span className="text-xs font-medium text-[#000000]">
+          2025
+        </span>
       </div>
+      
+      {/* Legend */}
+      <ChartLegend />
     </Card>
   );
 }
