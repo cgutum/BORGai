@@ -15,6 +15,8 @@ export const metadata: Metadata = {
   description: "AI-powered supply chain forecasting dashboard for BORG Automotive",
 };
 
+// Force redeploy with Analytics enabled
+
 export default function RootLayout({
   children,
 }: Readonly<{
