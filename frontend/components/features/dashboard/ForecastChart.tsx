@@ -72,21 +72,14 @@ export function ForecastChart() {
         onTimeRangeChange={setTimeRange}
       />
       
-      {/* Chart */}
+      {/* Chart - wrapped in white box */}
+      <div className="bg-white rounded-lg p-3 mb-2">
       <div className="w-full" style={{ height: '450px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={chartData}
-            margin={{ top: 20, right: 10, left: 20, bottom: 5 }}
+            margin={{ top: 20, right: 20, left: 20, bottom: 5 }}
           >
-            {/* Grid */}
-            <CartesianGrid 
-              stroke="#D3D0CC" 
-              strokeDasharray="3 3" 
-              vertical={true}
-              horizontal={true}
-            />
-            
             {/* Axes */}
             <XAxis 
               dataKey="date"
@@ -113,7 +106,7 @@ export function ForecastChart() {
             />
             
             
-            {/* Confidence Band (rendered first, behind everything) */}
+            {/* Confidence Band (rendered first, behind grid) */}
             <Area
               type="monotone"
               dataKey="confidenceUpper"
@@ -129,6 +122,14 @@ export function ForecastChart() {
               stroke="none"
               fillOpacity={1}
               isAnimationActive={false}
+            />
+            
+            {/* Grid - placed after areas to be on top */}
+            <CartesianGrid 
+              stroke="#D3D0CC" 
+              strokeDasharray="3 3" 
+              vertical={true}
+              horizontal={true}
             />
             
             {/* Bars */}
@@ -154,37 +155,38 @@ export function ForecastChart() {
               strokeWidth={2}
               strokeDasharray="6 4"
               strokeOpacity={0.8}
-              dot={false}
+              dot={{ fill: '#6E685F', r: 3 }}
               isAnimationActive={false}
               connectNulls={false}
             />
             
-            {/* AI Forecast Line (black, solid then dashed) */}
-            {/* Split into two lines: historical (solid) and future (dashed) */}
+            {/* AI Forecast Line - Historical (solid black with dots) */}
             <Line
               type="monotone"
-              dataKey={(dataPoint) => dataPoint.isHistorical ? dataPoint.aiForecast : null}
+              dataKey={(dataPoint) => dataPoint.isHistorical || dataPoint.isToday ? dataPoint.aiForecast : null}
               stroke="#000000"
               strokeWidth={3}
-              dot={false}
+              dot={{ fill: '#000000', r: 3 }}
               isAnimationActive={false}
-              connectNulls={true}
+              connectNulls={false}
             />
+            
+            {/* AI Forecast Line - Future (dashed black with dots, includes Today to connect) */}
             <Line
               type="monotone"
-              dataKey={(dataPoint) => dataPoint.isFuture ? dataPoint.aiForecast : null}
+              dataKey={(dataPoint) => dataPoint.isFuture || dataPoint.isToday ? dataPoint.aiForecast : null}
               stroke="#000000"
               strokeWidth={3}
               strokeDasharray="10 6"
-              dot={false}
+              dot={{ fill: '#000000', r: 3 }}
               isAnimationActive={false}
-              connectNulls={true}
+              connectNulls={false}
             />
             
-            {/* Today Line */}
-            {todayDate && (
+            {/* Today Line - always show when today index exists */}
+            {todayIndex >= 0 && (
               <ReferenceLine
-                x={todayDate}
+                x={chartData[todayIndex].date}
                 stroke="#000000"
                 strokeWidth={2}
                 strokeDasharray="8 4"
@@ -208,9 +210,10 @@ export function ForecastChart() {
           </ComposedChart>
         </ResponsiveContainer>
       </div>
+      </div>
       
       {/* Year Label */}
-      <div className="text-center mt-0 mb-1">
+      <div className="text-center mb-1">
         <span className="text-xs font-semibold text-[#6E685F]">
           {timeRange === '1month' || timeRange === '3months' ? '2025' : '2025 - 2026'}
         </span>

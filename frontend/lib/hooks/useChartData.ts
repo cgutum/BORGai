@@ -243,7 +243,7 @@ export function useChartData({ timeRange }: UseChartDataOptions): ChartDataPoint
       const date = granularity === 'week' ? key : `${key}-01`;
       const isHistorical = date < todayStr;
       const isFuture = date >= todayStr;
-      const isToday = date === todayStr || (granularity === 'month' && key === todayStr.substring(0, 7));
+      const isToday = false; // Will be set after sorting
       
       // Build breakdown array
       const breakdown = Array.from(value.breakdown.entries()).map(([id, data]) => ({
@@ -272,6 +272,24 @@ export function useChartData({ timeRange }: UseChartDataOptions): ChartDataPoint
     
     // 5. Sort by date
     dataPoints.sort((a, b) => a.date.localeCompare(b.date));
+    
+    // 6. Find the point closest to today and mark it as isToday
+    // This ensures Today line shows in all views
+    if (dataPoints.length > 0) {
+      const todayDate = new Date(todayStr);
+      let closestIndex = 0;
+      let closestDiff = Math.abs(new Date(dataPoints[0].date).getTime() - todayDate.getTime());
+      
+      dataPoints.forEach((point, index) => {
+        const diff = Math.abs(new Date(point.date).getTime() - todayDate.getTime());
+        if (diff < closestDiff) {
+          closestDiff = diff;
+          closestIndex = index;
+        }
+      });
+      
+      dataPoints[closestIndex].isToday = true;
+    }
     
     return dataPoints;
   }, [filterState.cores, filterState.components, timeRange]);
