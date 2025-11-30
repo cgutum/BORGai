@@ -27,7 +27,7 @@ export default function RootLayout({
           {children}
         </AuthProvider>
         <Toaster position="top-right" />
-        <Analytics />
+        <Analytics debug={false} />
       </body>
     </html>
   );
