@@ -23,7 +23,7 @@ export function KPIBadge() {
         ) : (
           <ChevronRight className="w-4 h-4 text-[#000000]" />
         )}
-        <h2 className="text-base font-semibold text-[#000000] uppercase">
+        <h2 className="text-base font-semibold text-[#000000]">
           KPIs
         </h2>
       </button>
@@ -31,17 +31,7 @@ export function KPIBadge() {
       {/* Content - Collapsible */}
       {isExpanded && (
         <div id="kpi-badge-content" className="px-4 pb-3 pt-0">
-          <div className="grid grid-cols-[1fr,auto] gap-3">
-            {/* Left: KPI Carousel */}
-            <div className="min-w-0">
-              <KPICarousel />
-            </div>
-
-            {/* Right: Alert Summary (Always Visible) */}
-            <div className="w-[240px]">
-              <AlertSummaryChart data={alertSummaryData} />
-            </div>
-          </div>
+          <KPICarousel />
         </div>
       )}
     </div>

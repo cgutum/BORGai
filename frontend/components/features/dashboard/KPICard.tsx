@@ -30,10 +30,10 @@ export function KPICard({ metric }: KPICardProps) {
 
   return (
     <TooltipProvider>
-      <Card className="bg-white rounded-lg border border-[#E5E5E5] shadow-sm hover:shadow-md transition-shadow py-3 px-4 flex flex-col h-full">
+      <Card className="bg-white rounded-lg border border-[#E5E5E5] shadow-sm hover:shadow-md transition-shadow py-2.5 px-3.5 flex flex-col h-full">
         {/* Header Row */}
-        <div className="flex items-start justify-between mb-1">
-          <h3 className="text-sm font-semibold text-[#000000] uppercase leading-tight flex-1">
+        <div className="flex items-start justify-between mb-0.5">
+          <h3 className="text-xs font-semibold text-[#000000] uppercase leading-tight flex-1">
             {metric.label}
           </h3>
           <Tooltip>
@@ -52,8 +52,8 @@ export function KPICard({ metric }: KPICardProps) {
         </div>
 
       {/* Metric Display */}
-      <div className="mb-2">
-        <div className="text-3xl font-bold text-[#000000] mb-1 text-center">
+      <div className="mb-0.5">
+        <div className="text-2xl font-bold text-[#000000] mb-0.5 text-left leading-tight">
           {metric.value}
         </div>
         <div className={`flex items-center text-xs font-medium ${getTrendColor()}`}>
@@ -63,7 +63,7 @@ export function KPICard({ metric }: KPICardProps) {
       </div>
 
       {/* Chart */}
-      <div className="flex-1 min-h-[60px] mb-1">
+      <div className="flex-1 min-h-[70px] max-h-[70px] mb-0.5">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
             <defs>
@@ -86,7 +86,7 @@ export function KPICard({ metric }: KPICardProps) {
       </div>
 
         {/* Time Period */}
-        <div className="text-xs text-[#6E685F] mt-auto">
+        <div className="text-[11px] text-[#6E685F] mt-auto">
           {metric.timePeriod}
         </div>
       </Card>

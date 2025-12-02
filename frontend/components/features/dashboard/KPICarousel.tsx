@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { KPICard } from './KPICard';
 import { CreateKPICard } from './CreateKPICard';
-import { allKPIs, getKPISlice } from '@/lib/data/kpi-metrics';
+import { AlertSummaryChart } from './AlertSummaryChart';
+import { allKPIs, getKPISlice, alertSummaryData } from '@/lib/data/kpi-metrics';
 
 const VISIBLE_CARDS = 4;
 const TOTAL_ITEMS = 6; // 5 KPIs + 1 Create button
@@ -35,21 +36,23 @@ export function KPICarousel() {
   const createButtonIndex = allKPIs.length - startIndex;
 
   return (
-    <div className="flex flex-col">
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-4 gap-3 mb-2">
-        {visibleKPIs.map((metric, index) => (
-          <KPICard key={metric.id} metric={metric} />
-        ))}
-        {showCreateButton && createButtonIndex >= 0 && createButtonIndex < VISIBLE_CARDS && (
-          <div style={{ gridColumn: createButtonIndex + 1 }}>
-            <CreateKPICard />
-          </div>
-        )}
-      </div>
+    <div className="grid grid-cols-5 gap-3">
+      {/* Left section: 4 KPI columns with navigation */}
+      <div className="col-span-4 flex flex-col">
+        {/* KPI Cards Grid - 4 columns */}
+        <div className="grid grid-cols-4 gap-3 mb-2">
+          {visibleKPIs.map((metric, index) => (
+            <KPICard key={metric.id} metric={metric} />
+          ))}
+          {showCreateButton && createButtonIndex >= 0 && createButtonIndex < VISIBLE_CARDS && (
+            <div style={{ gridColumn: createButtonIndex + 1 }}>
+              <CreateKPICard />
+            </div>
+          )}
+        </div>
 
-      {/* Navigation Buttons */}
-      <div className="flex items-center justify-center gap-3">
+        {/* Navigation Buttons - Centered under 4 KPIs */}
+        <div className="flex items-center justify-center gap-3">
         <button
           onClick={handlePrevious}
           disabled={!canGoBack}
@@ -67,6 +70,12 @@ export function KPICarousel() {
         >
           <ChevronRight className="w-4 h-4 text-[#000000]" />
         </button>
+        </div>
+      </div>
+
+      {/* Right section: Alert Summary - Always in 5th column */}
+      <div className="col-span-1">
+        <AlertSummaryChart data={alertSummaryData} />
       </div>
     </div>
   );

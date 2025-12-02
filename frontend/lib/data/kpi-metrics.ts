@@ -50,7 +50,7 @@ export const recentModelAccuracy: KPIMetric = {
 // KPI 2: AI Forecast vs. Legacy Forecast
 export const aiForecastVsLegacy: KPIMetric = {
   id: 'ai-vs-legacy',
-  label: 'AI FORECAST VS. LEGACY FORECAST',
+  label: 'AI VS. LEGACY FORECAST',
   value: '5%',
   change: -0.5,
   changeLabel: '-0.5%',

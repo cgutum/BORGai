@@ -19,10 +19,10 @@ export function AlertSummaryChart({ data }: AlertSummaryChartProps) {
 
   return (
     <TooltipProvider>
-      <Card className="bg-white rounded-lg border border-[#E5E5E5] shadow-sm hover:shadow-md transition-shadow p-3 flex flex-col h-full">
+      <Card className="bg-white rounded-lg border border-[#E5E5E5] shadow-sm hover:shadow-md transition-shadow py-2.5 px-3.5 flex flex-col h-full">
         {/* Header Row */}
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="text-[10px] font-semibold text-[#000000] uppercase leading-tight flex-1">
+        <div className="flex items-start justify-between mb-0.5">
+          <h3 className="text-xs font-semibold text-[#000000] uppercase leading-tight flex-1">
             ALERT SUMMARY
           </h3>
           <Tooltip>
@@ -41,8 +41,8 @@ export function AlertSummaryChart({ data }: AlertSummaryChartProps) {
         </div>
 
       {/* Total Alerts Display */}
-      <div className="mb-1">
-        <div className="text-2xl font-bold text-[#000000] mb-0.5">
+      <div className="mb-0.5">
+        <div className="text-2xl font-bold text-[#000000] mb-0.5 text-left leading-tight">
           {data.total}
         </div>
         <div className="text-xs text-[#6E685F] font-medium">
@@ -51,7 +51,7 @@ export function AlertSummaryChart({ data }: AlertSummaryChartProps) {
       </div>
 
       {/* Chart */}
-      <div className="flex-1 min-h-[60px] mb-1">
+      <div className="flex-1 min-h-[60px] max-h-[60px] mb-0.5">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
             <defs>
@@ -86,7 +86,7 @@ export function AlertSummaryChart({ data }: AlertSummaryChartProps) {
       </div>
 
         {/* Time Period */}
-        <div className="text-[10px] text-[#6E685F] mt-1 pt-1 border-t border-[#E5E5E5]">
+        <div className="text-[11px] text-[#6E685F] mt-1 pt-1 border-t border-[#E5E5E5]">
           {data.timePeriod}
         </div>
       </Card>
