@@ -5,7 +5,7 @@ export const mockUsers: User[] = [
   {
     id: '1',
     email: 'planner@borg.com',
-    name: 'Michael Schmidt',
+    name: 'Morten S. Bie',
     role: 'planner',
     department: 'Supply Chain Planning',
     created_at: new Date('2024-01-15'),

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LogOut, LayoutDashboard, BarChart3, TrendingUp, Network } from 'lucide-react';
+import { LogOut, LayoutDashboard, BarChart3, TrendingUp, Network, User } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 
@@ -19,7 +19,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center px-4">
+      <div className="flex h-16 items-center px-4 w-full">
         <div className="mr-8 flex items-center space-x-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: '#0065BD' }}>
             <span className="text-lg font-bold text-white">B</span>
@@ -30,7 +30,7 @@ export function Header() {
           </div>
         </div>
 
-        <nav className="flex flex-1 items-center space-x-1">
+        <nav className="flex items-center space-x-1">
           {navigation.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -71,12 +71,17 @@ export function Header() {
           })}
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex-1" />
+        
+        <div className="flex items-center gap-3">
           {user && (
             <>
-              <div className="hidden sm:flex flex-col items-end">
-                <span className="text-sm font-medium">{user.name}</span>
-                <span className="text-xs text-muted-foreground capitalize">{user.role}</span>
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4" style={{ color: '#6E685F' }} />
+                <div className="flex flex-col items-start">
+                  <span className="text-sm font-medium" style={{ color: '#000000' }}>Morten S. Bie</span>
+                  <span className="text-xs" style={{ color: '#6E685F' }}>Supply Chain Manager</span>
+                </div>
               </div>
               <Button
                 variant="ghost"
@@ -85,7 +90,7 @@ export function Header() {
                 className="gap-2"
               >
                 <LogOut className="h-4 w-4" />
-                <span className="hidden sm:inline">Logout</span>
+                <span>Logout</span>
               </Button>
             </>
           )}
