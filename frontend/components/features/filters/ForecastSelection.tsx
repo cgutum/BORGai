@@ -29,13 +29,10 @@ export default function ForecastSelection() {
   const hasFilters = filterState.categories.length > 0 || filterState.cores.length > 0 || filterState.components.length > 0;
   
   return (
-    <div className="w-full bg-white rounded-lg shadow-sm p-3 space-y-3">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-base font-semibold text-gray-900">
-          Filters
-        </h2>
-        {hasFilters && (
+    <div className="w-full flex flex-col flex-1 space-y-3">
+      {/* Clear All Button - Now returned to be shown in parent header */}
+      {hasFilters && (
+        <div className="flex justify-end -mt-3">
           <Button
             onClick={clearAllFilters}
             variant="ghost"
@@ -44,12 +41,12 @@ export default function ForecastSelection() {
           >
             Clear All
           </Button>
-        )}
-      </div>
+        </div>
+      )}
       
       {/* Preset Dropdown */}
       <div>
-        <label className="block text-xs font-medium text-gray-700 mb-1.5">
+        <label className="block text-xs font-medium text-gray-700 mb-2">
           Preset Views
         </label>
         <PresetDropdown
@@ -60,7 +57,7 @@ export default function ForecastSelection() {
       
       {/* Category Multi-Select */}
       <div>
-        <label className="block text-xs font-medium text-gray-700 mb-1.5">
+        <label className="block text-xs font-medium text-gray-700 mb-2">
           Categories
         </label>
         <MultiSelectDropdown
@@ -78,7 +75,7 @@ export default function ForecastSelection() {
       
       {/* Core Multi-Select */}
       <div>
-        <label className="block text-xs font-medium text-gray-700 mb-1.5">
+        <label className="block text-xs font-medium text-gray-700 mb-2">
           Cores
         </label>
         <MultiSelectDropdown
@@ -98,7 +95,7 @@ export default function ForecastSelection() {
       
       {/* Component Multi-Select */}
       <div>
-        <label className="block text-xs font-medium text-gray-700 mb-1.5">
+        <label className="block text-xs font-medium text-gray-700 mb-2">
           Components
         </label>
         <MultiSelectDropdown
@@ -115,16 +112,18 @@ export default function ForecastSelection() {
         />
       </div>
       
-      {/* Selected Tags */}
+      {/* Selected Tags - Expanded to full width and flex-grow */}
       {hasFilters && (
-        <TagList
-          categories={filterState.categories}
-          cores={filterState.cores}
-          components={filterState.components}
-          onRemoveCategory={toggleCategory}
-          onRemoveCore={toggleCore}
-          onRemoveComponent={toggleComponent}
-        />
+        <div className="flex-1 w-full overflow-y-auto mt-3">
+          <TagList
+            categories={filterState.categories}
+            cores={filterState.cores}
+            components={filterState.components}
+            onRemoveCategory={toggleCategory}
+            onRemoveCore={toggleCore}
+            onRemoveComponent={toggleComponent}
+          />
+        </div>
       )}
     </div>
   );

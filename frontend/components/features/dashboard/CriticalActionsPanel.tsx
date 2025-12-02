@@ -17,9 +17,9 @@ export function CriticalActionsPanel() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 flex flex-col">
       {/* Title */}
-      <h3 className="text-lg font-semibold text-[#0065BD]">Critical Actions</h3>
+      <h3 className="text-base font-semibold text-[#000000]">Critical Actions</h3>
 
       {/* Alert Boxes */}
       {hardcodedCriticalActions.map((action) => (

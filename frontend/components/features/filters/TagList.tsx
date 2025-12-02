@@ -28,12 +28,12 @@ export default function TagList({
   }
   
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2 w-full">
       <span className="text-xs font-medium text-gray-600">
         Selected ({totalTags})
       </span>
       
-      <div className="flex flex-wrap gap-1.5 max-h-[150px] overflow-y-auto">
+      <div className="flex flex-wrap gap-2 w-full overflow-y-auto">
         {/* Category Tags */}
         {categories.map(categoryId => {
           const category = coreCategories.find(c => c.id === categoryId);

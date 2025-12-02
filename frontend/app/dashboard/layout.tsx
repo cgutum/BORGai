@@ -42,23 +42,16 @@ export default function DashboardLayout({
     <FilterProvider>
       <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
         <Header />
-        <div className="flex flex-1 overflow-hidden">
-          {/* Left Sidebar: Forecast Selection - Fixed width, non-scrollable container */}
-          <aside className="w-[240px] flex-shrink-0 border-r border-[#D3D0CC] bg-gray-50">
-            <div className="h-full overflow-y-auto p-3">
-              <ForecastSelection />
-            </div>
-          </aside>
-          
-          {/* Main Content */}
-          <main className="flex-1 overflow-auto">
+        <div className="flex flex-1 overflow-hidden gap-4 p-4">
+          {/* Left 80%: Main Content (KPI Badge + Filters/Chart) */}
+          <main className="flex-1 overflow-auto" style={{ width: '80%' }}>
             {children}
           </main>
           
-          {/* Right Panel: Critical Actions */}
-          <aside className="w-[320px] flex-shrink-0 bg-white border-l border-[#D3D0CC] p-6 overflow-y-auto hidden xl:block">
+          {/* Right 20%: Critical Actions (Full Height) */}
+          <aside className="w-[20%] flex-shrink-0 bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 overflow-y-auto hidden xl:flex xl:flex-col">
             <CriticalActionsPanel />
-            <div className="mt-6">
+            <div className="mt-4">
               <CalendarWidget />
             </div>
           </aside>

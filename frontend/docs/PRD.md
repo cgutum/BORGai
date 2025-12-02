@@ -154,6 +154,12 @@ User Stories:
 
 2.1 Overall Dashboard Spatial Layout
 
+**Layout Overview:**
+
+The dashboard uses an 80-20 split below the main navigation:
+- **Left Section (80%):** Contains KPI Badge, Filters, and Main Chart
+- **Right Section (20%):** Critical Actions Panel (full height)
+
 Header Section (Full Width, Top)
 
     Left: BORGai logo + "Core Forecast Dashboard" title
@@ -162,25 +168,101 @@ Header Section (Full Width, Top)
 
     Right: User profile, settings, logout controls
 
-Left Sidebar (Fixed ~280px width)
+**KPI Badge Section (80% Width, Below Header) - NEW FEATURE**
 
-    Title: "Core Forecast"
+    Position: Top of left 80% column, spans full width of left section
+
+    Layout Structure:
+
+        Left: 4 KPI cards (carousel with navigation)
+
+        Right: Alert Summary chart (always visible, independent of carousel)
+
+    Collapsible Functionality:
+
+        Collapse/Expand button: [▼]/[▶] next to "KPIs" heading (black text)
+
+        Expanded: Shows full KPI cards, charts, and navigation (~180-200px height)
+
+        Collapsed: Only header visible (~40px height)
+
+        Default State: Expanded on page load
+
+    Carousel Navigation:
+
+        6 Total Items: 5 KPI metrics + 1 "Create KPI" action button
+
+        4 Items Visible: At any given time
+
+        Navigation Buttons: ◀ ▶ centered below KPI cards
+
+        States: 3 carousel positions (Initial → +1 click → +2 clicks)
+
+    KPI Cards (5 metrics):
+
+        1. Recent Model Accuracy: 93% (+0.8%, Last 30 days)
+
+        2. AI Forecast vs. Legacy Forecast: 5% (-0.5%, Last 30 days)
+
+        3. Average Lead Time: 53 Days (-2.1%, Last 12 Months)
+
+        4. Average Return Rate: 69% (+0.8%, Last 12 Months)
+
+        5. Core Inventory Coverage: 84% (+1%, Next 30 days)
+
+    Alert Summary Chart:
+
+        Always visible on right side
+
+        Shows: Total alerts (16), Forecast Alerts (12), Model Performance Alerts (4)
+
+        Time Period: Last 30 days
+
+        Area chart visualization with breakdown
+
+    Data Behavior:
+
+        Hardcoded metrics (MVP)
+
+        Independent of filter sidebar selections
+
+        No dynamic filtering based on core/component selection
+
+    Visual Design:
+
+        Matches existing dashboard card styling
+
+        TUM Blue (#0065BD) for metrics
+
+        Green/Red arrows for positive/negative trends
+
+        Area charts for each KPI
+
+        White background, subtle shadows
+
+Left Sidebar (20% of left section = 16% of page width)
+
+    Position: Starts BELOW KPI Badge section, left column
+
+    Title: "Filters"
 
     Filtering & Configuration:
 
         Collapsible sections for forecast hierarchy levels (L1/L2/L3/L4/L5)
 
-        "SOFA" category dropdown for system-wide filtering
+        Category dropdown for system-wide filtering
 
         Multi-select capability for comparing multiple product lines
 
         Expand/collapse all sections functionality
 
-    Purpose: Drive main dashboard content updates based on selection
+    Purpose: Drive forecast chart content updates based on selection (NOT KPI Badge)
 
-    Interactions: Clicking a level filters all dashboard data to show that product line
+    Interactions: Clicking a level filters forecast chart data to show that product line
 
-Main Content Area (Center, spans remaining width)
+Main Content Area (80% of left section = 64% of page width)
+
+    Position: Starts BELOW KPI Badge section, right of Filter sidebar, within left 80% column
 
 Section A: Upper Half - Forecast Chart
 
@@ -2092,9 +2174,20 @@ Step 5: Deploy
 - File: `app/login/page.tsx`
 
 ### Feature 2: Main Dashboard
-**Status:** ✅ Complete  
-**Implementation Date:** November 30, 2025  
+**Status:** 🔄 In Progress (KPI Badge being added)
+**Implementation Date:** November 30, 2025 (Forecast Chart complete), December 2, 2025 (KPI Badge in progress)
 **Details:**
+
+- **KPI Badge Section:** 🔄 In Development
+  - Collapsible section below main navigation
+  - 4 visible KPI cards with carousel navigation (6 total items)
+  - Alert Summary chart (always visible on right)
+  - Navigation buttons (◀ ▶) for carousel
+  - 5 KPIs: Model Accuracy, AI vs Legacy, Lead Time, Return Rate, Inventory Coverage
+  - "Create KPI" action button with toast notification
+  - Hardcoded data, independent of filter sidebar
+  - Feature plan: `docs/kpi_badge_featureplan.md`
+
 - **Forecast Chart:** ✅ Fully implemented
   - 80 weeks of data (May 2025 - Dec 2026)
   - 1,920 core forecasts + 9,600 component forecasts

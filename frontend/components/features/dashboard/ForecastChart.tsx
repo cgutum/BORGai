@@ -68,19 +68,19 @@ export function ForecastChart() {
   };
   
   return (
-    <Card className="p-4 bg-gray-50 rounded-lg border-0 shadow-none">
-      {/* White box wrapper around entire feature */}
-      <div className="bg-white rounded-lg p-4 shadow-sm">
+    <div className="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 flex flex-col h-full">
       {/* Header */}
-      <h2 className="text-base font-semibold text-[#000000] mb-2">
+      <h2 className="text-base font-semibold text-[#000000] mb-3">
         Forecast Chart
       </h2>
       
       {/* Controls */}
-      <ChartControls 
-        timeRange={timeRange}
-        onTimeRangeChange={setTimeRange}
-      />
+      <div className="mb-3">
+        <ChartControls 
+          timeRange={timeRange}
+          onTimeRangeChange={setTimeRange}
+        />
+      </div>
       
       {/* Chart */}
       <div className="w-full" style={{ height: '450px' }}>
@@ -256,15 +256,16 @@ export function ForecastChart() {
       </div>
       
       {/* Year Label */}
-      <div className="text-center">
+      <div className="text-center mt-3">
         <span className="text-xs font-semibold text-[#6E685F]">
           {timeRange === '1month' || timeRange === '3months' ? '2025' : '2025 - 2026'}
         </span>
       </div>
       
       {/* Legend */}
-      <ChartLegend />
+      <div className="mt-3">
+        <ChartLegend />
       </div>
-    </Card>
+    </div>
   );
 }
