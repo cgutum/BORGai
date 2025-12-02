@@ -352,51 +352,117 @@ Section B: Lower Half - KPI Cards & Alert Summary
 
         Visual: Red background for urgency, badge styling
 
-Critical Actions Panel (Right-side callout, fixed position)
+Critical Actions Panel (Right-side callout, fixed position, 20% width)
 
-    Title: "Critical Actions"
+    **Overview:** Independent scrolling panel with 4 sections
+    - Independent scroll: Panel scrolls without affecting main dashboard
+    - Custom scrollbar: Thin TUM Blue (#0065BD) styling
+    - Title: "Critical Actions" (scrolls with content, not fixed)
 
-    Red Alert Boxes (stacked vertically):
+    **Section 1: One-Page Summary Button**
 
-        "STOCK LOW <Y": Stock below minimum threshold Y
+        Full-width button with icon and text
+        - Icon: FileText (lucide-react), TUM Blue (#0065BD)
+        - Text: "1-Page Summary"
+        - Style: White background, TUM Blue border, hover light blue
+        - Click: Opens modal overlay
 
-            Color: Red (#C01530)
+    **One-Page Summary Modal:**
+        - Overlay: Semi-transparent black backdrop with blur effect
+        - Modal: 80% viewport width, 85% height, centered
+        - Close: X button (top-right) or click outside
+        - Content: 6 hardcoded sections with timestamp
+            1. Supply Overview (Last 30 Days) - KPIs with trends
+            2. Critical Alerts (Immediate Action Required)
+            3. Forecast Performance (Last 7 Days)
+            4. Pending Actions (Requires Attention)
+            5. Upcoming Deliveries (Next 7 Days)
+            6. Weekly Trends
+        - Styling: TUM Blue headers, clean typography, trend indicators
 
-            Icon: ⚠️ warning symbol
+    **Section 2: Alerts**
 
-            Action: Trigger reorder review
+        Container: White card with border, shadow
+        - 3 Alert Cards (hardcoded examples):
 
-            Clickable: Drill into affected SKUs
+        Alert 1: "STOCK LOW"
+            - Icon: AlertTriangle (lucide-react), TUM Red (#C01530)
+            - Header: TUM Red (#C01530), uppercase, 12px font-semibold
+            - Body: SKU details, demand/supply status
+            - Details button: Shows "Feature coming soon" toast
 
-        "DELIVERY COMING": Scheduled delivery approaching (48-72 hours)
+        Alert 2: "DELIVERY COMING"
+            - Icon: Truck (lucide-react), TUM Red (#C01530)
+            - Header: TUM Red (#C01530), uppercase, 12px font-semibold
+            - Body: 2 pallets, Dec 12, 3-6pm, 2 SKUs affected
+            - Details button: Shows "Feature coming soon" toast
 
-            Color: Red (#C01530)
+        Alert 3: "SUPPLY DISRUPTION"
+            - Icon: AlertCircle (lucide-react), TUM Red (#C01530)
+            - Header: TUM Red (#C01530), uppercase, 12px font-semibold
+            - Body: Multiple cores not delivered, 3 SKUs affected
+            - Details button: Shows "Feature coming soon" toast
 
-            Icon: 🚚 delivery truck
+        "Acknowledge All" button (bottom): Ghost button, shows toast
 
-            Action: Prepare receiving, validate forecast
+    **Section 3: Action Recommendations**
 
-            Clickable: Show delivery details and expected contents
+        Separator: Horizontal grey line (#E5E5E5)
+        Container: White card with border, shadow
+        - 3 Recommendation Cards (hardcoded examples):
 
-        "STOCK LOW ×Y": Multiple products critically low (multiplicative factor)
+        Recommendation 1: "INCENTIVIZE SUPPLY"
+            - Icon: TrendingUp (lucide-react), TUM Green (#22C55E)
+            - Header: TUM Green (#22C55E), uppercase, 12px font-semibold
+            - Body: Increase supply for critical SKUs, 3 SKUs affected
+            - Details button: Shows "Feature coming soon" toast
 
-            Color: Red (#C01530)
+        Recommendation 2: "RESEARCH MARKET TREND"
+            - Icon: TrendingUp (lucide-react), TUM Green (#22C55E)
+            - Header: TUM Green (#22C55E), uppercase, 12px font-semibold
+            - Body: BMW X5 unexpected demand, 15 SKUs affected
+            - Details button: Shows "Feature coming soon" toast
 
-            Icon: 🔴 critical indicator
+        Recommendation 3: "CONTACT SUPPLIER"
+            - Icon: Phone (lucide-react), TUM Green (#22C55E)
+            - Header: TUM Green (#22C55E), uppercase, 12px font-semibold
+            - Body: Supplier WHMUC02 has cores ready
+            - Details button: Shows "Feature coming soon" toast
 
-            Action: Immediate escalation needed
+        "Mark All Complete" button (bottom): Ghost button, shows toast
 
-            Clickable: Show affected products and locations
+    **Section 4: Calendar Widget**
 
-    Calendar Widget:
+        Header: "DECEMBER 2025" with navigation buttons (◀ ▶)
+        - Month/Year: 14px, font-semibold, centered
+        - Navigation: ChevronLeft/Right icons, border buttons
+        - Behavior: Navigate prev/next month, doesn't remember selection
 
-        Shows upcoming critical action dates
+        Calendar Grid:
+        - Day headers: Su Mo Tu We Th Fr Sa (11px, grey)
+        - Date cells: 32px × 32px, centered
+        - Today (Dec 2): TUM Blue (#0065BD) background, white text
 
-        Blue circle: Today's date
+        Event Indicators (icons, not emojis):
+        - Critical events: AlertCircle icon, TUM Red (#C01530)
+        - Regular events: Calendar icon, Grey (#6E685F)
+        - Delivery events: Package icon, Grey (#6E685F)
 
-        Red circles: Dates with critical events (deliveries, threshold alerts)
+        Tooltips (on hover):
+        - Black background, white text
+        - Shows event details
+        - Examples: "Delivery: 1 pallet, 4 SKUs", "Critical: Stock review"
 
-        Emoji/icons: Visual indication of event type
+        Hardcoded Events (December 2025):
+        - Dec 3: Delivery (grey package)
+        - Dec 5: Critical (red alert) + Delivery
+        - Dec 7: Delivery (grey package)
+        - Dec 10: Regular event (grey calendar)
+        - Dec 12: Delivery (grey package)
+        - Dec 15: Regular event (grey calendar)
+        - Dec 18: Critical event (red alert)
+        - Dec 20: Delivery (grey package)
+        - Dec 22: Regular event (grey calendar)
 
         Purpose: Timeline visualization of when actions occur
 

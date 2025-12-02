@@ -7,7 +7,6 @@ import { FilterProvider } from '@/lib/contexts/FilterContext';
 import { Header } from '@/components/layout/Header';
 import ForecastSelection from '@/components/features/filters/ForecastSelection';
 import { CriticalActionsPanel } from '@/components/features/dashboard/CriticalActionsPanel';
-import { CalendarWidget } from '@/components/features/dashboard/CalendarWidget';
 
 export default function DashboardLayout({
   children,
@@ -51,9 +50,6 @@ export default function DashboardLayout({
           {/* Right 20%: Critical Actions (Full Height) */}
           <aside className="w-[20%] flex-shrink-0 bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 overflow-y-auto hidden xl:flex xl:flex-col">
             <CriticalActionsPanel />
-            <div className="mt-4">
-              <CalendarWidget />
-            </div>
           </aside>
         </div>
       </div>

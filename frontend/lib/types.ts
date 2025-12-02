@@ -167,7 +167,7 @@ export interface CriticalAction {
 
 export interface CalendarEvent {
   date: string;
-  type: 'delivery' | 'alert' | 'threshold';
+  type: 'delivery' | 'critical' | 'meeting';
   title: string;
   description: string;
   icon: string;

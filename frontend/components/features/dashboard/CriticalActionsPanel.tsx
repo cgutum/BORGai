@@ -1,56 +1,130 @@
 'use client';
 
-import { Card } from '@/components/ui/card';
-import { hardcodedCriticalActions } from '@/lib/data/critical-actions';
-import { AlertCircle, Truck, AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
+import { FileText, ChevronDown, ChevronUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { OnePageSummaryModal } from './OnePageSummaryModal';
+import { AlertCard } from './AlertCard';
+import { RecommendationCard } from './RecommendationCard';
+import { CalendarWidget } from './CalendarWidget';
+import { criticalAlerts } from '@/lib/data/critical-alerts';
+import { actionRecommendations } from '@/lib/data/action-recommendations';
 
 export function CriticalActionsPanel() {
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'DELIVERY_COMING':
-        return <Truck className="h-5 w-5" />;
-      case 'STOCK_LOW_MULTI':
-        return <AlertCircle className="h-5 w-5" />;
-      default:
-        return <AlertTriangle className="h-5 w-5" />;
-    }
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAlertsExpanded, setIsAlertsExpanded] = useState(true);
+  const [isRecommendationsExpanded, setIsRecommendationsExpanded] = useState(true);
+
+  const handleAcknowledgeAll = () => {
+    toast.info('Feature coming soon', {
+      description: 'Acknowledge all functionality will be available in the next release.',
+    });
+  };
+
+  const handleMarkAllComplete = () => {
+    toast.info('Feature coming soon', {
+      description: 'Mark all complete functionality will be available in the next release.',
+    });
   };
 
   return (
-    <div className="space-y-3 flex flex-col">
-      {/* Title */}
-      <h3 className="text-base font-semibold text-[#000000]">Critical Actions</h3>
+    <>
+      <div className="space-y-3 flex flex-col h-full">
+        {/* Title */}
+        <h3 className="text-base font-semibold text-[#000000]">Critical Actions</h3>
 
-      {/* Alert Boxes */}
-      {hardcodedCriticalActions.map((action) => (
-        <Card
-          key={action.id}
-          className="p-4 border-[#C01530] bg-[#C01530]/5 cursor-pointer hover:bg-[#C01530]/10 transition-colors"
+        {/* Section 1: One-Page Summary Button */}
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          variant="outline"
+          className="w-full justify-start gap-2 py-4 px-3 border-[#0065BD] text-[#0065BD] hover:bg-[#F0F7FF] transition-colors"
         >
-          <div className="flex items-start gap-3">
-            {/* Icon */}
-            <div className="flex-shrink-0 text-[#C01530]">
-              {getIcon(action.type)}
-            </div>
+          <FileText className="w-4 h-4" />
+          <span className="text-sm font-semibold">1-Page Summary</span>
+        </Button>
 
-            {/* Content */}
-            <div className="flex-1">
-              <div className="font-semibold text-[#C01530] text-sm mb-1">
-                {action.title}
-              </div>
-              <div className="text-xs text-[#6E685F] mb-2">
-                {action.description}
-              </div>
-              <div className="text-xs text-[#6E685F]">
-                {action.affectedSKUs.length} SKU{action.affectedSKUs.length > 1 ? 's' : ''} affected
-              </div>
-            </div>
-
-            {/* Emoji */}
-            <div className="text-2xl">{action.icon}</div>
+        {/* Section 2: Alerts */}
+        <div className="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4">
+          {/* Header with Collapse Button */}
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="text-xs font-semibold text-[#000000] uppercase">Alerts</h4>
+            <button
+              onClick={() => setIsAlertsExpanded(!isAlertsExpanded)}
+              className="text-[#6E685F] hover:text-[#000000] transition-colors"
+              aria-label={isAlertsExpanded ? 'Collapse' : 'Expand'}
+            >
+              {isAlertsExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
           </div>
-        </Card>
-      ))}
-    </div>
+
+          {/* Collapsible Content */}
+          {isAlertsExpanded && (
+            <div className="space-y-3">
+              <div className="space-y-3">
+                {criticalAlerts.map((alert) => (
+                  <AlertCard key={alert.id} alert={alert} />
+                ))}
+              </div>
+
+              <Button
+                onClick={handleAcknowledgeAll}
+                variant="ghost"
+                size="sm"
+                className="w-full text-xs font-medium text-[#6E685F] hover:bg-gray-50"
+              >
+                Acknowledge All
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Separator */}
+        <div className="border-t border-[#E5E5E5]" />
+
+        {/* Section 3: Action Recommendations */}
+        <div className="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4">
+          {/* Header with Collapse Button */}
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="text-xs font-semibold text-[#000000] uppercase">Action Recommendations</h4>
+            <button
+              onClick={() => setIsRecommendationsExpanded(!isRecommendationsExpanded)}
+              className="text-[#6E685F] hover:text-[#000000] transition-colors"
+              aria-label={isRecommendationsExpanded ? 'Collapse' : 'Expand'}
+            >
+              {isRecommendationsExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+          </div>
+
+          {/* Collapsible Content */}
+          {isRecommendationsExpanded && (
+            <div className="space-y-3">
+              <div className="space-y-3">
+                {actionRecommendations.map((recommendation) => (
+                  <RecommendationCard key={recommendation.id} recommendation={recommendation} />
+                ))}
+              </div>
+
+              <Button
+                onClick={handleMarkAllComplete}
+                variant="ghost"
+                size="sm"
+                className="w-full text-xs font-medium text-[#6E685F] hover:bg-gray-50"
+              >
+                Mark All Complete
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Section 4: Calendar */}
+        <div className="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4">
+          <CalendarWidget />
+        </div>
+      </div>
+
+      {/* One-Page Summary Modal */}
+      <OnePageSummaryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+    </>
   );
 }
