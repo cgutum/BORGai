@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { FilterProvider } from '@/lib/contexts/FilterContext';
 import { Header } from '@/components/layout/Header';
@@ -15,6 +15,7 @@ export default function DashboardLayout({
 }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -37,20 +38,25 @@ export default function DashboardLayout({
     return null;
   }
 
+  // Hide Critical Actions Panel on Forecast Analysis page (it has its own custom layout)
+  const showCriticalActions = !pathname?.includes('/forecast-analysis');
+
   return (
     <FilterProvider>
       <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
         <Header />
         <div className="flex flex-1 overflow-hidden gap-4 p-4">
-          {/* Left 80%: Main Content (KPI Badge + Filters/Chart) */}
-          <main className="flex-1 overflow-auto" style={{ width: '80%' }}>
+          {/* Main Content - Full width on Forecast Analysis, 80% width elsewhere */}
+          <main className={showCriticalActions ? "flex-1 overflow-auto" : "flex-1 overflow-auto w-full"} style={showCriticalActions ? { width: '80%' } : undefined}>
             {children}
           </main>
           
-          {/* Right 20%: Critical Actions (Full Height) */}
-          <aside className="w-[20%] flex-shrink-0 bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 overflow-y-auto hidden xl:flex xl:flex-col">
-            <CriticalActionsPanel />
-          </aside>
+          {/* Right 20%: Critical Actions (Full Height) - Hidden on Forecast Analysis page */}
+          {showCriticalActions && (
+            <aside className="w-[20%] flex-shrink-0 bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 overflow-y-auto hidden xl:flex xl:flex-col">
+              <CriticalActionsPanel />
+            </aside>
+          )}
         </div>
       </div>
     </FilterProvider>

@@ -578,361 +578,751 @@ Time Range Selection:
 
 Feature 3: Forecast Analysis Page - Model Transparency & Feature Contribution
 
+**Status**: Redesigned December 2025  
+**Feature Plan**: See `docs/forecast_analysis_page_featureplan.md` for detailed specifications
+
 User Stories:
 
     As a supply chain planner, I want to see exactly which data sources drive each week's forecast so I can understand and validate the model's logic
 
     As a supply chain planner, I want to review feature contributions over time so I can detect model drift or unusual patterns
 
+    As a supply chain planner, I want to focus on a single core's analysis with locked filters to maintain context
+
 3.1 Page Layout Structure
 
-Header Section (Full Width, Top)
+**Layout Type**: Three-panel grid layout (no Critical Actions Panel on right side)
 
-    SKU/Product Information:
+```
+┌─────────────────────────────────────────────────────────────┐
+│ MAIN NAVIGATION BAR                                         │
+├────────────────┬────────────────────────────────────────────┤
+│ FILTERS PANEL  │ CORE DETAILS CARD                          │
+│ (Left, 20-25%) │ (Top Right, 75-80%)                        │
+│ Height: 4x nav │ Same height as filters                     │
+├────────────────┴────────────────────────────────────────────┤
+│ MAIN DATA TABLE CARD (Full width)                          │
+│ - Tabs, sub-headers, controls, feature table               │
+└─────────────────────────────────────────────────────────────┘
+```
 
-        SKU name: e.g., "Turbocharger, 3.0L Diesel"
+**3.1.1 Filters Panel (Left Sidebar)**
 
-        SKU ID: e.g., "CORE-TURBO-001"
+Purpose: Locked filter context for focused analysis
 
-    Status Indicators (Right-aligned):
+    Width: 20-25% of viewport
 
-        Forecast Status: "Need Review" / "Accepted" / "Overridden" (badge with color)
+    Height: Fixed at 4x navigation bar height (~240-280px)
 
-        Edit Status: "Open" / "Locked" (badge)
+    Background: White card with grey border (#D3D0CC)
 
-        Last Action: "Accepted by M. Bie on Nov 28, 2025 at 14:32"
+    Components:
 
-        Total Alerts: "[N] alerts"
+        Preset Views Dropdown (Disabled)
 
-        Last Updated: "Generated 2 hours ago"
+            Current value: "Favorites" (preselected)
 
-        Lock Date: "Locked until Dec 5, 2025"
+            All options grayed out and non-interactive
 
-    Action Buttons (Right side):
+            Options: All, Favorites (highlighted), High Priority, Standard
 
-        "Accept AI Forecast" (Primary button, TUM Blue #0065BD): Confirm model prediction
+            Visual state: opacity 0.5, cursor: not-allowed
 
-        "Overwrite" (Secondary button, grey border): Manual override (opens override panel)
+        Cores Multi-Select (Disabled)
+
+            Current value: "TC_BMW_x3_2023" (BMW x3 Turbocharger)
+
+            Dropdown opens but all options grayed out
+
+            Search field disabled
+
+            Favorite cores still show star icon but non-interactive
+
+            Communicates: "Analysis is locked to this specific core"
+
+    Overflow: Vertical scroll if content exceeds fixed height
+
+**3.1.2 Core Details Card (Top Right)**
+
+Purpose: Display selected core information and actions
+
+    Height: Same as Filters Panel (synchronized)
+
+    Layout: Flexbox column with space-between for equal spacing
+
+    Background: White card with grey border (#D3D0CC)
+
+    Padding: 24px (p-6)
+
+    Components:
+
+        Core Information (Top Section)
+
+            Core Name: "Turboflow BMW x3 2025" (20px, font-semibold, black)
+
+            SKU: "SKU: TCBMW_X3_2023_5" (14px, grey #6E685F)
+
+        Status Badges (Top Right)
+
+            "Need Review" badge: Orange background (#E37222), white text
+
+            "Open" badge: Green background (#22C55E), white text
+
+        Action Buttons (Middle Section)
+
+            "Accept Forecast" button: TUM Blue (#0065BD), white text
+
+            "Overwrite" button: Outline variant, grey border (#D3D0CC)
+
+            Both buttons show toast "Feature coming soon" (dummy)
+
+        Metadata Icons (Bottom Section - 3 rows)
+
+            AlertCircle icon: "3 Alerts connected to this core"
+
+            Clock icon: "Generated 2 hours ago" (relative time)
+
+            Lock icon: "Locked by M. Bie until Dec 5, 2025"
+
+            All icons: 16px (h-4 w-4), grey color (#6E685F)
+
+        Last Action Footer
+
+            Border top: 1px solid grey (#D3D0CC)
+
+            Text: "Last Action: M. Bie on Nov 28, 2025 at 14:32"
+
+            Font: 12px, username and timestamp bold
+
+**3.1.3 Main Data Table Card (Below Both Panels)**
+
+Purpose: Display feature contribution analysis with controls
+
+    Width: Full width (spans both columns)
+
+    Position: Below Filters Panel and Core Details Card
+
+    Background: White card with grey border (#D3D0CC)
+
+    Structure: Tabs → Header → Sub-headers → Controls → Feature Table
 
 3.2 Navigation Tabs
 
-Three Main Tabs:
+Three Main Tabs (Top of Main Card):
 
-    Forecast Overview (Default View)
+    Analysis (Default Active)
 
-        High-level forecast summary
+        Shows full feature contribution analysis
 
-        Chart showing AI vs. consensus
+        Blue background (#0065BD) when active, white text
 
-        KPI metrics for this SKU
+        Contains all sub-headers, controls, and table
 
-    Analysis (Primary for Feature Contribution)
+    Forecast Overview (Dummy)
 
-        Detailed feature contribution table
+        Shows toast "Feature coming soon" when clicked
 
-        Three sub-views (described below)
+        Does not switch tab, remains on Analysis
 
-        Deep dive into model drivers
+        White background, grey text (#6E685F)
 
-    History
+    History (Dummy)
 
-        Previous forecast versions
+        Shows toast "Feature coming soon" when clicked
 
-        Comparison with actual outcomes (once realized)
+        Does not switch tab, remains on Analysis
 
-        Audit trail of changes
+        White background, grey text (#6E685F)
 
-Currently on "Analysis" Tab
-3.3 Analysis Tab - Sub-Views
+Tab Design:
 
-Sub-View Toggle (Below tabs):
+    Active: bg-[#0065BD] text-white
 
-    Forecast Data Analysis (Default, selected)
+    Inactive: bg-white text-[#6E685F]
 
-        Shows feature contribution table with full detail
+    Hover: bg-[#F5F5F5] (inactive only)
 
-        Useful for understanding individual drivers
+    Border bottom: 1px solid grey (#D3D0CC) below tab strip
 
-    Aggregated View
+3.3 Analysis Tab - Content Structure
 
-        Rolls up features into categories
+**Header Section**
 
-        Shows category-level contributions
+    Title: "Forecast Analysis"
 
-        Cleaner overview, less granular
+        Font: 20px (text-xl), font-semibold
 
-    Feature Contribution Analysis
+        Color: Black (#000000)
 
-        Alternative visualization of top drivers
+        Margin bottom: 16px (mb-4)
 
-        Ranked list format
+**Sub-Headers Section**
 
-        Good for identifying dominant factors
+Two sub-header buttons with dot indicators:
 
-3.4 Feature Contribution Table (Main Component in Analysis Tab)
+    Forecast Data Analysis (Preselected)
 
-Table Structure:
+        Blue dot (8px diameter) before text
 
-Columns (Time periods):
+        Text color: Black (#000000), font-medium
 
-    Each column represents a forecast period (weekly intervals typical)
+        Border bottom: 2px solid blue (#0065BD)
 
-    Column header shows date: "03/01", "03/08", "03/15", ..., "05/17"
+        State: Active, shows feature contribution table
 
-    Cell at top of column shows forecasted quantity for that week (e.g., "586", "573", "615")
+    Forecast Model Analysis (Dummy)
 
-    Column width: Consistent, auto-resizes on screen resize
+        Grey dot (8px diameter) before text
+
+        Text color: Grey (#6E685F), font-normal
+
+        No border bottom
+
+        Shows toast "Feature coming soon" when clicked
+
+        State: Inactive, not yet implemented
+
+Layout: Horizontal flex with 24px gap (gap-6)
+
+**Grey Line Separator**
+
+    Border: 1px solid grey (#D3D0CC)
+
+    Full width, 24px margin bottom (mb-6)
+
+**Control Buttons Box**
+
+Container:
+
+    Background: Light grey (#F5F5F5)
+
+    Padding: 16px (p-4)
+
+    Border radius: 6px (rounded)
+
+    Layout: Horizontal flex with 16px gap (gap-4)
+
+Components (Left to Right):
+
+1. View Toggle (Segmented Control)
+
+    Detailed View Button (Default Active)
+
+        Background: TUM Blue (#0065BD)
+
+        Text: White (#FFFFFF), 14px, font-medium
+
+        Padding: 8px 16px (py-2 px-4)
+
+        Border radius: Left side only (rounded-l)
+
+        Click behavior: Expands all categories in table
+
+    Aggregate View Button
+
+        Background: White (#FFFFFF)
+
+        Text: Black (#000000), 14px, font-medium
+
+        Padding: 8px 16px
+
+        Border: 1px solid grey (#D3D0CC, except left edge)
+
+        Border radius: Right side only (rounded-r)
+
+        Click behavior: Collapses all categories, shows summary rows
+
+2. Value Mode Dropdown
+
+    Options:
+
+        "Absolute Values" (Default): Shows raw contribution numbers (+64, -30)
+
+        "Relative Values": Shows percentage contribution (+10.9%, -4.8%)
+
+    Width: 200px
+
+    Border: 1px solid grey (#D3D0CC)
+
+    Calculation (Relative): (featureValue / totalForecast) × 100
+
+3. Action Buttons (All Dummy)
+
+    Filters Button
+
+        Variant: Outline, grey border (#D3D0CC)
+
+        Icon: Filter (lucide-react, 16px, positioned left)
+
+        Text: "Filters"
+
+        Shows toast: "Feature coming soon"
+
+    Update Button
+
+        Background: TUM Blue (#0065BD)
+
+        Text: White (#FFFFFF)
+
+        No icon
+
+        Shows toast: "Feature coming soon"
+
+    Download Button
+
+        Variant: Outline, grey border (#D3D0CC)
+
+        Icon: Download (lucide-react, 16px, positioned left)
+
+        Text: "Download"
+
+        Shows toast: "Feature coming soon"
+
+3.4 Feature Contribution Table (Current Implementation)
+
+**Component**: FeatureTable.tsx (Keep existing implementation)
+
+**Structure**:
+
+**Table Structure:**
+
+Columns (Time Periods):
+
+    Each column represents a forecast period (weekly intervals)
+
+    Column header shows date: "03/01", "03/08", "03/15", "03/22", "03/29", "04/05", "04/12"
+
+    Column width: Minimum 80px, centered content
 
 Rows (Forecast Components & Features):
 
-    Current Forecast (Top row, bold)
+1. AI Forecast Row (Always Visible)
 
-        Shows the final AI-predicted demand for each week
+        Label: "AI Forecast"
 
-        Values: 586, 573, 615, 623, 557, 612, ... (example values)
+        Values: 586, 573, 615, 623, 557, 612, 645 (example)
 
-        Styling: Bold background (light blue #98C6EA at 20% opacity)
+        Background: Light blue (#0065BD at 10% opacity)
 
-        This is the bottom-line forecast that appears on main dashboard
+        Text: TUM Blue (#0065BD), font-semibold
 
-    External Data Group (Collapsible section):
+        This is the final forecast that appears on main dashboard
 
-        Macroeconomic Trends (e.g., PMI, interest rates, inflation)
+2. EXTERNAL DATA Group (Collapsible)
 
-            Contribution values: -64, -30, -76, +9, -34, ...
+    7 features with contribution values:
 
-            Positive = increases forecast, Negative = decreases forecast
+        Macroeconomic Trends: -64, -30, -76, +9, -34, -12, -45
 
-        Customer Trends (e.g., customer sentiment, order patterns)
+        Customer Trends: -80, +3, -87, -21, -79, +15, -34
 
-            Values: -80, +3, -87, -21, -79, ...
+        Google Trends: +17, -89, -47, -67, -82, +23, +56
 
-        Google Trends (e.g., search interest in replacement parts)
+        Market Insights: +48, -67, +5, +64, -8, -23, +12
 
-            Values: +17, -89, -47, -67, -82, ...
+        Point of Sale: -2, -66, -132, -80, -69, -45, -89
 
-        Market Insights (e.g., competitor activity, market conditions)
+        Seasonality: +50, +179, +164, +4, +73, +98, +134
 
-            Values: +48, -67, +5, +64, -8, ...
+        Weather: +67, +127, +13, -71, -46, +34, -12
 
-        Point of Sale Transactions (e.g., actual sales data)
+    Category Header:
 
-            Values: -2, -66, -132, -80, -69, ...
+        Button with ChevronDown (expanded) or ChevronRight (collapsed)
 
-        Seasonality (e.g., seasonal patterns, holiday effects)
+        Text: "EXTERNAL DATA" (uppercase, font-semibold, black)
 
-            Values: +50, +179, +164, +4, +73, ...
+        Hover: Light grey background (#F5F5F5)
 
-        Weather (e.g., seasonal vehicle damage, maintenance peaks)
+        Collapsible: Click to toggle feature rows visibility
 
-            Values: +67, +127, +13, -71, -46, ...
+3. SALES ORDERS Group (Collapsible)
 
-    Sales Orders Group (Collapsible section):
+    2 features:
 
-        Open Sales Orders (current backlog)
+        Open Sales Orders: -60, +183, +27, -20, -15, +45, +78
 
-            Values: -60, +183, +27, -20, -15, ...
+        Historical Sales Orders: +43, -64, -29, +36, -72, -23, +12
 
-        Historical Sales Orders (past order patterns)
+    Same category header styling as EXTERNAL DATA
 
-            Values: +43, -64, -29, +36, -72, ...
+4. EVENTS Group (Collapsible)
 
-    Events Group (Collapsible section):
+    2 features:
 
-        Holidays (e.g., winter break, Easter, summer holidays)
+        Holidays: +2, +197, +158, 0, 0, +23, +45
 
-            Values: +2, +197, +158, [blank], [blank], ...
+        Marketing Campaigns: -53, -67, -83, +37, +28, -12, +34
 
-        Marketing Campaigns (e.g., promotional periods)
+    Same category header styling as EXTERNAL DATA
 
-            Values: -53, -67, -83, +37, +28, ...
+**Default State**: All three groups expanded (ChevronDown icons showing)
 
-Cell Styling & Color Coding:
+**Cell Styling & Color Coding**:
 
-    Green Cells: Positive contributions (increase forecast)
+Absolute Values Mode (Default):
 
-        Light green background: #A2AD00 at 15% opacity
+    Positive values: "+64", "+179" (with + prefix)
 
-        Text: #A2AD00 (darker green)
+    Negative values: "-30", "-87" (with - prefix)
 
-        Intensity (saturation): Higher for larger contributions
+    Zero values: "—" (em dash)
 
-    Red Cells: Negative contributions (decrease forecast)
+Relative Values Mode:
 
-        Light red background: #E37222 at 15% opacity
+    Positive values: "+10.9%", "+31.3%" (percentage of total forecast)
 
-        Text: #E37222 (darker orange/red)
+    Negative values: "-4.8%", "-15.2%"
 
-        Intensity: Higher for larger (more negative) contributions
+    Zero values: "0.0%"
 
-    Neutral Cells: Zero or near-zero contributions
+Color Coding (Both Modes):
 
-        Light grey background
+    Positive Impact (Green Cells)
 
-        Text: Black or grey
+        Background: #A2AD00 at 15% opacity
 
-    Empty Cells: Feature not available for that period
+        Text: #A2AD00 (Success Green)
 
-        Light grey diagonal hatching or "N/A" text
+        Meaning: This feature increases the forecast
 
-        Subtle styling to indicate no data
+    Negative Impact (Orange Cells)
 
-Cell Interaction:
+        Background: #E37222 at 15% opacity
 
-    Hover over cell: Tooltip appears with exact value, feature name, interpretation
+        Text: #E37222 (TUM Orange)
+
+        Meaning: This feature decreases the forecast
+
+    Neutral Impact (Grey Cells)
+
+        Background: #F5F5F5 (Light Grey)
+
+        Text: #6E685F (TUM Grey)
+
+        Meaning: Zero or minimal impact
+
+**Collapsible Behavior:**
+
+Category Headers:
+
+    Clickable button spanning full width
+
+    Left side: Chevron icon + category label (uppercase, font-semibold)
+
+        ChevronDown (h-4 w-4): Category expanded
+
+        ChevronRight (h-4 w-4): Category collapsed
+
+    Hover: Light grey background (#F5F5F5)
+
+    Click: Toggle visibility of all feature rows in category
+
+Feature Rows:
+
+    Indented 32px (pl-8) from left edge
+
+    Border top: 1px solid grey (#D3D0CC at 30% opacity)
+
+    Visible when category is expanded
+
+    Hidden when category is collapsed
+
+Aggregate View Mode (Future):
+
+    All categories show collapsed state (ChevronRight)
+
+    Category rows show aggregated totals (sum of all features in category)
+
+    User can still manually expand categories to see individual features
+
+**Table Footer (Legend):**
+
+    Border top: 1px solid grey (#D3D0CC)
+
+    Padding top: 16px (pt-4)
+
+    Margin top: 24px (mt-6)
+
+    Layout: Horizontal flex with 24px gap (gap-6)
+
+    Font: 12px (text-xs), grey (#6E685F)
+
+    Two legend items:
+
+        Green box (16px × 16px, border #A2AD00) + "Positive contributor (increases forecast)"
+
+        Orange box (16px × 16px, border #E37222) + "Negative contributor (decreases forecast)"
+
+**Horizontal Scroll:**
+
+    Container: overflow-x-auto on card wrapper
+
+    Minimum table width enforced by column min-widths
+
+    Browser default scrollbar
+
+**Cell Interaction (Future Enhancement):**
+
+    Hover: Tooltip with detailed value and explanation
 
         Example: "Seasonality (Winter peak): +127 units | Contributes 20% to weekly forecast"
 
-    Click on cell: Opens detailed explanation panel
+    Click: Opens detailed explanation modal
 
-        Shows: Why this feature contributes (e.g., "Winter typically shows +25% increase due to vehicle maintenance peaks")
+        Shows: Historical context, trend analysis, why this feature contributes
 
-        Shows: Historical context (e.g., "Compared to last week: +15% increase")
+3.5 Interaction Flows
 
-3.5 Feature Contribution Display Options
+**Page Load Flow:**
 
-Top Controls (Above table):
+1. User navigates to `/dashboard/forecast-analysis`
 
-    Display Mode Selector:
+2. System loads default state:
 
-        Toggle: Absolute Value vs. Signed Value
+    Filters Panel: Preset "Favorites", Core "TC_BMW_x3_2023" (both disabled/grayed out)
 
-            Absolute: Shows magnitude (|value|), harder to distinguish impact direction
+    Core Details Card: Shows BMW x3 details, badges, metadata
 
-            Signed: Shows direction (positive/negative), easier to see push/pull
+    Main Content: "Analysis" tab active, "Forecast Data Analysis" sub-header active
 
-        Default: Signed Value
+    Controls: "Detailed View" active, "Absolute Values" selected
 
-    Color Scheme Selector:
+    Feature Table: All three category groups expanded
 
-        Option 1: Red/Green (default, intuitive for contribution direction)
+3. Page renders in ~300ms
 
-        Option 2: Blue/Orange (alternative, better for color-blind users)
+**Tab Switching Flow:**
 
-        Option 3: Monochrome (grayscale, printer-friendly)
+    Analysis Tab (Active): Shows full content
 
-    Feature Filter:
+    Forecast Overview Tab (Dummy): Shows toast "Feature coming soon", stays on Analysis
 
-        Multi-select dropdown: Choose which feature groups to display
+    History Tab (Dummy): Shows toast "Feature coming soon", stays on Analysis
 
-        Options: Show/hide "External Data", "Sales Orders", "Events", etc.
+**Sub-Header Navigation Flow:**
 
-        Purpose: Focus on relevant drivers, reduce cognitive load
+    Forecast Data Analysis (Active): Shows feature contribution table
 
-        Default: All features shown
+    Forecast Model Analysis (Dummy): Shows toast "Feature coming soon", stays on Forecast Data Analysis
 
-    Update / Apply Button:
+**View Toggle Flow:**
 
-        Click to refresh table based on selections above
+    Detailed View → Aggregate View:
 
-        Shows loading indicator while recalculating
+        Updates button states (Aggregate becomes blue, Detailed becomes white)
 
-        Maintains current scroll position
+        Collapses all category groups
 
-    Export Controls:
+        Shows only category summary rows (future: with aggregated totals)
 
-        "Download as CSV": Export table data for analysis in Excel
+        Duration: 200ms smooth transition
 
-        "Download as PNG": Export chart visualization
+    Aggregate View → Detailed View:
 
-        "Share Report": Generate shareable link with these settings
+        Updates button states (Detailed becomes blue, Aggregate becomes white)
 
-3.6 Visual Layout of Analysis Tab
+        Expands all category groups
 
-text
-┌─ Header Section ────────────────────────────────────────────┐
-│ SKU: Turbocharger, 3.0L Diesel (CORE-TURBO-001)            │
-│ Status: Need Review | Edit: Open | Alerts: 3                │
-│ [Accept AI Forecast] [Overwrite] [↓ More Actions]           │
-└─────────────────────────────────────────────────────────────┘
+        Shows all individual feature rows
 
-┌─ Tabs ──────────────────────────────────────────────────────┐
-│ Forecast Overview | Analysis [ACTIVE] | History             │
-└─────────────────────────────────────────────────────────────┘
+        Duration: 200ms smooth transition
 
-┌─ Sub-View Selector ─────────────────────────────────────────┐
-│ ● Forecast Data Analysis | Aggregated View | Feature Contrib│
-└─────────────────────────────────────────────────────────────┘
+**Dropdown Change Flow:**
 
-┌─ Display Controls ──────────────────────────────────────────┐
-│ [● Signed Value | Absolute Value] [Red/Green ▼] [Filters ▼]│
-│                                              [Update] [↓]    │
-└─────────────────────────────────────────────────────────────┘
+    Absolute Values → Relative Values:
 
-┌─ Feature Contribution Table ────────────────────────────────┐
-│      │ 03/01 │ 03/08 │ 03/15 │ 03/22 │ 03/29 │ ... │ 05/17 │
-├──────┼───────┼───────┼───────┼───────┼───────┼─────┼───────┤
-│ AI   │  586  │  573  │  615  │  623  │  557  │ ... │  712  │
-├──────┼───────┼───────┼───────┼───────┼───────┼─────┼───────┤
-│[▼] EXTERNAL DATA                                             │
-│ Macro │ -64   │ -30   │ -76   │  +9   │ -34   │ ... │  -7   │
-│ Custr │ -80   │  +3   │ -87   │ -21   │ -79   │ ... │ +116  │
-│ GTrnd │ +17   │ -89   │ -47   │ -67   │ -82   │ ... │ +76   │
-│ Mkt   │ +48   │ -67   │  +5   │ +64   │  -8   │ ... │ -13   │
-│ PoS   │  -2   │ -66   │ -132  │ -80   │ -69   │ ... │ -125  │
-│ Seas  │ +50   │ +179  │ +164  │  +4   │ +73   │ ... │ +63   │
-│ Weatr │ +67   │ +127  │ +13   │ -71   │ -46   │ ... │  +1   │
-├──────┼───────┼───────┼───────┼───────┼───────┼─────┼───────┤
-│[▼] SALES ORDERS                                              │
-│ Open  │ -60   │ +183  │ +27   │ -20   │ -15   │ ... │ +158  │
-│ Hist  │ +43   │ -64   │ -29   │ +36   │ -72   │ ... │ +13   │
-├──────┼───────┼───────┼───────┼───────┼───────┼─────┼───────┤
-│[▼] EVENTS                                                    │
-│ Hol   │  +2   │ +197  │ +158  │ blank │ blank │ ... │ +30   │
-│ Mktg  │ -53   │ -67   │ -83   │ +37   │ +28   │ ... │ -13   │
-└──────┴───────┴───────┴───────┴───────┴───────┴─────┴───────┘
+        Calculates percentage contribution: (featureValue / totalForecast) × 100
 
-[Legend: ✓ = supported data | ◯ = N/A | Green = positive contributor | Red = negative contributor]
+        Updates all table cells with percentage format (+10.9%, -4.8%)
 
-3.7 User Interactions on Analysis Tab
+        Keeps color coding (green/orange)
 
-Collapse/Expand Feature Groups:
+        Duration: 100ms (instant update)
 
-    User clicks [▼] or [►] icon next to "EXTERNAL DATA" group
+    Relative Values → Absolute Values:
 
-    Section expands/collapses to show/hide individual features
+        Restores original contribution values
 
-    State persists during session
+        Updates cells with absolute format (+64, -30)
 
-Drill into Feature Explanation:
+        Duration: 100ms
 
-    User clicks on a cell (e.g., "Seasonality +179" for 03/08)
+**Dummy Button Interactions:**
 
-    Explanation panel slides in from right side
+All dummy buttons show toast "Feature coming soon" (3 second duration, dismissible):
 
-    Shows:
+    Accept Forecast button
 
-        Feature name and value
+    Overwrite button
 
-        Why this feature contributed (e.g., "Spring break holidays increase travel demand")
+    Filters button
 
-        Historical context (e.g., "Seasonality was -15 last week, now +179 — trend change detected")
+    Update button
 
-        Confidence indicator (e.g., "Based on 3 years of historical data")
+    Download button
 
-    User clicks [X] to close panel or clicks another cell to update it
+**Filter Panel Interactions (Disabled State):**
 
-Change Display Settings:
+    Preset Views Dropdown:
 
-    User toggles "Signed Value" → "Absolute Value"
+        Dropdown does not open (disabled)
 
-    Cell values change (e.g., "-64" becomes "64")
+        Cursor shows "not-allowed" icon
 
-    Interpretation: Focus shifts from "impact direction" to "magnitude"
+        Current selection visible but grayed out
 
-Filter Features:
+    Cores Multi-Select:
 
-    User clicks "Filters ▼"
+        Dropdown opens but all options grayed out
 
-    Dropdown shows checklist: External Data ☑️, Sales Orders ☑️, Events ☑️
+        Checkboxes disabled, no selection changes possible
 
-    User uncheck "Events"
+        Search field disabled
 
-    Clicks [Update]
+        Current selection (TC_BMW_x3_2023) shows checkmark but grayed
 
-    Table refreshes, Events rows hidden
+3.6 Data Requirements
 
-    Column totals recalculate
+**Hardcoded Data (Initial Implementation):**
+
+```typescript
+// Selected core details
+const selectedCore = {
+  id: "TC_BMW_x3_2023",
+  name: "Turboflow BMW x3 2025",
+  sku: "TCBMW_X3_2023_5",
+  category: "Turbocharger"
+};
+
+// Core status and metadata
+const coreStatus = {
+  badges: [
+    { label: "Need Review", color: "#E37222" },
+    { label: "Open", color: "#22C55E" }
+  ],
+  metadata: {
+    alertCount: 3,
+    generatedTime: "2 hours ago",
+    lockedBy: "M. Bie",
+    lockedUntil: "Dec 5, 2025"
+  },
+  lastAction: {
+    user: "M. Bie",
+    timestamp: "Nov 28, 2025 at 14:32"
+  }
+};
+
+// Filter state (disabled)
+const filterState = {
+  presetView: "favorites",
+  selectedCores: ["TC_BMW_x3_2023"],
+  disabled: true
+};
+
+// Feature contribution data (already in FeatureTable.tsx)
+const forecastData = {
+  dates: ['03/01', '03/08', '03/15', '03/22', '03/29', '04/05', '04/12'],
+  currentForecast: [586, 573, 615, 623, 557, 612, 645],
+  features: {
+    externalData: [/* 7 features */],
+    salesOrders: [/* 2 features */],
+    events: [/* 2 features */]
+  }
+};
+```
+
+**Future API Integration (Add TODO Comments):**
+
+```typescript
+// TODO: Replace with API call
+// GET /api/forecast-analysis?coreId=TC_BMW_x3_2023
+// GET /api/cores/{coreId}/status
+// GET /api/forecast-analysis/{coreId}/contributions
+```
+
+3.7 Component Architecture
+
+**New Components:**
+
+    `ForecastFiltersPanel.tsx`: Left sidebar with disabled filters
+
+    `CoreDetailsCard.tsx`: Top right card with core info and actions
+
+    `AnalysisMainContent.tsx`: Main card with tabs, sub-headers, controls, and table
+
+**Deprecated Components:**
+
+    `AnalysisHeader.tsx`: Content moved to CoreDetailsCard
+
+    `AnalysisTabs.tsx`: Integrated into AnalysisMainContent
+
+    `TableControls.tsx`: Integrated into AnalysisMainContent
+
+**Existing Components (Keep):**
+
+    `FeatureTable.tsx`: Current table implementation (will enhance later)
+
+3.8 Responsive Design
+
+**Desktop (≥1280px):**
+
+    Filters Panel: 20% width
+
+    Core Details Card: 80% width (minus gap)
+
+    All features visible
+
+**Laptop (1024px - 1279px):**
+
+    Filters Panel: 25% width
+
+    Core Details Card: 75% width
+
+    Slightly compressed but functional
+
+**Tablet (≤1023px) - Future Enhancement:**
+
+    Stack vertically: Filters → Core Details → Main Content
+
+    Remove fixed heights
+
+    Full-width cards
+
+3.9 Design Specs Summary
+
+**Color Palette:**
+- TUM Blue: `#0065BD` (primary buttons, active states)
+- TUM Grey: `#6E685F` (body text, icons)
+- TUM Orange: `#E37222` (warning badge, negative values)
+- TUM Green: `#22C55E` (success badge)
+- Border Grey: `#D3D0CC` (card borders, separators)
+- Success Green: `#A2AD00` (positive contributions)
+
+**Typography:**
+- H2: 20px, font-semibold (page headers)
+- H3: 18px, font-semibold (section headers)
+- Body: 14px, font-normal
+- Small: 12px, font-normal
+
+**Spacing:**
+- Card padding: 24px (p-6)
+- Section spacing: 24px (mb-6)
+- Element spacing: 16px (mb-4)
+- Grid gap: 24px (gap-6)
+
+**Shadows:**
+- Cards: `0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)`
+- Hover: `0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)`
+
+**Icons:**
+- Small (inline): 16px (h-4 w-4)
+- Medium (buttons): 18px
+- Large (headers): 20px (h-5 w-5)
+
+---
+
+**End of Feature 3 Specifications**
 
 Feature 4: Coming Soon Placeholder Features
 

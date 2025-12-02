@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 
@@ -29,10 +29,24 @@ const sampleData = {
   },
 };
 
-export function FeatureTable() {
+interface FeatureTableProps {
+  viewMode?: 'detailed' | 'aggregate';
+  valueMode?: 'absolute' | 'relative';
+}
+
+export function FeatureTable({ viewMode = 'detailed', valueMode = 'absolute' }: FeatureTableProps) {
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
     new Set(['externalData', 'salesOrders', 'events'])
   );
+
+  // Update expanded groups when viewMode changes
+  useEffect(() => {
+    if (viewMode === 'detailed') {
+      setExpandedGroups(new Set(['externalData', 'salesOrders', 'events']));
+    } else {
+      setExpandedGroups(new Set());
+    }
+  }, [viewMode]);
 
   const toggleGroup = (group: string) => {
     setExpandedGroups((prev) => {
@@ -53,6 +67,17 @@ export function FeatureTable() {
       return 'bg-[#E37222]/15 text-[#E37222]';
     }
     return 'bg-gray-50 text-[#6E685F]';
+  };
+
+  // Format cell value based on valueMode
+  const formatCellValue = (value: number, forecastValue: number) => {
+    if (valueMode === 'relative') {
+      // Calculate percentage contribution to forecast
+      const percentage = (value / forecastValue) * 100;
+      return `${percentage > 0 ? '+' : ''}${percentage.toFixed(1)}%`;
+    }
+    // Absolute mode
+    return `${value > 0 ? '+' : ''}${value === 0 ? '—' : value}`;
   };
 
   return (
@@ -76,7 +101,7 @@ export function FeatureTable() {
             <td className="p-3 text-sm font-semibold text-[#0065BD]">AI Forecast</td>
             {sampleData.currentForecast.map((value, idx) => (
               <td key={idx} className="text-center p-3 text-sm font-semibold text-[#0065BD]">
-                {value}
+                {valueMode === 'relative' ? '100%' : value}
               </td>
             ))}
           </tr>
@@ -106,8 +131,7 @@ export function FeatureTable() {
                     key={idx}
                     className={`text-center p-3 text-sm font-medium ${getCellColor(value)}`}
                   >
-                    {value > 0 ? '+' : ''}
-                    {value}
+                    {formatCellValue(value, sampleData.currentForecast[idx])}
                   </td>
                 ))}
               </tr>
@@ -138,8 +162,7 @@ export function FeatureTable() {
                     key={idx}
                     className={`text-center p-3 text-sm font-medium ${getCellColor(value)}`}
                   >
-                    {value > 0 ? '+' : ''}
-                    {value}
+                    {formatCellValue(value, sampleData.currentForecast[idx])}
                   </td>
                 ))}
               </tr>
@@ -170,8 +193,7 @@ export function FeatureTable() {
                     key={idx}
                     className={`text-center p-3 text-sm font-medium ${getCellColor(value)}`}
                   >
-                    {value > 0 ? '+' : ''}
-                    {value === 0 ? '—' : value}
+                    {formatCellValue(value, sampleData.currentForecast[idx])}
                   </td>
                 ))}
               </tr>
