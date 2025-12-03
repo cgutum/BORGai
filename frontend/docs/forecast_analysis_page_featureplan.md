@@ -425,11 +425,11 @@ const coreDetails = {
       <div className="flex gap-6 mb-6">
         <button className="flex items-center gap-2 text-sm font-medium text-[#000000] border-b-2 border-[#0065BD] pb-2">
           <div className="w-2 h-2 rounded-full bg-[#0065BD]" />
-          Forecast Data Analysis
+          Forecast Contribution Analysis
         </button>
         <button className="flex items-center gap-2 text-sm text-[#6E685F] pb-2">
           <div className="w-2 h-2 rounded-full bg-[#6E685F]" />
-          Forecast Model Analysis
+          Forecast Detail Analysis
         </button>
       </div>
       
@@ -578,34 +578,51 @@ Two-button segmented control:
   - Categories can still be manually expanded/collapsed with chevron
   - Visual state: Blue background on Aggregate View button, white on Detailed View
 
-**Dropdown: Absolute Values / Relative Values**
+**Dropdown: View Mode Selection**
 
 **Structure:**
 ```tsx
-<Select defaultValue="absolute" className="border-[#D3D0CC]">
+<Select defaultValue="impact" className="border-[#D3D0CC]">
   <SelectTrigger className="w-[200px]">
     <SelectValue />
   </SelectTrigger>
   <SelectContent>
+    <SelectItem value="impact">Impact Factor</SelectItem>
     <SelectItem value="absolute">Absolute Values</SelectItem>
-    <SelectItem value="relative">Relative Values</SelectItem>
+    <SelectItem value="relative">Relative Value</SelectItem>
   </SelectContent>
 </Select>
 ```
 
 **Functionality:**
-- **Absolute Values** (default): Shows raw contribution numbers (e.g., +64, -30, -76)
-- **Relative Values**: Shows percentage contribution to total forecast (e.g., +10.9%, -4.8%, -12.3%)
+- **Impact Factor** (default): Shows contribution impact from -50 to +50
+- **Absolute Values**: Shows unit contribution to total forecast (sum equals AI Forecast)
+- **Relative Value**: Shows percentage contribution to total forecast (AI Forecast row shows 100%)
 
-**Relative Value Calculation:**
-```typescript
-relativeValue = (featureContribution / totalForecastValue) * 100
-// Example: (-64 / 586) * 100 = -10.92%
-```
+**Value Calculation Logic:**
+
+1. **Impact Factor** (stored/base value): Range -50 to +50
+   - Represents the strength of contribution (positive or negative)
+   - Color-coded by severity (5 grades)
+
+2. **Absolute Value Calculation**:
+   ```typescript
+   // All absolute values must sum to AI Forecast for that week
+   totalImpact = sum of all |impactFactors|
+   absoluteValue = (|impactFactor| / totalImpact) * aiForecast
+   // Apply sign based on impact factor direction
+   ```
+
+3. **Relative Percentage Calculation**:
+   ```typescript
+   relativePercentage = (absoluteValue / aiForecast) * 100
+   // Example: If absolute = 12 and AI Forecast = 85, then relative = 14.1%
+   ```
 
 **Display Format:**
-- Absolute: "+64", "-30", "0" (with + sign for positive)
-- Relative: "+10.9%", "-4.8%", "0.0%" (one decimal place, with + sign)
+- Impact Factor: "+35", "-12", "0" (with + sign for positive, no decimals)
+- Absolute: "+12.5", "-8.3", "0.0" (one decimal, units)
+- Relative: "+14.1%", "-9.8%", "0.0%" (one decimal place, with + sign)
 
 **Action Buttons (Dummy):**
 
@@ -642,58 +659,242 @@ All three buttons show toast "Feature coming soon" when clicked.
 
 ---
 
-### 3.4 Feature Table Component (Existing)
+### 3.4 Forecast Contribution Analysis Table Component
 
-**Component**: `FeatureTable.tsx` (Keep current implementation)  
+**Component**: `ForecastContributionTable.tsx` (Replaces FeatureTable.tsx)  
 **Location**: `components/features/forecast-analysis/`
 
-#### 3.4.1 Current Implementation Summary
+#### 3.4.1 Table Structure
 
-**Structure:**
-- AI Forecast row (blue background, always visible)
-- Three collapsible category groups:
-  - **EXTERNAL DATA**: 7 features (Macroeconomic, Customer Trends, Google Trends, etc.)
-  - **SALES ORDERS**: 2 features (Open, Historical)
-  - **EVENTS**: 2 features (Holidays, Marketing Campaigns)
-- Legend at bottom (positive/negative color coding)
+**Header Row:**
+- **AI Forecast Row** (light blue background `#E3F2FD`, blue top border `#0065BD`, always visible, not collapsible)
+  - Background: Light blue (`#E3F2FD`)
+  - Top border: 2px solid TUM Blue (`#0065BD`)
+  - Text color: TUM Blue (`#0065BD`)
+  - Values: 50-120 units range
+  - 8 weeks of forecast data starting Dec 9, 2025
 
-**Collapsible Behavior:**
-- Each category has chevron icon (ChevronDown when expanded, ChevronRight when collapsed)
-- Clicking category header toggles expansion
-- Default state: All categories expanded
+**Category Hierarchy:**
 
-**Color Coding:**
-- Positive values: Light green background `#A2AD00/15`, green text `#A2AD00`
-- Negative values: Light orange background `#E37222/15`, orange text `#E37222`
-- Zero values: Grey background `#F5F5F5`, grey text `#6E685F`
+**INTERNAL** (Top-level collapsible)
+- **Historic Supply** (Sub-category collapsible)
+  - Core Condition Rate
+  - Core Quantity
+  - Delivery Date
+  - Component 1 Condition Rate
+  - Component 2 Condition Rate
+  - Component 3 Condition Rate
+  - Component 4 Condition Rate
+  - Component 5 Condition Rate
+- **Sales Orders** (Sub-category collapsible)
+  - Core Type
+  - Quantity
+  - Order Date
+  - Return Rate
 
-#### 3.4.2 Future Enhancements (To Be Implemented Later)
+**EXTERNAL** (Top-level collapsible)
+- **Registration Data & Customer Trends** (Sub-category collapsible)
+  - Vehicle Model
+  - Quantity
+  - Month
+  - Total Fleet
+  - Breakdown Rate
+  - Region
+- **Recall Data & Market Insights** (Sub-category collapsible)
+  - Model
+  - Quantity
+  - Region
+  - Part/Core Type
+- **Macroeconomic Trends** (Sub-category collapsible)
+  - Interest Rate
+  - GDP
+  - PMI
+  - Used Car Market Trend
 
-**Props to Add:**
+#### 3.4.2 Data Structure & Values
+
+**AI Forecast (Week Values):**
 ```typescript
-interface FeatureTableProps {
-  viewMode: 'detailed' | 'aggregate';
-  valueMode: 'absolute' | 'relative';
+aiForecast = [85, 92, 78, 105, 88, 95, 110, 82] // Range: 50-120 units
+weekDates = ['12/09', '12/16', '12/23', '12/30', '01/06', '01/13', '01/20', '01/27']
+```
+
+**Impact Factor Ranges by Category Type:**
+- **Historic Supply** (high impact): -45 to +45
+- **Sales Orders** (medium-high): -35 to +40
+- **Registration Data & Customer Trends** (medium): -30 to +35
+- **Recall Data & Market Insights** (low-medium): -20 to +25
+- **Macroeconomic Trends** (low): -15 to +20
+
+**Sample Impact Factor Data** (Week 1 example):
+```typescript
+internal: {
+  historicSupply: {
+    coreConditionRate: +42,
+    coreQuantity: +38,
+    deliveryDate: +28,
+    component1ConditionRate: +35,
+    component2ConditionRate: +32,
+    component3ConditionRate: +30,
+    component4ConditionRate: +25,
+    component5ConditionRate: +22
+  },
+  salesOrders: {
+    coreType: +35,
+    quantity: +38,
+    orderDate: +25,
+    returnRate: -18
+  }
+},
+external: {
+  registrationData: {
+    vehicleModel: +28,
+    quantity: +25,
+    month: +15,
+    totalFleet: +20,
+    breakdownRate: -12,
+    region: +18
+  },
+  recallData: {
+    model: +15,
+    quantity: +12,
+    region: +8,
+    partCoreType: +10
+  },
+  macroeconomic: {
+    interestRate: -8,
+    gdp: +12,
+    pmi: +10,
+    usedCarMarket: +5
+  }
 }
 ```
 
-**Aggregate View Enhancements:**
-- When `viewMode === 'aggregate'`:
-  - Collapse all categories by default
-  - Show category summary rows:
-    - EXTERNAL DATA: Sum of all 7 features
-    - SALES ORDERS: Sum of 2 features
-    - EVENTS: Sum of 2 features
-  - Category headers still clickable to expand/collapse individual features
+**Aggregated Mean Impact Factors** (for Aggregate View):
+- **Historic Supply**: Weighted average (35% Core Condition/Quantity, 15% each for others)
+- **Sales Orders**: Weighted average (40% Quantity, 30% Core Type, 20% Order Date, 10% Return Rate)
+- **Registration Data & Customer Trends**: Weighted average (30% Vehicle Model/Quantity, 10% others)
+- **Recall Data & Market Insights**: Simple average of 4 features
+- **Macroeconomic Trends**: Weighted average (30% GDP, 25% PMI, 25% Interest Rate, 20% Used Car Market)
 
-**Relative Values Display:**
-- When `valueMode === 'relative'`:
-  - Convert all contribution values to percentages
-  - Formula: `(value / totalForecast) * 100`
-  - Display format: "+10.9%", "-4.8%", "0.0%"
-  - Keep same color coding logic (positive = green, negative = orange)
+#### 3.4.3 Color Coding System (5 Grades)
 
-**Note:** These enhancements are documented for future implementation but not required for initial redesign.
+**Impact Factor Color Thresholds (TUM Color Palette with Transparency):**
+- **Strong Positive** (`#A2AD00/25` bg, `#A2AD00` text): Impact Factor > +30 (TUM Green 25%)
+- **Moderate Positive** (`#A2AD00/18` bg, `#6B7280` text): Impact Factor +10 to +30 (TUM Green 18%)
+- **Neutral** (`#F5F5F5` bg, `#6E685F` text): Impact Factor -10 to +10 (Grey)
+- **Moderate Negative** (`#E37222/18` bg, `#6B7280` text): Impact Factor -30 to -10 (TUM Orange 18%)
+- **Strong Negative** (`#E37222/25` bg, `#E37222` text): Impact Factor < -30 (TUM Orange 25%)
+
+**Color Application:**
+- Full cell background colors with transparency levels (not solid colors)
+- Colors apply to entire table cell based on impact factor value
+- TUM brand colors: Green (#A2AD00) for positive, Orange (#E37222) for negative
+- Transparency levels: 25% for strongest impact, 18% for moderate, solid grey for neutral
+- Colored text on lighter backgrounds for optimal readability
+
+#### 3.4.4 View Modes
+
+**Props Interface:**
+```typescript
+interface ForecastContributionTableProps {
+  viewMode: 'detailed' | 'aggregate';
+  valueMode: 'impact' | 'absolute' | 'relative';
+}
+```
+
+**View Mode: Impact Factor (Default)**
+- Displays impact factor values (-50 to +50)
+- Format: "+42", "-18", "0"
+- Used as base for calculating other modes
+
+**View Mode: Absolute Values**
+- Shows unit contribution to total forecast
+- All absolute values sum to AI Forecast for that week
+- Calculation:
+  ```typescript
+  totalAbsoluteImpact = sum of |impactFactor| for all features
+  absoluteValue = (|impactFactor| / totalAbsoluteImpact) * aiForecast * sign(impactFactor)
+  ```
+- Format: "+12.5", "-8.3", "0.0" (one decimal, units)
+
+**View Mode: Relative Percentage**
+- Shows percentage contribution to total forecast
+- Calculation:
+  ```typescript
+  relativePercentage = (|absoluteValue| / aiForecast) * 100 * sign(absoluteValue)
+  ```
+- Format: "+14.7%", "-9.8%", "0.0%" (one decimal)
+
+**Aggregate View Behavior:**
+- Only shows mean impact factors (not absolute/relative)
+- When category collapsed, shows weighted mean in aggregate row
+- Clicking chevron expands to show individual features
+- Color coding based on mean impact factor value
+
+#### 3.4.5 Collapsible Behavior
+
+**Three-Level Hierarchy:**
+1. **Top Level**: INTERNAL, EXTERNAL (always visible headers)
+2. **Mid Level**: Historic Supply, Sales Orders, Registration Data, Recall Data, Macroeconomic (collapsible sub-categories)
+3. **Bottom Level**: Individual features (visible when mid-level expanded)
+
+**Cascade Collapse Logic:**
+- Collapsing top category (INTERNAL/EXTERNAL) automatically collapses all sub-categories beneath it
+- Expanding top category shows sub-category headers (features remain collapsed until sub-category expanded)
+- Sub-categories must be individually expanded to show features
+- Collapsing sub-category only affects features beneath it
+
+**Detailed View (Default):**
+- All top categories expanded on initialization
+- All sub-categories expanded on initialization
+- Individual feature rows visible
+- Chevrons point down (ChevronDown) when expanded
+- User can manually collapse any level
+
+**Aggregate View:**
+- Top categories (INTERNAL, EXTERNAL) expanded to show sub-categories
+- Sub-categories visible but collapsed (showing weighted mean values)
+- Chevrons removed/disabled for top categories (always expanded)
+- Sub-category chevrons point right (ChevronRight) when collapsed
+- Sub-categories show weighted mean impact factors in colored cells
+- User can manually expand sub-categories to see individual features
+- Switching back to Detailed View expands all sub-categories
+
+**View Toggle Behavior:**
+- Clicking "Detailed View": Expands all categories and sub-categories automatically
+- Clicking "Aggregate View": Collapses all categories and sub-categories automatically
+- Manual expand/collapse state is reset when switching views
+
+**Interaction:**
+- Clicking category header toggles expansion
+- State controlled by view mode (detailed vs aggregate)
+- Smooth 200ms transition animation
+
+#### 3.4.6 Legend
+
+**Position**: Bottom of table, below grey separator line
+
+**Structure:**
+- Grey separator line (1px solid `#D3D0CC`) above legend
+- Margin top: 24px before separator
+- Margin top: 16px after separator
+
+**Design - Gradient Bar:**
+- Horizontal gradient bar from TUM Orange (left) → Grey (center) → TUM Green (right)
+- Gradient: `linear-gradient(to right, rgba(227, 114, 34, 0.25) 0%, rgba(227, 114, 34, 0.25) 20%, #F5F5F5 45%, #F5F5F5 55%, rgba(162, 173, 0, 0.25) 80%, rgba(162, 173, 0, 0.25) 100%)`
+- Bar height: 24px (h-6)
+- Rounded corners (rounded-sm)
+- Max width: 672px (max-w-2xl)
+- Colors use 25% opacity (rgba) matching the strongest cell colors
+
+**Labels:**
+- Left: "Negative contributor" with subtext "(decreases forecast)"
+- Right: "Positive contributor" with subtext "(increases forecast)"
+- Label font size: 14px (text-sm)
+- Subtext font size: 12px (text-xs)
+- Text color: Grey `#6B7280`
+- Subtext color: Light grey `#9CA3AF`
 
 ---
 
@@ -708,9 +909,9 @@ interface FeatureTableProps {
    ├─ Core Details Card: Shows BMW x3 details, badges, metadata
    └─ Main Content:
       ├─ "Analysis" tab active
-      ├─ "Forecast Data Analysis" sub-header active
+      ├─ "Forecast Contribution Analysis" sub-header active
       ├─ "Detailed View" button active (all categories expanded)
-      ├─ "Absolute Values" dropdown selected
+      ├─ "Impact Factor" dropdown selected (default view)
       └─ Feature table with all groups expanded
 3. Page renders in ~300ms
 ```
@@ -742,19 +943,19 @@ Action: No action needed (already selected)
 
 ### 4.3 Sub-Header Navigation Flow
 
-**Forecast Data Analysis (Active by Default):**
+**Forecast Contribution Analysis (Active by Default):**
 ```
 State: Active (blue dot, underline, bold text)
 Content: Current feature contribution table
 Action: No action needed (already selected)
 ```
 
-**Forecast Model Analysis:**
+**Forecast Detail Analysis:**
 ```
-1. User clicks "Forecast Model Analysis"
+1. User clicks "Forecast Detail Analysis"
 2. System shows toast: "Feature coming soon"
 3. Sub-header remains inactive (grey dot, no underline)
-4. "Forecast Data Analysis" stays active
+4. "Forecast Contribution Analysis" stays active
 5. No content change
 ```
 
@@ -783,30 +984,48 @@ Action: No action needed (already selected)
 3. Duration: 200ms smooth transition
 ```
 
-### 4.5 Dropdown Change Flow
+### 4.5 View Mode Dropdown Change Flow
 
-**Absolute Values → Relative Values:**
-```
-1. User clicks dropdown, selects "Relative Values"
-2. System:
-   ├─ Calculates percentage contribution for each cell
-   ├─ Formula: (featureValue / totalForecast) * 100
-   ├─ Updates all table cells with percentage format (+10.9%, -4.8%)
-   ├─ Keeps color coding (positive = green, negative = orange)
-   └─ Updates legend text to explain percentages
-3. Duration: 100ms (instant cell update)
-```
-
-**Relative Values → Absolute Values:**
+**Impact Factor → Absolute Values:**
 ```
 1. User clicks dropdown, selects "Absolute Values"
 2. System:
-   ├─ Restores original contribution values
-   ├─ Updates all table cells with absolute format (+64, -30)
-   ├─ Keeps color coding
-   └─ Restores original legend text
+   ├─ Calculates unit contribution for each feature
+   ├─ Formula: (|impactFactor| / totalAbsImpact) * aiForecast * sign
+   ├─ Ensures all values sum to AI Forecast for each week
+   ├─ Updates all table cells with absolute format (+12.5, -8.3)
+   ├─ Keeps color coding based on original impact factor
+   └─ Legend remains same (explains color grades)
+3. Duration: 100ms (instant cell update)
+```
+
+**Impact Factor → Relative Percentage:**
+```
+1. User clicks dropdown, selects "Relative Percentage"
+2. System:
+   ├─ First calculates absolute values (as above)
+   ├─ Then converts to percentage: (|absolute| / aiForecast) * 100
+   ├─ Updates all table cells with percentage format (+14.7%, -9.8%)
+   ├─ Keeps color coding based on original impact factor
+   └─ Legend remains same
 3. Duration: 100ms
 ```
+
+**Any Mode → Impact Factor:**
+```
+1. User clicks dropdown, selects "Impact Factor"
+2. System:
+   ├─ Restores original impact factor values (-50 to +50)
+   ├─ Updates all table cells with impact format (+42, -18)
+   ├─ Color coding based on impact factor thresholds
+   └─ Default legend displayed
+3. Duration: 100ms
+```
+
+**Note on Aggregate View:**
+- When in Aggregate View, only Impact Factor mode is available
+- Dropdown automatically switches to "Impact Factor" when Aggregate View is selected
+- Dropdown is disabled (grayed out) in Aggregate View
 
 ### 4.6 Table Interaction Flows
 
@@ -824,12 +1043,16 @@ Action: No action needed (already selected)
 **Category Summary Row (Aggregate View):**
 ```
 When Aggregate View is active:
-- Category rows show aggregated totals across all weeks
+- Category rows show weighted mean impact factors across all weeks
+- Only Impact Factor mode available (dropdown disabled)
 - Example row structure:
-  ┌─────────────────┬────────┬────────┬────────┐
-  │ > EXTERNAL DATA │  +135  │  +174  │  +32   │
-  └─────────────────┴────────┴────────┴────────┘
-- Clicking chevron expands to show individual features
+  ┌──────────────────────────┬────────┬────────┬────────┐
+  │ > Historic Supply        │  +32   │  +35   │  +28   │
+  │ > Registration Data...   │  +18   │  +20   │  +15   │
+  └──────────────────────────┴────────┴────────┴────────┘
+- Values are weighted averages of sub-features
+- Clicking chevron expands to show individual features with their impact factors
+- Color coding applies to mean values
 ```
 
 ### 4.7 Dummy Button Interactions
@@ -913,7 +1136,10 @@ When Aggregate View is active:
 - Small text: 12px (text-xs), font-normal
 - Button text: 14px (text-sm), font-medium
 - Table headers: 14px (text-sm), font-semibold
-- Table cells: 14px (text-sm), font-medium
+- Table top categories: 14px (text-sm), font-semibold
+- Table sub-categories: 14px (text-sm), font-medium
+- Table feature rows: 14px (text-sm), font-normal
+- Table cell values: 14px (text-sm), font-medium
 
 ### 5.3 Spacing System
 
@@ -922,7 +1148,7 @@ When Aggregate View is active:
 - Control box padding: 16px (p-4)
 - Button padding: 10px 20px (py-2.5 px-5)
 - Small button padding: 8px 16px (py-2 px-4)
-- Table cell padding: 12px (p-3)
+- Table cell padding: 8px 16px (py-2 px-4) - reduced for cleaner look
 
 **Margins:**
 - Section spacing: 24px (mb-6, mt-6)
@@ -1164,9 +1390,9 @@ frontend/
 - [ ] Forecast Overview and History tabs show toast when clicked
 - [ ] "Forecast Analysis" header displays in black, 20px font
 - [ ] Two sub-headers visible with dot indicators:
-  - "Forecast Data Analysis" (active: blue dot, underlined)
-  - "Forecast Model Analysis" (inactive: grey dot, no underline)
-- [ ] Forecast Model Analysis shows toast when clicked
+  - "Forecast Contribution Analysis" (active: blue dot, underlined)
+  - "Forecast Detail Analysis" (inactive: grey dot, no underline)
+- [ ] Forecast Detail Analysis shows toast when clicked
 - [ ] Grey line separator below sub-headers
 
 ### 8.5 Control Buttons Requirements
@@ -1174,8 +1400,10 @@ frontend/
 - [ ] Control box has light grey background (#F5F5F5)
 - [ ] Two-button toggle: "Detailed View" (active), "Aggregate View" (inactive)
 - [ ] Detailed View button has blue background when active
-- [ ] Dropdown shows "Absolute Values" selected by default
-- [ ] Dropdown has "Relative Values" option
+- [ ] Dropdown shows "Impact Factor" selected by default
+- [ ] Dropdown has three options: "Impact Factor", "Absolute Values", "Relative Percentage"
+- [ ] Dropdown becomes disabled (grayed out) when Aggregate View is selected
+- [ ] Dropdown automatically switches to "Impact Factor" when entering Aggregate View
 - [ ] Three action buttons visible: Filters, Update, Download
 - [ ] Filters button has filter icon on left
 - [ ] Download button has download icon on left
@@ -1190,24 +1418,38 @@ frontend/
 - [ ] Transition animation is smooth (200ms)
 - [ ] Categories can still be manually expanded/collapsed after toggle
 
-### 8.7 Dropdown Functionality Requirements
+### 8.7 View Mode Dropdown Functionality Requirements
 
-- [ ] Selecting "Relative Values" converts all numbers to percentages
-- [ ] Relative values show format: "+10.9%", "-4.8%", "0.0%"
-- [ ] Color coding preserved (green for positive, orange for negative)
-- [ ] Selecting "Absolute Values" restores original numbers
+- [ ] Default selection is "Impact Factor" showing values -50 to +50
+- [ ] Selecting "Absolute Values" shows unit contributions summing to AI Forecast
+- [ ] Absolute values show format: "+12.5", "-8.3", "0.0" (one decimal)
+- [ ] Selecting "Relative Percentage" shows percentage contributions
+- [ ] Relative percentage shows format: "+14.7%", "-9.8%", "0.0%" (one decimal)
+- [ ] Color coding preserved across all modes based on impact factor thresholds
 - [ ] Dropdown change is instant (100ms transition)
+- [ ] Dropdown becomes disabled when Aggregate View is active
+- [ ] Only Impact Factor available in Aggregate View
 
-### 8.8 Feature Table Requirements
+### 8.8 Forecast Contribution Table Requirements
 
-- [ ] AI Forecast row always visible at top (blue background)
-- [ ] Three category groups: EXTERNAL DATA, SALES ORDERS, EVENTS
+- [ ] AI Forecast row always visible at top (blue background, 50-120 units range)
+- [ ] 8 weeks of forecast data displayed (starting Dec 9, 2025)
+- [ ] Two top-level categories: INTERNAL, EXTERNAL
+- [ ] Five sub-categories: Historic Supply, Sales Orders, Registration Data, Recall Data, Macroeconomic
+- [ ] 27 individual feature rows total across all categories
 - [ ] Each category has chevron icon (Down when expanded, Right when collapsed)
 - [ ] Clicking category header toggles expansion
-- [ ] All categories expanded by default
-- [ ] Color coding: Green for positive, Orange for negative
-- [ ] Legend displayed at bottom
-- [ ] Table scrolls horizontally if needed
+- [ ] All categories expanded by default in Detailed View
+- [ ] 5-level color coding: Deep Green, Light Green, Neutral, Light Red, Deep Red
+- [ ] Color thresholds: >+30, +10 to +30, -10 to +10, -30 to -10, <-30
+- [ ] Legend displayed at bottom with all 5 color grades
+- [ ] Table scrolls horizontally if needed (8 weeks + labels)
+- [ ] Impact Factor mode shows values from -50 to +50
+- [ ] Absolute Values mode shows unit contributions (sum equals AI Forecast)
+- [ ] Relative Percentage mode shows % contribution (sum equals 100%)
+- [ ] Aggregate View shows weighted mean impact factors only
+- [ ] Dropdown disabled in Aggregate View (Impact Factor only)
+- [ ] Smooth 200ms transition when expanding/collapsing categories
 
 ### 8.9 Toast Notifications Requirements
 
@@ -1454,11 +1696,12 @@ None required - all features use existing dependencies.
 
 - **Core**: Remanufactured automotive part (e.g., turbocharger, alternator)
 - **SKU**: Stock Keeping Unit - unique product identifier
-- **Feature Contribution**: Impact of a data source on forecast prediction
-- **Aggregate View**: Collapsed view showing category summaries
-- **Detailed View**: Expanded view showing individual features
-- **Absolute Values**: Raw contribution numbers (e.g., +64, -30)
-- **Relative Values**: Percentage contribution to total forecast (e.g., +10.9%)
+- **Impact Factor**: Contribution strength from -50 to +50 showing influence on forecast
+- **Aggregate View**: Collapsed view showing weighted mean impact factors for categories
+- **Detailed View**: Expanded view showing all individual features
+- **Absolute Values**: Unit contribution to total forecast (sum equals AI Forecast)
+- **Relative Percentage**: Percentage contribution to total forecast
+- **Weighted Mean**: Average impact factor with higher weight on critical features
 
 ### 16.2 Design References
 
@@ -1470,15 +1713,86 @@ None required - all features use existing dependencies.
 
 | Name | Hex Code | Usage |
 |------|----------|-------|
-| TUM Blue | #0065BD | Primary buttons, active states, links |
+| TUM Blue | #0065BD | Primary buttons, active states, links, AI Forecast row |
 | TUM Grey | #6E685F | Body text, icons, disabled text |
-| TUM Orange | #E37222 | Warning badge, negative values |
-| TUM Green | #22C55E | Success badge, positive indicators |
+| TUM Orange | #E37222 | Warning badge, light negative impact |
+| Deep Red | #DC2626 | Strong negative impact (< -30) |
+| Deep Green | #22C55E | Strong positive impact (> +30) |
+| Light Green | #A2AD00 | Moderate positive impact (+10 to +30) |
 | Border Grey | #D3D0CC | Card borders, separators |
-| Background Grey | #F5F5F5 | Disabled inputs, control box |
-| Success Green | #A2AD00 | Positive contributions (table) |
+| Background Grey | #F5F5F5 | Disabled inputs, control box, neutral impact |
 | White | #FFFFFF | Card backgrounds, button text |
 | Black | #000000 | Headings, primary text |
+
+### 16.4 Complete Data Structure for Forecast Contribution Table
+
+**8-Week Forecast Dates (Starting Dec 3, 2025):**
+```typescript
+weekDates = ['12/09', '12/16', '12/23', '12/30', '01/06', '01/13', '01/20', '01/27']
+```
+
+**AI Forecast Values (50-120 range with realistic variation):**
+```typescript
+aiForecast = [85, 92, 78, 105, 88, 95, 110, 82]
+```
+
+**Complete Feature Hierarchy (27 features total):**
+
+**INTERNAL Category:**
+- **Historic Supply** (8 features) - High impact range: ±45
+  - Core Condition Rate
+  - Core Quantity
+  - Delivery Date
+  - Component 1 Condition Rate
+  - Component 2 Condition Rate
+  - Component 3 Condition Rate
+  - Component 4 Condition Rate
+  - Component 5 Condition Rate
+  - *Weighted Mean*: 35% Core Condition/Quantity, 15% Delivery, 10% each Component
+
+- **Sales Orders** (4 features) - Medium-high impact: ±40
+  - Core Type
+  - Quantity
+  - Order Date
+  - Return Rate
+  - *Weighted Mean*: 40% Quantity, 30% Core Type, 20% Order Date, 10% Return Rate
+
+**EXTERNAL Category:**
+- **Registration Data & Customer Trends** (6 features) - Medium impact: ±35
+  - Vehicle Model
+  - Quantity
+  - Month
+  - Total Fleet
+  - Breakdown Rate
+  - Region
+  - *Weighted Mean*: 30% Vehicle Model/Quantity, 10% each other
+
+- **Recall Data & Market Insights** (4 features) - Low-medium impact: ±25
+  - Model
+  - Quantity
+  - Region
+  - Part/Core Type
+  - *Simple Average* of all 4 features
+
+- **Macroeconomic Trends** (4 features) - Low impact: ±20
+  - Interest Rate
+  - GDP
+  - PMI
+  - Used Car Market Trend
+  - *Weighted Mean*: 30% GDP, 25% PMI, 25% Interest Rate, 20% Used Car Market
+
+**Sample Impact Factor Patterns (Week 1 = 85 units):**
+- Historic Supply features: Volatile with mix of strong positive and negative spikes
+- Sales Orders: Mostly positive except Return Rate (consistently negative)
+- Registration Data: Mixed with seasonal variations and regional differences
+- Recall Data: Event-driven with sporadic positive and negative spikes
+- Macroeconomic: Interest Rate consistently negative, others moderately positive
+
+**Data Characteristics:**
+- More negative values throughout for realism
+- Each feature has distinct "personality" (patterns/trends)
+- Week-to-week variation creates appealing visual heatmap
+- Mix of volatile and stable features across categories
 
 ---
 

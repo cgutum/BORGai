@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { Filter, Download } from 'lucide-react';
 import { toast } from 'sonner';
-import { FeatureTable } from './FeatureTable';
+import ForecastContributionTable from '@/components/features/dashboard/ForecastContributionTable';
 
 /**
  * AnalysisMainContent Component
@@ -17,9 +17,9 @@ import { FeatureTable } from './FeatureTable';
  */
 export default function AnalysisMainContent() {
   const [activeTab, setActiveTab] = useState('analysis');
-  const [activeSubHeader, setActiveSubHeader] = useState('forecast-data');
+  const [activeSubHeader, setActiveSubHeader] = useState('forecast-contribution');
   const [viewMode, setViewMode] = useState<'detailed' | 'aggregate'>('detailed');
-  const [valueMode, setValueMode] = useState<'absolute' | 'relative'>('absolute');
+  const [valueMode, setValueMode] = useState<'impact' | 'absolute' | 'relative'>('impact');
 
   const handleTabChange = (value: string) => {
     if (value === 'overview' || value === 'history') {
@@ -32,21 +32,25 @@ export default function AnalysisMainContent() {
   };
 
   const handleSubHeaderClick = (subHeader: string) => {
-    if (subHeader === 'forecast-model') {
+    if (subHeader === 'forecast-detail') {
       toast.info('Feature coming soon', {
-        description: 'Forecast Model Analysis will be available in the next release.',
+        description: 'Forecast Detail Analysis will be available in the next release.',
       });
       return;
     }
     setActiveSubHeader(subHeader);
   };
 
-  const handleViewToggle = (mode: 'detailed' | 'aggregate') => {
-    setViewMode(mode);
+  const handleValueModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setValueMode(e.target.value as 'impact' | 'absolute' | 'relative');
   };
 
-  const handleValueModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setValueMode(e.target.value as 'absolute' | 'relative');
+  const handleViewToggleWithMode = (mode: 'detailed' | 'aggregate') => {
+    setViewMode(mode);
+    // Auto-switch to Impact Factor when entering Aggregate View
+    if (mode === 'aggregate') {
+      setValueMode('impact');
+    }
   };
 
   const handleFiltersClick = () => {
@@ -101,26 +105,26 @@ export default function AnalysisMainContent() {
           {/* Sub-Headers with Dot Indicators */}
           <div className="flex gap-6 mb-4">
             <button
-              onClick={() => handleSubHeaderClick('forecast-data')}
+              onClick={() => handleSubHeaderClick('forecast-contribution')}
               className={`flex items-center gap-2 text-sm pb-2 transition-colors ${
-                activeSubHeader === 'forecast-data'
+                activeSubHeader === 'forecast-contribution'
                   ? 'font-medium text-[#000000] border-b-2 border-[#0065BD]'
                   : 'text-[#6E685F] border-b-2 border-transparent'
               }`}
             >
               <div
                 className={`w-2 h-2 rounded-full ${
-                  activeSubHeader === 'forecast-data' ? 'bg-[#0065BD]' : 'bg-[#6E685F]'
+                  activeSubHeader === 'forecast-contribution' ? 'bg-[#0065BD]' : 'bg-[#6E685F]'
                 }`}
               />
-              Forecast Data Analysis
+              Forecast Contribution Analysis
             </button>
             <button
-              onClick={() => handleSubHeaderClick('forecast-model')}
+              onClick={() => handleSubHeaderClick('forecast-detail')}
               className="flex items-center gap-2 text-sm text-[#6E685F] pb-2"
             >
               <div className="w-2 h-2 rounded-full bg-[#6E685F]" />
-              Forecast Model Analysis
+              Forecast Detail Analysis
             </button>
           </div>
 
@@ -132,7 +136,7 @@ export default function AnalysisMainContent() {
             {/* View Toggle */}
             <div className="flex border border-[#D3D0CC] rounded overflow-hidden">
               <button
-                onClick={() => handleViewToggle('detailed')}
+                onClick={() => handleViewToggleWithMode('detailed')}
                 className={`px-4 py-2 text-sm font-medium transition-colors ${
                   viewMode === 'detailed'
                     ? 'bg-[#0065BD] text-white'
@@ -142,7 +146,7 @@ export default function AnalysisMainContent() {
                 Detailed View
               </button>
               <button
-                onClick={() => handleViewToggle('aggregate')}
+                onClick={() => handleViewToggleWithMode('aggregate')}
                 className={`px-4 py-2 text-sm font-medium transition-colors border-l border-[#D3D0CC] ${
                   viewMode === 'aggregate'
                     ? 'bg-[#0065BD] text-white'
@@ -157,8 +161,12 @@ export default function AnalysisMainContent() {
             <select
               value={valueMode}
               onChange={handleValueModeChange}
-              className="px-3 py-2 text-sm border border-[#D3D0CC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#0065BD]"
+              disabled={viewMode === 'aggregate'}
+              className={`px-3 py-2 text-sm border border-[#D3D0CC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#0065BD] ${
+                viewMode === 'aggregate' ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
+              <option value="impact">Impact Factor</option>
               <option value="absolute">Absolute Values</option>
               <option value="relative">Relative Values</option>
             </select>
@@ -193,8 +201,11 @@ export default function AnalysisMainContent() {
             </Button>
           </div>
 
-          {/* Feature Table */}
-          <FeatureTable viewMode={viewMode} valueMode={valueMode} />
+          {/* Forecast Contribution Table */}
+          <ForecastContributionTable 
+            viewMode={valueMode} 
+            isAggregateView={viewMode === 'aggregate'} 
+          />
         </TabsContent>
 
         <TabsContent value="overview" className="p-6">
