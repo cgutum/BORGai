@@ -13,11 +13,11 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
   const getIcon = () => {
     switch (recommendation.type) {
       case 'incentivize-supply':
-        return <TrendingUp className="w-5 h-5 text-[#22C55E]" />;
+        return <TrendingUp className="w-5 h-5" style={{ color: 'rgba(162, 173, 0, 0.85)' }} />;
       case 'research-market':
-        return <TrendingUp className="w-5 h-5 text-[#22C55E]" />;
+        return <TrendingUp className="w-5 h-5" style={{ color: 'rgba(162, 173, 0, 0.85)' }} />;
       case 'contact-supplier':
-        return <Phone className="w-5 h-5 text-[#22C55E]" />;
+        return <Phone className="w-5 h-5" style={{ color: 'rgba(162, 173, 0, 0.85)' }} />;
     }
   };
 
@@ -36,7 +36,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <h4 className="text-xs font-semibold text-[#22C55E] uppercase leading-tight mb-1">
+        <h4 className="text-xs font-semibold uppercase leading-tight mb-1" style={{ color: 'rgba(162, 173, 0, 0.85)' }}>
           {recommendation.title}
         </h4>
         <p className="text-[11px] font-normal text-[#000000] leading-snug mb-0.5">

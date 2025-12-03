@@ -13,11 +13,11 @@ export function AlertCard({ alert }: AlertCardProps) {
   const getIcon = () => {
     switch (alert.type) {
       case 'stock-low':
-        return <AlertTriangle className="w-5 h-5 text-[#C01530]" />;
+        return <AlertTriangle className="w-5 h-5" style={{ color: 'rgba(227, 114, 34, 0.85)' }} />;
       case 'delivery-coming':
-        return <Truck className="w-5 h-5 text-[#C01530]" />;
+        return <Truck className="w-5 h-5" style={{ color: 'rgba(227, 114, 34, 0.85)' }} />;
       case 'supply-disruption':
-        return <AlertCircle className="w-5 h-5 text-[#C01530]" />;
+        return <AlertCircle className="w-5 h-5" style={{ color: 'rgba(227, 114, 34, 0.85)' }} />;
     }
   };
 
@@ -36,7 +36,7 @@ export function AlertCard({ alert }: AlertCardProps) {
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <h4 className="text-xs font-semibold text-[#C01530] uppercase leading-tight mb-1">
+        <h4 className="text-xs font-semibold uppercase leading-tight mb-1" style={{ color: 'rgba(227, 114, 34, 0.85)' }}>
           {alert.title}
         </h4>
         <p className="text-[11px] font-normal text-[#000000] leading-snug mb-0.5">

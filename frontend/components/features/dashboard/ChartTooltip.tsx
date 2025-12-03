@@ -115,7 +115,7 @@ export function ChartTooltip({ active, payload, label }: ChartTooltipProps) {
         )}
         
         {difference && (
-          <div className={`text-xs font-medium ${difference.absolute.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
+          <div className={`text-xs font-medium`} style={{ color: difference.absolute.startsWith('+') ? 'rgba(162, 173, 0, 0.85)' : 'rgba(227, 114, 34, 0.85)' }}>
             Difference: {difference.absolute} units ({difference.percent})
           </div>
         )}

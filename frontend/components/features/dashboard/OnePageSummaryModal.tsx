@@ -22,7 +22,7 @@ export function OnePageSummaryModal({ isOpen, onClose }: OnePageSummaryModalProp
     if (!item.trend) return null;
     
     const IconComponent = item.trend === 'up' ? TrendingUp : TrendingDown;
-    const color = item.isPositive ? '#22C55E' : '#EF4444';
+    const color = item.isPositive ? 'rgba(162, 173, 0, 0.85)' : 'rgba(227, 114, 34, 0.85)';
     
     return <IconComponent className="w-3 h-3 inline ml-1" style={{ color }} />;
   };

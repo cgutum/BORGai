@@ -17,12 +17,12 @@ export function KPICard({ metric }: KPICardProps) {
     index
   }));
 
-  // Determine trend color - matches chart colors
+  // Determine trend color - matches chart colors using TUM colors
   const getTrendColor = () => {
-    if (metric.trend === 'up' && metric.isPositive) return 'text-[#22C55E]'; // Green matching chart
-    if (metric.trend === 'down' && metric.isPositive) return 'text-[#22C55E]'; // Green for positive down (like lead time)
-    if (metric.trend === 'up' && !metric.isPositive) return 'text-[#EF4444]'; // Red matching chart
-    if (metric.trend === 'down' && !metric.isPositive) return 'text-[#EF4444]'; // Red matching chart
+    if (metric.trend === 'up' && metric.isPositive) return 'text-[#A2AD00]'; // TUM Green matching chart
+    if (metric.trend === 'down' && metric.isPositive) return 'text-[#A2AD00]'; // TUM Green for positive down (like lead time)
+    if (metric.trend === 'up' && !metric.isPositive) return 'text-[#E37222]'; // TUM Orange matching chart
+    if (metric.trend === 'down' && !metric.isPositive) return 'text-[#E37222]'; // TUM Orange matching chart
     return 'text-[#6E685F]';
   };
 
@@ -68,14 +68,14 @@ export function KPICard({ metric }: KPICardProps) {
           <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id={`gradient-${metric.id}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={metric.isPositive ? '#22C55E' : '#EF4444'} stopOpacity={0.3} />
-                <stop offset="95%" stopColor={metric.isPositive ? '#22C55E' : '#EF4444'} stopOpacity={0} />
+                <stop offset="0%" stopColor={metric.isPositive ? '#A2AD00' : '#E37222'} stopOpacity={0.3} />
+                <stop offset="95%" stopColor={metric.isPositive ? '#A2AD00' : '#E37222'} stopOpacity={0} />
               </linearGradient>
             </defs>
             <Area
               type="monotone"
               dataKey="value"
-              stroke={metric.isPositive ? '#22C55E' : '#EF4444'}
+              stroke={metric.isPositive ? '#A2AD00' : '#E37222'}
               strokeWidth={2}
               fill={`url(#gradient-${metric.id})`}
               isAnimationActive={true}
