@@ -8,6 +8,7 @@ import { Select } from '@/components/ui/select';
 import { Filter, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import ForecastContributionTable from '@/components/features/dashboard/ForecastContributionTable';
+import ForecastDetailTable from '@/components/features/dashboard/ForecastDetailTable';
 
 /**
  * AnalysisMainContent Component
@@ -32,12 +33,6 @@ export default function AnalysisMainContent() {
   };
 
   const handleSubHeaderClick = (subHeader: string) => {
-    if (subHeader === 'forecast-detail') {
-      toast.info('Feature coming soon', {
-        description: 'Forecast Detail Analysis will be available in the next release.',
-      });
-      return;
-    }
     setActiveSubHeader(subHeader);
   };
 
@@ -121,9 +116,15 @@ export default function AnalysisMainContent() {
             </button>
             <button
               onClick={() => handleSubHeaderClick('forecast-detail')}
-              className="flex items-center gap-2 text-sm text-[#6E685F] pb-2"
+              className={`flex items-center gap-2 text-sm transition-colors ${
+                activeSubHeader === 'forecast-detail'
+                  ? 'text-[#000000] font-medium border-b-2 border-[#0065BD] pb-2'
+                  : 'text-[#6E685F] hover:text-[#000000] pb-2'
+              }`}
             >
-              <div className="w-2 h-2 rounded-full bg-[#6E685F]" />
+              <div className={`w-2 h-2 rounded-full ${
+                activeSubHeader === 'forecast-detail' ? 'bg-[#0065BD]' : 'bg-[#6E685F]'
+              }`} />
               Forecast Detail Analysis
             </button>
           </div>
@@ -157,19 +158,21 @@ export default function AnalysisMainContent() {
               </button>
             </div>
 
-            {/* Value Mode Dropdown */}
-            <select
-              value={valueMode}
-              onChange={handleValueModeChange}
-              disabled={viewMode === 'aggregate'}
-              className={`px-3 py-2 text-sm border border-[#D3D0CC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#0065BD] ${
-                viewMode === 'aggregate' ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-            >
-              <option value="impact">Impact Factor</option>
-              <option value="absolute">Absolute Values</option>
-              <option value="relative">Relative Values</option>
-            </select>
+            {/* Value Mode Dropdown (only for Forecast Contribution) */}
+            {activeSubHeader === 'forecast-contribution' && (
+              <select
+                value={valueMode}
+                onChange={handleValueModeChange}
+                disabled={viewMode === 'aggregate'}
+                className={`px-3 py-2 text-sm border border-[#D3D0CC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#0065BD] ${
+                  viewMode === 'aggregate' ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                <option value="impact">Impact Factor</option>
+                <option value="absolute">Absolute Values</option>
+                <option value="relative">Relative Values</option>
+              </select>
+            )}
 
             <div className="flex-1" />
 
@@ -201,11 +204,17 @@ export default function AnalysisMainContent() {
             </Button>
           </div>
 
-          {/* Forecast Contribution Table */}
-          <ForecastContributionTable 
-            viewMode={valueMode} 
-            isAggregateView={viewMode === 'aggregate'} 
-          />
+          {/* Conditionally render table based on active sub-header */}
+          {activeSubHeader === 'forecast-contribution' ? (
+            <ForecastContributionTable 
+              viewMode={valueMode} 
+              isAggregateView={viewMode === 'aggregate'} 
+            />
+          ) : (
+            <ForecastDetailTable 
+              isAggregateView={viewMode === 'aggregate'} 
+            />
+          )}
         </TabsContent>
 
         <TabsContent value="overview" className="p-6">

@@ -518,13 +518,13 @@ const coreDetails = {
 - Border bottom: 2px solid `#0065BD`
 - **State**: Active by default
 
-**Sub-Header 2: Forecast Model Analysis (Dummy)**
-- Dot color: Grey `#6E685F`
-- Text color: Grey `#6E685F`
-- Text weight: font-normal
-- Border bottom: None
-- **Interaction**: Shows toast "Feature coming soon" when clicked
-- **State**: Inactive, not selectable yet
+**Sub-Header 2: Forecast Detail Analysis**
+- Dot color: TUM Blue `#0065BD` (when active)
+- Text color: Black `#000000` (when active)
+- Text weight: font-medium (when active)
+- Border bottom: 2px solid `#0065BD` (when active)
+- **Interaction**: Switches to Forecast Detail Analysis table
+- **State**: Selectable, shows detail metrics table
 
 **Layout:**
 - Horizontal flex with 24px gap (gap-6)
@@ -1796,10 +1796,592 @@ aiForecast = [85, 92, 78, 105, 88, 95, 110, 82]
 
 ---
 
+## 4. Forecast Detail Analysis Table
+
+**Sub-Header**: "Forecast Detail Analysis" (second option in sub-header navigation)
+
+### 4.1 Purpose & Overview
+
+Shows operational and supply chain metrics with performance-based color coding. Unlike Forecast Contribution Analysis (which shows feature impacts on forecast), this table displays absolute performance metrics like inbound core volumes, component recovery rates, and supply chain KPIs.
+
+**Key Differences from Forecast Contribution Analysis:**
+- No value mode dropdown (absolute/relative/impact) - shows actual metric values only
+- Performance-based color coding (good/warning/poor based on metric-specific thresholds)
+- Different data structure (operational metrics vs. forecast contributions)
+- Still has Detailed/Aggregate view toggle with cascade collapse logic
+
+### 4.2 Table Structure & Hierarchy
+
+**Three-Level Collapsible Hierarchy:**
+
+**1. Supplier Key Numbers** (Top Category)
+- **Inbound Cores - Dealer Network** (Sub-category)
+  - Total Inbound Cores - Dealer Network (units)
+  - Average Lead Time - Dealer Network (weeks)
+- **Inbound Cores - Direct Customers** (Sub-category)
+  - Total Inbound Cores - Direct Customers (units)
+  - Average Lead Time - Direct Customers (weeks)
+- **Inbound Cores - OEM/Service Partners** (Sub-category)
+  - Total Inbound Cores - OEM/Service Partners (units)
+  - Average Lead Time - OEM/Service Partners (weeks)
+
+**2. Supply - Component Level** (Top Category)
+- **Component 1** (Sub-category)
+  - Quantity Component 1 (units)
+  - Recovery Rate 1 (%)
+- **Component 2** (Sub-category)
+  - Quantity Component 2 (units)
+  - Recovery Rate 2 (%)
+- **Component 3** (Sub-category)
+  - Quantity Component 3 (units)
+  - Recovery Rate 3 (%)
+- **Component 4** (Sub-category)
+  - Quantity Component 4 (units)
+  - Recovery Rate 4 (%)
+- **Component 5** (Sub-category)
+  - Quantity Component 5 (units)
+  - Recovery Rate 5 (%)
+
+**3. Core Supply Chain KPIs** (Top Category - Flat, No Sub-categories)
+- Recent Model Accuracy (%)
+- Average Lead Time (days)
+- Core Return Rate (%)
+- Core Inventory on Hand ($)
+- Core Inventory Coverage (%)
+- Recovery Rate - Scraped Cores (%)
+- Avg Recoverable Components per Core Type (units)
+
+### 4.3 Data Specifications
+
+**Time Period**: Same 8 weeks as Forecast Contribution Analysis
+- Week dates: `['12/09', '12/16', '12/23', '12/30', '01/06', '01/13', '01/20', '01/27']`
+
+**Value Ranges & Calculation Logic:**
+
+#### 4.3.1 Supplier Key Numbers
+
+**Total Inbound Cores Calculation:**
+- Shown when "Supplier Key Numbers" is collapsed (aggregate view)
+- Calculation: Sum of Dealer Network + Direct Customers + OEM/Service Partners
+- Total Range: 80-120 units per week
+
+**Dealer Network:**
+- Quantity Range: 20-30 units (approximately 25% of total)
+- Lead Time Range: 24-48 weeks (6-12 months)
+- Week-to-week variation: ±15% noise on quantity, ±2 weeks on lead time
+- Sample Week 1 values: 25 units, 36w
+
+**Direct Customers:**
+- Quantity Range: 12-18 units (approximately 15% of total)
+- Lead Time Range: 0-96 weeks (0-24 months, highly variable)
+- Week-to-week variation: ±20% noise on quantity, ±4 weeks on lead time
+- Sample Week 1 values: 15 units, 48w
+
+**OEM/Service Partners:**
+- Quantity Range: 48-72 units (approximately 60% of total)
+- Lead Time Range: 12-36 weeks (3-9 months)
+- Week-to-week variation: ±10% noise on quantity, ±2 weeks on lead time
+- Sample Week 1 values: 60 units, 24w
+
+#### 4.3.2 Supply - Component Level
+
+**Component 1 (High performer):**
+- Quantity Range: 180-220 units
+- Recovery Rate Range: 85-95%
+- Week-to-week variation: ±5% on quantity, ±1% on recovery rate
+- Sample Week 1 values: 200 units, 90.0%
+
+**Component 2 (Stable):**
+- Quantity Range: 80-120 units
+- Recovery Rate Range: 80-90%
+- Week-to-week variation: ±8% on quantity, ±1.5% on recovery rate
+- Sample Week 1 values: 100 units, 85.0%
+
+**Component 3 (Moderate):**
+- Quantity Range: 50-80 units
+- Recovery Rate Range: 60-70%
+- Week-to-week variation: ±10% on quantity, ±2% on recovery rate
+- Sample Week 1 values: 65 units, 65.0%
+
+**Component 4 (Highly volatile):**
+- Quantity Range: 20-80 units (wide range)
+- Recovery Rate Range: 20-70% (wide range)
+- Week-to-week variation: ±15% on quantity, ±3% on recovery rate
+- Sample Week 1 values: 50 units, 45.0%
+
+**Component 5 (Challenging):**
+- Quantity Range: 60-80 units
+- Recovery Rate Range: 30-75%
+- Week-to-week variation: ±10% on quantity, ±2.5% on recovery rate
+- Sample Week 1 values: 70 units, 52.5%
+
+#### 4.3.3 Core Supply Chain KPIs
+
+**Recent Model Accuracy:**
+- Range: 80-100%
+- Format: Percentage with 1 decimal (e.g., "92.5%")
+- Week-to-week variation: ±2%
+- Performance: Higher is better
+- Sample Week 1 value: 92.5%
+
+**Average Lead Time:**
+- Range: 60-365 days
+- Format: Integer with "d" suffix (e.g., "180d")
+- Week-to-week variation: ±10 days
+- Performance: Lower is better (target < 120 days)
+- Sample Week 1 value: 180d
+
+**Core Return Rate:**
+- Range: 60-70%
+- Format: Percentage with 1 decimal (e.g., "65.0%")
+- Week-to-week variation: ±1.5%
+- Performance: Higher is better
+- Sample Week 1 value: 65.0%
+
+**Core Inventory on Hand:**
+- Range: $200,000 - $2,000,000
+- Format: "$1.2M", "$500K" (abbreviated with K/M, one decimal)
+- Week-to-week variation: ±$50K
+- Performance: Moderate is better (target $800K-$1.2M)
+- Sample Week 1 value: $1.0M
+
+**Core Inventory Coverage:**
+- Range: 80-300%
+- Format: Percentage with 1 decimal (e.g., "150.0%")
+- Week-to-week variation: ±10%
+- Performance: Moderate is better (target 100-180%)
+- Sample Week 1 value: 150.0%
+
+**Recovery Rate (Scraped Cores):**
+- Range: 60-80%
+- Format: Percentage with 1 decimal (e.g., "72.0%")
+- Week-to-week variation: ±2%
+- Performance: Higher is better
+- Sample Week 1 value: 72.0%
+
+**Avg Recoverable Components:**
+- Range: 50-200 units
+- Format: Integer (e.g., "125")
+- Week-to-week variation: ±10 units
+- Performance: Higher is better
+- Sample Week 1 value: 125
+
+### 4.4 Color Coding System (Performance-Based)
+
+**Color Palette**: Same TUM colors with transparency as Forecast Contribution Analysis
+- Strong Positive: `bg-[#A2AD00]/25 text-[#A2AD00]` (TUM Green 25%)
+- Moderate Positive: `bg-[#A2AD00]/18 text-[#6B7280]` (TUM Green 18%)
+- Neutral: `bg-[#F5F5F5] text-[#6E685F]` (Grey)
+- Moderate Negative: `bg-[#E37222]/18 text-[#6B7280]` (TUM Orange 18%)
+- Strong Negative: `bg-[#E37222]/25 text-[#E37222]` (TUM Orange 25%)
+
+**Performance Logic by Metric Type:**
+
+#### Higher is Better Metrics:
+
+**Recovery Rates (Components 1-5, Core Return Rate, Recovery Rate Scraped):**
+- Strong Positive (Green 25%): Value ≥ 90% of range max
+- Moderate Positive (Green 18%): Value ≥ 70% of range max
+- Neutral (Grey): Value 40-70% of range max
+- Moderate Negative (Orange 18%): Value 20-40% of range max
+- Strong Negative (Orange 25%): Value < 20% of range max
+
+**Model Accuracy:**
+- Strong Positive: ≥ 95%
+- Moderate Positive: 90-95%
+- Neutral: 85-90%
+- Moderate Negative: 80-85%
+- Strong Negative: < 80%
+
+**Avg Recoverable Components:**
+- Strong Positive: ≥ 160 units
+- Moderate Positive: 130-160 units
+- Neutral: 90-130 units
+- Moderate Negative: 60-90 units
+- Strong Negative: < 60 units
+
+#### Lower is Better Metrics:
+
+**Average Lead Time (days):**
+- Strong Positive (Green 25%): < 120 days (target zone)
+- Moderate Positive (Green 18%): 120-180 days
+- Neutral (Grey): 180-250 days
+- Moderate Negative (Orange 18%): 250-320 days
+- Strong Negative (Orange 25%): > 320 days
+
+**Channel Lead Times (weeks):**
+
+*Dealer Network:*
+- Strong Positive: < 30 weeks
+- Moderate Positive: 30-36 weeks
+- Neutral: 36-42 weeks
+- Moderate Negative: 42-46 weeks
+- Strong Negative: > 46 weeks
+
+*Direct Customers:*
+- Strong Positive: < 40 weeks
+- Moderate Positive: 40-55 weeks
+- Neutral: 55-70 weeks
+- Moderate Negative: 70-85 weeks
+- Strong Negative: > 85 weeks
+
+*OEM/Service Partners:*
+- Strong Positive: < 20 weeks
+- Moderate Positive: 20-25 weeks
+- Neutral: 25-30 weeks
+- Moderate Negative: 30-34 weeks
+- Strong Negative: > 34 weeks
+
+#### Optimal Range Metrics (Middle is Better):
+
+**Core Inventory on Hand:**
+- Strong Positive (Green 25%): $800K-$1.2M (target zone)
+- Moderate Positive (Green 18%): $600K-$800K or $1.2M-$1.5M
+- Neutral (Grey): $400K-$600K or $1.5M-$1.7M
+- Moderate Negative (Orange 18%): $250K-$400K or $1.7M-$1.9M
+- Strong Negative (Orange 25%): < $250K or > $1.9M
+
+**Core Inventory Coverage:**
+- Strong Positive (Green 25%): 100-180% (target zone)
+- Moderate Positive (Green 18%): 85-100% or 180-220%
+- Neutral (Grey): 70-85% or 220-260%
+- Moderate Negative (Orange 18%): 60-70% or 260-280%
+- Strong Negative (Orange 25%): < 60% or > 280%
+
+#### Quantity Metrics:
+
+**Inbound Cores (Dealer/Direct/OEM) and Component Quantities:**
+- Strong Positive: ≥ 85% of range max
+- Moderate Positive: 70-85% of range max
+- Neutral: 40-70% of range max
+- Moderate Negative: 25-40% of range max
+- Strong Negative: < 25% of range max
+
+### 4.5 Formatting Specifications
+
+**Number Formats:**
+```typescript
+// Units (integers with thousands separator)
+"125"        // < 1,000
+"1,200"      // ≥ 1,000
+
+// Percentages (one decimal place)
+"92.5%"
+
+// Currency (abbreviated)
+"$850K"      // < $1M
+"$1.2M"      // ≥ $1M
+
+// Time - Days (integer with suffix)
+"180d"
+
+// Time - Weeks (integer with suffix)
+"24w"
+```
+
+**Display Rules:**
+- No +/- signs (just raw values)
+- Always include unit symbols (%, $, d, w)
+- Thousands separator for large integers
+- One decimal place for percentages and currency millions
+
+### 4.6 Controls & Interactions
+
+**Available Controls:**
+- [Detailed View*] [Aggregate View] toggle (same as Forecast Contribution)
+- ~~Value Mode Dropdown~~ **REMOVED** - not applicable for this table
+- [🔍 Filters] [Update] [⬇ Download] buttons (same dummy functionality)
+
+**Control Box Layout:**
+```
+┌────────────────────────────────────────────────────────────┐
+│ [Detailed View*][Aggregate View]  [Filters] [Update] [↓]  │
+└────────────────────────────────────────────────────────────┘
+```
+
+**Detailed View Behavior:**
+- All three top categories expanded on initialization
+- All sub-categories expanded
+- All individual metrics visible
+- Full hierarchy with chevrons pointing down (ChevronDown)
+
+**Aggregate View Behavior:**
+- **Supplier Key Numbers**: Collapsed to show "Total Inbound Cores" (sum of 3 channels)
+- **Supply - Component Level**: Collapsed to show "Average Recovery Rate" (weighted average)
+- **Core Supply Chain KPIs**: Always shows all 7 metrics (no sub-categories, cannot collapse)
+
+**Cascade Collapse Logic:**
+- Collapsing "Supplier Key Numbers" hides all 3 channel sub-categories
+- Collapsing "Supply - Component Level" hides all 5 component sub-categories
+- Collapsing individual sub-category (e.g., "Component 1") hides quantity and recovery rate metrics
+- "Core Supply Chain KPIs" is flat (no cascade behavior)
+
+### 4.7 Aggregate Calculations
+
+**Supplier Key Numbers → Total Inbound Cores:**
+```typescript
+totalInboundCores[week] = 
+  dealerNetwork[week] + 
+  directCustomers[week] + 
+  oemServicePartners[week];
+```
+- Shows single aggregated row when collapsed
+- Color based on total quantity performance (80-120 range)
+
+**Supply - Component Level → Average Recovery Rate:**
+```typescript
+weightedRecoveryRate[week] = 
+  Σ(component_i.recoveryRate[week] × component_i.quantity[week]) / 
+  Σ(component_i.quantity[week]);
+```
+- Shows single aggregated row when collapsed
+- Color based on recovery rate performance (higher is better)
+- Format: "72.5%" (one decimal)
+
+**Core Supply Chain KPIs:**
+- No aggregation (always shows all 7 individual metrics)
+- Cannot be collapsed further (flat structure)
+
+### 4.8 Sub-Header Navigation Integration
+
+**Switching Between Tables:**
+
+When user clicks "Forecast Contribution Analysis":
+- Component: `<ForecastContributionTable />`
+- Value mode dropdown: **Visible** and enabled
+- Data: Impact factors, absolute values, or relative percentages
+- Color logic: Contribution-based (positive/negative impact)
+
+When user clicks "Forecast Detail Analysis":
+- Component: `<ForecastDetailTable />`
+- Value mode dropdown: **Hidden** (not applicable)
+- Data: Performance metrics (units, %, $, days, weeks)
+- Color logic: Performance-based (good/warning/poor)
+
+**Shared State:**
+- View mode (Detailed/Aggregate) persists across both tables
+- Time period remains same (8 weeks: Dec 9 - Jan 27)
+- Control buttons remain in same positions
+
+### 4.9 Legend Design
+
+**Legend Type**: Same gradient bar style as Forecast Contribution Analysis
+
+**Visual Design:**
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Poor performance    [████████░░░░░░░░░░░░░░░░████████]    Good performance │
+│  (below target)              (neutral zone)             (at/above target)  │
+│                      -50%      0%      +50%                  │
+└──────────────────────────────────────────────────────────────┘
+```
+
+**Gradient Bar:**
+- Same gradient as Forecast Contribution: `linear-gradient(to right, rgba(227, 114, 34, 0.25) 0%, rgba(227, 114, 34, 0.18) 25%, #F5F5F5 45%, #F5F5F5 55%, rgba(162, 173, 0, 0.18) 75%, rgba(162, 173, 0, 0.25) 100%)`
+- Height: 32px (h-8)
+- Border: 1px solid `#D3D0CC`
+- Rounded corners
+
+**Labels:**
+- Left side:
+  - Title: "Poor performance" (14px, font-medium, `#E37222`)
+  - Subtitle: "(below target)" (12px, `#9CA3AF`)
+- Right side:
+  - Title: "Good performance" (14px, font-medium, `#A2AD00`)
+  - Subtitle: "(at/above target)" (12px, `#9CA3AF`)
+- Scale markers: Show relative performance (-50%, 0%, +50%)
+
+### 4.10 Component Structure
+
+**Component File**: `ForecastDetailTable.tsx`  
+**Location**: `components/features/dashboard/`
+
+**Data File**: `forecast-detail-data.ts`  
+**Location**: `lib/data/`
+
+**Props Interface:**
+```typescript
+interface ForecastDetailTableProps {
+  viewMode: 'detailed' | 'aggregate';
+  isAggregateView: boolean; // Convenience prop
+  // Note: No valueMode prop (removed for this table)
+}
+```
+
+**Data Interfaces:**
+```typescript
+interface MetricRow {
+  name: string;
+  unit: 'units' | 'percentage' | 'currency' | 'days' | 'weeks';
+  values: number[]; // 8 weeks of data
+  performanceType: 'higherIsBetter' | 'lowerIsBetter' | 'optimalRange';
+  thresholds: {
+    strongPositive: number | [number, number]; // Single value or [min, max] for optimal range
+    moderatePositive: number | [number, number];
+    neutral: [number, number]; // Always a range
+    moderateNegative: number | [number, number];
+    strongNegative: number | [number, number];
+  };
+}
+
+interface SubCategory {
+  name: string;
+  metrics: MetricRow[];
+}
+
+interface TopCategory {
+  name: string;
+  type: 'hierarchical' | 'flat'; // Hierarchical has sub-categories, flat doesn't
+  subCategories?: SubCategory[]; // For Supplier/Component categories
+  metrics?: MetricRow[]; // For KPIs (flat structure)
+}
+
+export const weekDates = ['12/09', '12/16', '12/23', '12/30', '01/06', '01/13', '01/20', '01/27'];
+
+export const forecastDetailData: TopCategory[] = [
+  {
+    name: 'Supplier Key Numbers',
+    type: 'hierarchical',
+    subCategories: [
+      {
+        name: 'Inbound Cores - Dealer Network',
+        metrics: [
+          { name: 'Total Inbound Cores - Dealer Network', unit: 'units', ... },
+          { name: 'Average Lead Time - Dealer Network', unit: 'weeks', ... }
+        ]
+      },
+      // ... more sub-categories
+    ]
+  },
+  // ... more top categories
+];
+```
+
+### 4.11 Implementation Functions
+
+**Color Function:**
+```typescript
+function getPerformanceColorClass(
+  value: number,
+  metric: MetricRow
+): string {
+  const { performanceType, thresholds } = metric;
+  
+  if (performanceType === 'higherIsBetter') {
+    if (value >= thresholds.strongPositive) return 'bg-[#A2AD00]/25 text-[#A2AD00]';
+    if (value >= thresholds.moderatePositive) return 'bg-[#A2AD00]/18 text-[#6B7280]';
+    if (value >= thresholds.neutral[0] && value <= thresholds.neutral[1]) return 'bg-[#F5F5F5] text-[#6E685F]';
+    if (value >= thresholds.moderateNegative) return 'bg-[#E37222]/18 text-[#6B7280]';
+    return 'bg-[#E37222]/25 text-[#E37222]';
+  }
+  
+  if (performanceType === 'lowerIsBetter') {
+    if (value <= thresholds.strongPositive) return 'bg-[#A2AD00]/25 text-[#A2AD00]';
+    if (value <= thresholds.moderatePositive) return 'bg-[#A2AD00]/18 text-[#6B7280]';
+    if (value >= thresholds.neutral[0] && value <= thresholds.neutral[1]) return 'bg-[#F5F5F5] text-[#6E685F]';
+    if (value <= thresholds.moderateNegative) return 'bg-[#E37222]/18 text-[#6B7280]';
+    return 'bg-[#E37222]/25 text-[#E37222]';
+  }
+  
+  if (performanceType === 'optimalRange') {
+    const [targetMin, targetMax] = thresholds.strongPositive as [number, number];
+    if (value >= targetMin && value <= targetMax) return 'bg-[#A2AD00]/25 text-[#A2AD00]';
+    // ... similar logic for other ranges
+  }
+  
+  return 'bg-[#F5F5F5] text-[#6E685F]'; // Default neutral
+}
+```
+
+**Format Function:**
+```typescript
+function formatMetricValue(value: number, unit: string): string {
+  switch (unit) {
+    case 'units':
+      return value >= 1000 
+        ? `${(value / 1000).toFixed(1)}K`.replace('.0K', 'K')
+        : Math.round(value).toLocaleString();
+    
+    case 'percentage':
+      return `${value.toFixed(1)}%`;
+    
+    case 'currency':
+      if (value >= 1_000_000) {
+        return `$${(value / 1_000_000).toFixed(1)}M`;
+      }
+      return `$${Math.round(value / 1000)}K`;
+    
+    case 'days':
+      return `${Math.round(value)}d`;
+    
+    case 'weeks':
+      return `${Math.round(value)}w`;
+    
+    default:
+      return value.toFixed(1);
+  }
+}
+```
+
+**Aggregate Calculation Functions:**
+```typescript
+function calculateTotalInboundCores(
+  dealerNetwork: number[],
+  directCustomers: number[],
+  oemService: number[]
+): number[] {
+  return weekDates.map((_, idx) => 
+    dealerNetwork[idx] + directCustomers[idx] + oemService[idx]
+  );
+}
+
+function calculateWeightedRecoveryRate(
+  components: Array<{ quantity: number[]; recoveryRate: number[] }>
+): number[] {
+  return weekDates.map((_, weekIdx) => {
+    const totalQuantity = components.reduce(
+      (sum, c) => sum + c.quantity[weekIdx], 0
+    );
+    const weightedSum = components.reduce(
+      (sum, c) => sum + c.quantity[weekIdx] * c.recoveryRate[weekIdx], 0
+    );
+    return weightedSum / totalQuantity;
+  });
+}
+```
+
+### 4.12 Data Generation Strategy
+
+**Principles:**
+1. Values stay within specified ranges
+2. Week-to-week variation adds realism (noise/volatility)
+3. Some metrics show trends (improving/declining over 8 weeks)
+4. Relationships maintained (e.g., Total Inbound = sum of channels)
+
+**Sample Data Pattern (Week 1-8):**
+```typescript
+// Dealer Network Quantity (range 20-30, ±15% variation)
+[25, 27, 23, 26, 28, 24, 26, 25]
+
+// Component 1 Recovery Rate (range 85-95%, ±1% variation, trending up)
+[88.5, 89.0, 89.5, 90.0, 90.5, 91.0, 91.5, 92.0]
+
+// Core Inventory on Hand (range $200K-$2M, ±$50K variation, hovering near target)
+[1000000, 1050000, 980000, 1020000, 1100000, 1080000, 1050000, 1020000]
+```
+
+---
+
+**End of Forecast Detail Analysis Specification**
+
+---
+
 **End of Feature Plan Document**
 
 **Next Steps:**
-1. Review and approve this feature plan
-2. Update PRD (Task 2)
-3. Begin component implementation (Tasks 3-5)
-4. Test and validate (Task 8)
+1. Review and approve Forecast Detail Analysis specification
+2. Create `forecast-detail-data.ts` with all metrics and 8 weeks of data
+3. Implement `ForecastDetailTable.tsx` component
+4. Update `AnalysisMainContent.tsx` to switch between tables
+5. Test both tables with view mode toggles
+6. Validate color coding and aggregate calculations
