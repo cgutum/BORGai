@@ -19,8 +19,8 @@ export default function CoreDetailsCard() {
     coreName: 'Turbocharger X3 2025',
     sku: 'TCBMW_X3_2023_5',
     statusBadges: [
-      { label: 'Need Review', color: '#E37222' },
-      { label: 'Open', color: '#A2AD00' },
+      { label: 'Need Review', color: 'rgba(227, 114, 34, 0.75)' }, // TUM Orange with 75% opacity
+      { label: 'Open', color: 'rgba(162, 173, 0, 0.75)' }, // TUM Green with 75% opacity
     ],
     metadata: {
       alertCount: 3,

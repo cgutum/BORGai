@@ -46,7 +46,7 @@ export function Header() {
                   <Icon className="h-4 w-4" />
                   {item.name}
                   {item.comingSoon && (
-                    <span className="absolute -top-1 -right-1 bg-[#C01530] text-white text-[9px] px-1.5 py-0.5 rounded-full font-semibold">
+                    <span className="absolute -top-1 -right-1 bg-[#0065BD]/70 text-white text-[9px] px-1.5 py-0.5 rounded-full font-semibold">
                       SOON
                     </span>
                   )}
