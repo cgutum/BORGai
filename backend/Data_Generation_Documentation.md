@@ -17,19 +17,21 @@
 ## Overview
 
 ### Purpose
-This system generates realistic synthetic data for automotive turbocharger core supply chain analysis. It simulates the complete lifecycle from vehicle registrations through turbocharger failures, core returns, and component remanufacturing.
+This system generates realistic synthetic data for automotive turbocharger core supply chain analysis. It simulates the complete lifecycle from vehicle registrations through turbocharger failures, core returns, and component remanufacturing. The generated data serves as input for machine learning-based supply forecasting models.
 
 ### Domain Context
 - **Industry**: Automotive aftermarket and remanufacturing
 - **Component**: Turbochargers for BMW X3 and X5 vehicles
-- **Time Period**: 2018-2026 (8-year analysis window)
+- **Time Period**: 2018-2026 (9-year analysis window)
 - **Geographic Scope**: Single market (implied German/European)
+- **Integration**: Data feeds into XGBoost forecasting model for 2026 predictions
 
 ### Key Assumptions
 - **One turbocharger per vehicle** (single-turbo configurations)
 - **2% failure rate** over vehicle lifetime
 - **65-75% core return rate** (cores returned to remanufacturers)
-- **8-year failure distribution window** after initial registration
+- **8-year failure distribution window** after initial registration (months 12-96)
+- **Proper Weibull normalization** ensures realistic failure timing distribution
 
 ---
 
