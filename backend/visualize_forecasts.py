@@ -204,10 +204,107 @@ print("✓ Saved: forecast_plot_2_importance.png")
 plt.close()
 
 # ===================================================================
-# PLOT 3: Seamless Timeline - Validation (2025) + Forecast (2026)
+# PLOT 3: Validation Only (2025) with Confidence Bands - By Core Type
 # ===================================================================
 
-print("📊 Creating Plot 3: Seamless Timeline...")
+print("📊 Creating Plot 3: Validation with Confidence Bands (By Core Type)...")
+
+fig = plt.figure(figsize=(20, 14))
+gs = fig.add_gridspec(3, 4, width_ratios=[2.55, 2.55, 2.55, 2.35], hspace=0.3, wspace=0.3)
+fig.suptitle('Model Validation Performance (2025) - Actual vs Predicted with Confidence by Core Type', 
+             fontsize=16, fontweight='bold')
+
+core_types = df_val['Core_Typ'].unique()
+colors_cores = ['#2E86AB', '#A23B72', '#F18F01']
+
+for idx, core_type in enumerate(core_types[:3]):
+    ax = fig.add_subplot(gs[idx, :3])
+    ax.set_xlim(df_val['Datum'].min(), df_val['Datum'].max())
+    ax.margins(x=0.15)  # Add 15% margin to compress x-axis
+    
+    # Get validation data for this core type
+    df_val_core = df_val[df_val['Core_Typ'] == core_type].copy()
+    
+    # Calculate confidence intervals per core type
+    residual_std_core = df_val_core['Residual'].std()
+    df_val_core_agg = df_val_core.groupby('Datum').agg({'Target': 'sum', 'Predicted': 'sum'}).reset_index()
+    df_val_core_agg['Lower_80'] = df_val_core_agg['Predicted'] - 1.282 * residual_std_core  # 80% CI
+    df_val_core_agg['Upper_80'] = df_val_core_agg['Predicted'] + 1.282 * residual_std_core
+    
+    # Plot confidence band (very subtle)
+    ax.fill_between(df_val_core_agg['Datum'], df_val_core_agg['Lower_80'], df_val_core_agg['Upper_80'],
+                    alpha=0.08, color=colors_cores[idx], label='80% Confidence Interval')
+    
+    # Plot actual and predicted
+    ax.plot(df_val_core_agg['Datum'], df_val_core_agg['Target'], 
+            label='Actual', color=colors_cores[idx], linewidth=2.5, marker='o', markersize=5, zorder=3, alpha=0.9)
+    ax.plot(df_val_core_agg['Datum'], df_val_core_agg['Predicted'], 
+            label='Predicted', color=colors_cores[idx], linewidth=2, marker='s', markersize=4, 
+            linestyle='--', zorder=3, alpha=0.7)
+    
+    ax.set_xlabel('Date (2025)', fontsize=11)
+    ax.set_ylabel('Weekly Supply Quantity', fontsize=11)
+    ax.set_title(f'{core_type}')
+    ax.legend(loc='upper left', fontsize=10)
+    ax.grid(True, alpha=0.3)
+    
+    # Add core-specific statistics
+    mae_core = mean_absolute_error(df_val_core['Target'], df_val_core['Predicted'])
+    rmse_core = np.sqrt(mean_squared_error(df_val_core['Target'], df_val_core['Predicted']))
+    r2_core = r2_score(df_val_core['Target'], df_val_core['Predicted'])
+    
+    stats_text = f'MAE: {mae_core:.1f} | RMSE: {rmse_core:.1f} | R²: {r2_core:.3f}'
+    ax.text(0.98, 0.98, stats_text, transform=ax.transAxes, 
+            fontsize=9, verticalalignment='top', horizontalalignment='right',
+            bbox=dict(boxstyle='round', facecolor='white', alpha=0.85))
+
+# Add overall KPI panel on the right
+ax_kpi = fig.add_subplot(gs[:, 3])
+ax_kpi.axis('off')
+
+kpi_text = f"""
+OVERALL MODEL PERFORMANCE
+
+Accuracy Metrics:
+  MAE:     {mae:.2f} units
+  RMSE:    {rmse:.2f} units
+  MAPE:    {mape:.1f}%
+  R² Score: {r2:.3f}
+
+Central Tendency:
+  Avg Actual:    {avg_actual:.2f}
+  Avg Predicted: {avg_predicted:.2f}
+  Avg Deviation: {avg_deviation:.2f}
+
+Residual Statistics:
+  Mean Residual: {avg_deviation:.2f}
+  Std Deviation: {std_deviation:.2f}
+  
+Validation Period:
+  Start: {df_val['Datum'].min().strftime('%Y-%m-%d')}
+  End:   {df_val['Datum'].max().strftime('%Y-%m-%d')}
+  Weeks: {len(df_val.groupby('Datum'))}
+  
+Interpretation:
+  • Explains {r2*100:.1f}% of variance
+  • Typical error: ±{rmse:.1f}
+  • Bias: {avg_deviation:.2f} units
+  • 80% CI: ±{1.282*std_deviation:.1f}
+"""
+
+ax_kpi.text(0.05, 0.98, kpi_text, transform=ax_kpi.transAxes, 
+            fontsize=10, verticalalignment='top', family='monospace',
+            bbox=dict(boxstyle='round', facecolor='#f0f0f0', alpha=0.8, pad=1))
+
+plt.savefig('forecast_plot_3_validation_confidence.png', dpi=300, bbox_inches='tight')
+print("✓ Saved: forecast_plot_3_validation_confidence.png")
+plt.close()
+
+# ===================================================================
+# PLOT 4: Seamless Timeline - Validation (2025) + Forecast (2026)
+# ===================================================================
+
+print("📊 Creating Plot 4: Seamless Timeline...")
 
 fig, axes = plt.subplots(3, 1, figsize=(18, 14))
 fig.suptitle('Seamless Timeline: Validation (2025) → Forecast (2026)', 
@@ -269,15 +366,15 @@ for idx, core_type in enumerate(core_types[:3]):
                 bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
 
 plt.tight_layout()
-plt.savefig('forecast_plot_3_seamless_timeline.png', dpi=300, bbox_inches='tight')
-print("✓ Saved: forecast_plot_3_seamless_timeline.png")
+plt.savefig('forecast_plot_4_seamless_timeline.png', dpi=300, bbox_inches='tight')
+print("✓ Saved: forecast_plot_4_seamless_timeline.png")
 plt.close()
 
 # ===================================================================
-# PLOT 4: Core Type Comparison
+# PLOT 5: Core Type Comparison
 # ===================================================================
 
-print("📊 Creating Plot 4: Core Type Comparison...")
+print("📊 Creating Plot 5: Core Type Comparison...")
 
 fig, axes = plt.subplots(2, 2, figsize=(16, 10))
 fig.suptitle('Forecast Comparison by Core Type', fontsize=16, fontweight='bold')
@@ -338,15 +435,15 @@ for i, (core, value) in enumerate(total_by_core.items()):
     ax.text(i, value, f'{value:,.0f}', ha='center', va='bottom', fontweight='bold')
 
 plt.tight_layout()
-plt.savefig('forecast_plot_4_core_comparison.png', dpi=300, bbox_inches='tight')
-print("✓ Saved: forecast_plot_4_core_comparison.png")
+plt.savefig('forecast_plot_5_core_comparison.png', dpi=300, bbox_inches='tight')
+print("✓ Saved: forecast_plot_5_core_comparison.png")
 plt.close()
 
 # ===================================================================
-# PLOT 5: Aggregated Timeline with All Core Types
+# PLOT 6: Aggregated Timeline with All Core Types
 # ===================================================================
 
-print("📊 Creating Plot 5: Aggregated Timeline...")
+print("📊 Creating Plot 6: Aggregated Timeline...")
 
 fig, ax = plt.subplots(figsize=(18, 8))
 fig.suptitle('Total Supply: Validation (2025) → Forecast (2026)', 
@@ -393,8 +490,8 @@ ax.text(0.02, 0.98, stats_text, transform=ax.transAxes,
         bbox=dict(boxstyle='round', facecolor='white', alpha=0.9))
 
 plt.tight_layout()
-plt.savefig('forecast_plot_5_aggregated_timeline.png', dpi=300, bbox_inches='tight')
-print("✓ Saved: forecast_plot_5_aggregated_timeline.png")
+plt.savefig('forecast_plot_6_aggregated_timeline.png', dpi=300, bbox_inches='tight')
+print("✓ Saved: forecast_plot_6_aggregated_timeline.png")
 plt.close()
 
 # ===================================================================
@@ -407,7 +504,8 @@ print("="*70)
 print("\nGenerated Plots:")
 print("  1. forecast_plot_1_validation.png - Validation performance (2025) with KPIs")
 print("  2. forecast_plot_2_importance.png - Feature importance analysis")
-print("  3. forecast_plot_3_seamless_timeline.png - By core type: 2025→2026")
-print("  4. forecast_plot_4_core_comparison.png - Core type comparisons")
-print("  5. forecast_plot_5_aggregated_timeline.png - Aggregated: 2025→2026")
+print("  3. forecast_plot_3_validation_confidence.png - Validation (2025) with confidence bands & KPIs")
+print("  4. forecast_plot_4_seamless_timeline.png - By core type: 2025→2026")
+print("  5. forecast_plot_5_core_comparison.png - Core type comparisons")
+print("  6. forecast_plot_6_aggregated_timeline.png - Aggregated: 2025→2026")
 print("="*70)
