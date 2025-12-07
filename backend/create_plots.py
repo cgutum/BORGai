@@ -184,6 +184,67 @@ print("✓ Saved: plot_03_supply_2023-2026_weekly.png")
 plt.close()
 
 # ===================================================================
+# PLOT 3.5: Core Supply (2024-2025, Weekly - Compact)
+# ===================================================================
+
+print("\n📊 Creating Plot 3.5: Core Supply (2024-2025, Weekly - Compact)...")
+
+# Filter supply for 2024-2025 only
+df_supply_compact = df_supply[
+    (df_supply['Jahr'] >= 2024) & 
+    (df_supply['Jahr'] <= 2025)
+].copy()
+
+# Create week-year label
+df_supply_compact['WeekYear'] = df_supply_compact['Anlieferdatum'].dt.strftime('%Y-%m-W') + \
+                                 df_supply_compact['Woche'].astype(str)
+
+# Aggregate by week and core type
+df_supply_compact_agg = df_supply_compact.groupby(['WeekYear', 'Core_Typ'])['Menge'].sum().reset_index()
+
+# Sort by actual date for proper ordering
+df_supply_compact_sorted = df_supply_compact.sort_values('Anlieferdatum')
+week_order_compact = df_supply_compact_sorted['WeekYear'].unique()
+
+# Pivot for plotting
+df_supply_compact_pivot = df_supply_compact_agg.pivot_table(
+    index='WeekYear',
+    columns='Core_Typ',
+    values='Menge',
+    aggfunc='sum'
+).reindex(week_order_compact).fillna(0)
+
+# Plot with narrower bars for more compact appearance
+fig, ax = plt.subplots(figsize=(12, 16))  # 3:4 aspect ratio
+x_positions = np.arange(len(df_supply_compact_pivot.index))
+width = 0.20  # Narrower bars for more compact look
+
+colors = ['#e377c2', '#7f7f7f', '#bcbd22']
+for i, core_type in enumerate(df_supply_compact_pivot.columns):
+    ax.bar(x_positions + i*width, df_supply_compact_pivot[core_type], width,
+           label=core_type, color=colors[i], alpha=0.8)
+
+ax.set_xlabel('Week', fontsize=12, fontweight='bold')
+ax.set_ylabel('Quantity', fontsize=12, fontweight='bold')
+ax.set_title('Exemplary Core Supply 2024-2025', fontsize=14, fontweight='bold')
+
+# Show every 4th label for better readability
+tick_spacing = 4
+ax.set_xticks(x_positions[::tick_spacing] + width)
+ax.set_xticklabels(df_supply_compact_pivot.index[::tick_spacing], rotation=45, ha='right', fontsize=8)
+
+ax.legend(loc='upper left', framealpha=0.9)
+ax.grid(True, alpha=0.3)
+
+# Make x-axis much more compact - only 75% of current span
+ax.set_xlim(-0.5, len(x_positions) * 0.75 - 0.5)
+
+plt.tight_layout()
+plt.savefig('plot_03_5_supply_2024-2025_weekly_compact.png', dpi=300, bbox_inches='tight')
+print("✓ Saved: plot_03_5_supply_2024-2025_weekly_compact.png")
+plt.close()
+
+# ===================================================================
 # PLOT 4: Component Supply for 6 Example Months
 # ===================================================================
 
@@ -316,6 +377,7 @@ print("\n📈 Generated Plots:")
 print("  1. plot_01_registrations_2023-2026.png - Vehicle registrations by model")
 print("  2. plot_02_orders_2023-2026.png - Core orders by type")
 print("  3. plot_03_supply_2023-2026_weekly.png - Core supply weekly")
+print("  3.5 plot_03_5_supply_2024-2025_weekly_compact.png - Core supply 2024-2025 (compact)")
 print("  4. plot_04_components_6months.png - Component breakdown for 6 months")
 print("  6. plot_06_reusability_rates.png - Component reusability rates")
 print("\n✓ All visualizations created successfully!")
