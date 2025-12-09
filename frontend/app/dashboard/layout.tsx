@@ -43,11 +43,11 @@ export default function DashboardLayout({
 
   return (
     <FilterProvider>
-      <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
+      <div className="min-h-screen bg-[#FAFAFA] flex flex-col min-w-[1200px]">
         <Header />
         {/* Wrapper with horizontal scroll for mobile, min-width ensures desktop layout is preserved */}
         <div className="flex-1 overflow-x-auto">
-          <div className="flex gap-4 p-4 min-w-[1280px] min-h-full">
+          <div className="flex gap-4 p-4 h-full">
             {/* Main Content - Full width on Forecast Analysis, 80% width elsewhere */}
             <main className={showCriticalActions ? "flex-1" : "flex-1 w-full"} style={showCriticalActions ? { width: '80%' } : undefined}>
               {children}
