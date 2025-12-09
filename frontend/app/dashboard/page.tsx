@@ -6,7 +6,7 @@ import ForecastSelection from '@/components/features/filters/ForecastSelection';
 
 export default function DashboardPage() {
   return (
-    <div className="flex-1 overflow-auto p-4">
+    <div className="flex-1 overflow-auto">
       {/* Main Grid Container - KPI Badge spans both columns */}
       <div className="grid grid-cols-[20%_80%] gap-4 items-start">
         {/* KPI Badge Section - Spans both Filters and Chart columns */}

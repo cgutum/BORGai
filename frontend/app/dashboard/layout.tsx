@@ -45,18 +45,21 @@ export default function DashboardLayout({
     <FilterProvider>
       <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
         <Header />
-        <div className="flex flex-1 overflow-hidden gap-4 p-4">
-          {/* Main Content - Full width on Forecast Analysis, 80% width elsewhere */}
-          <main className={showCriticalActions ? "flex-1 overflow-auto" : "flex-1 overflow-auto w-full"} style={showCriticalActions ? { width: '80%' } : undefined}>
-            {children}
-          </main>
-          
-          {/* Right 20%: Critical Actions (Full Height) - Hidden on Forecast Analysis page */}
-          {showCriticalActions && (
-            <aside className="w-[20%] flex-shrink-0 bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 overflow-y-auto hidden xl:flex xl:flex-col">
-              <CriticalActionsPanel />
-            </aside>
-          )}
+        {/* Wrapper with horizontal scroll for mobile, min-width ensures desktop layout is preserved */}
+        <div className="flex-1 overflow-x-auto overflow-y-hidden">
+          <div className="flex gap-4 p-4 min-w-[1400px] h-full">
+            {/* Main Content - Full width on Forecast Analysis, 80% width elsewhere */}
+            <main className={showCriticalActions ? "flex-1 overflow-auto" : "flex-1 overflow-auto w-full"} style={showCriticalActions ? { width: '80%' } : undefined}>
+              {children}
+            </main>
+            
+            {/* Right 20%: Critical Actions (Full Height) - Hidden on Forecast Analysis page */}
+            {showCriticalActions && (
+              <aside className="w-[20%] flex-shrink-0 bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 overflow-y-auto flex flex-col">
+                <CriticalActionsPanel />
+              </aside>
+            )}
+          </div>
         </div>
       </div>
     </FilterProvider>

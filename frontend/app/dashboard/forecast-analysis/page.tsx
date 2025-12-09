@@ -17,7 +17,7 @@ export default function ForecastAnalysisPage() {
   const topCardHeight = '16rem'; // 256px = 4 * 64px
 
   return (
-    <div className="p-6">
+    <div>
       {/* Grid Layout: Two-column top row, full-width bottom row */}
       <div className="grid grid-cols-[minmax(20%,25%)_1fr] gap-6 mb-6">
         {/* Left: Filters Panel */}
