@@ -33,7 +33,7 @@ export function KPICard({ metric }: KPICardProps) {
       <Card className="bg-white rounded-lg border border-[#E5E5E5] shadow-sm hover:shadow-md transition-shadow py-2.5 px-3.5 flex flex-col h-full">
         {/* Header Row */}
         <div className="flex items-start justify-between mb-0.5">
-          <h3 className="text-xs font-semibold text-[#000000] uppercase leading-tight flex-1">
+          <h3 className="text-xs font-semibold text-[#000000] uppercase leading-tight flex-1 h-8">
             {metric.label}
           </h3>
           <Tooltip>
