@@ -75,7 +75,21 @@ export const averageLeadTime: KPIMetric = {
   info: 'Average time from order placement to delivery. Lower lead times indicate faster supply chain processes and better responsiveness.'
 };
 
-// KPI 4: Average Return Rate
+// KPI 4: Customer Satisfaction
+export const customerSatisfaction: KPIMetric = {
+  id: 'customer-satisfaction',
+  label: 'CUSTOMER SATISFACTION',
+  value: '96%',
+  change: 1.1,
+  changeLabel: '+1.1%',
+  timePeriod: 'Last 30 days',
+  chartData: generateChartData(95, 30, 2), // 30 points, variance ±2%
+  trend: 'up',
+  isPositive: true,
+  info: 'Percentage of orders delivered within the predefined time span. Measures customer satisfaction based on on-time delivery performance and order fulfillment accuracy.'
+};
+
+// KPI 5: Average Return Rate
 export const averageReturnRate: KPIMetric = {
   id: 'return-rate',
   label: 'AVERAGE RETURN RATE',
@@ -89,7 +103,7 @@ export const averageReturnRate: KPIMetric = {
   info: 'Percentage of cores successfully returned and remanufactured. Higher return rates ensure sustainable supply of cores for remanufacturing.'
 };
 
-// KPI 5: Core Inventory Coverage
+// KPI 6: Core Inventory Coverage
 export const coreInventoryCoverage: KPIMetric = {
   id: 'inventory-coverage',
   label: 'CORE INVENTORY COVERAGE',
@@ -108,6 +122,7 @@ export const allKPIs: KPIMetric[] = [
   recentModelAccuracy,
   aiForecastVsLegacy,
   averageLeadTime,
+  customerSatisfaction,
   averageReturnRate,
   coreInventoryCoverage
 ];

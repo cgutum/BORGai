@@ -8,7 +8,7 @@ import { AlertSummaryChart } from './AlertSummaryChart';
 import { allKPIs, getKPISlice, alertSummaryData } from '@/lib/data/kpi-metrics';
 
 const VISIBLE_CARDS = 4;
-const TOTAL_ITEMS = 6; // 5 KPIs + 1 Create button
+const TOTAL_ITEMS = 7; // 6 KPIs + 1 Create button
 
 export function KPICarousel() {
   const [startIndex, setStartIndex] = useState(0);

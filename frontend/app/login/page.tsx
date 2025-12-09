@@ -71,7 +71,7 @@ export default function LoginPage() {
             BORGai
           </h1>
           <p className="text-base font-semibold text-[#6E685F] mt-2 leading-relaxed">
-            Intelligent Core Supply Forecasting Platform
+            AI-driven Core Supply Forecasting Platform
           </p>
         </div>
 
