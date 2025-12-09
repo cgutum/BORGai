@@ -19,7 +19,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-16 items-center px-4 w-full min-w-[1400px]">
+      <div className="flex h-16 items-center px-4 w-full min-w-[1280px]">
         <div className="mr-8 flex items-center space-x-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: '#0065BD' }}>
             <span className="text-lg font-bold text-white">B</span>
